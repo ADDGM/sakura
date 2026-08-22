@@ -139,7 +139,7 @@ if(!function_exists('siren_ajax_comment_err')) {
 }
 // 机器评论验证
 function siren_robot_comment(){
-  if ( !$_POST['no-robot'] && !is_user_logged_in()) {
+  if ( empty($_POST['no-robot']) && !is_user_logged_in()) {
      siren_ajax_comment_err('上车请刷卡。<br>Please comfirm you are not a robot.');
   }
 }
@@ -148,7 +148,7 @@ if(akina_option('norobot')) add_action('pre_comment_on_post', 'siren_robot_comme
 function scp_comment_post( $incoming_comment ) {
   // 为什么要拦自己呢？
   global $user_ID; 
-  if( $user_ID && current_user_can('level_10') ) {
+  if( $user_ID && current_user_can('manage_options') ) {
     return( $incoming_comment );
   } elseif(!preg_match('/[一-龥]/u', $incoming_comment['comment_content'])){
     siren_ajax_comment_err('写点汉字吧。You should add some Chinese words.');
@@ -212,7 +212,7 @@ add_action('wp_ajax_ajax_comment', 'siren_ajax_comment_callback');
 if(akina_option('exlogin_url')){
   add_action('login_enqueue_scripts','login_protection');
   function login_protection(){
-    if($_GET['word'] != 'press'){
+    if(($_GET['word'] ?? '') != 'press'){
       $admin_url = akina_option('exlogin_url');
       wp_redirect( $admin_url );
       exit;
@@ -242,7 +242,7 @@ function Exuser_center(){ ?>
         if(num == 0) { window.location=URL; } 
     } 
   </script>    
-  <?php if(current_user_can('level_10')){ ?>
+  <?php if(current_user_can('manage_options')){ ?>
   <div class="admin-login-check">
     <?php echo login_ok(); ?>
     <?php if(akina_option('login_urlskip')){ ?><script>window.open("<?php bloginfo('url'); ?>/wp-admin/",1);gopage("<?php bloginfo('url'); ?>",0);</script><?php } ?>
@@ -267,7 +267,7 @@ function login_ok(){
   <p id="login-showtime"></p>
   <p class="ex-logout">
     <a href="<?php bloginfo('url'); ?>" title="<?php _e('Home','sakura')/*首页*/?>"><?php _e('Home','sakura')/*首页*/?></a>
-    <?php if(current_user_can('level_10')){  ?>
+    <?php if(current_user_can('manage_options')){  ?>
     <a href="<?php bloginfo('url'); ?>/wp-admin/" title="<?php _e('Manage','sakura')/*后台*/?>" target="_top"><?php _e('Manage','sakura')/*后台*/?></a> 
     <?php } ?>
     <a href="<?php echo wp_logout_url(get_bloginfo('url')); ?>" title="<?php _e('Logout','sakura')/*登出*/?>" target="_top"><?php _e('Sign out? ','sakura')/*登出？*/?></a>
@@ -289,7 +289,7 @@ function the_headPattern(){
     $header = 'single-header';
     $ava = akina_option('focus_logo', '') ? akina_option('focus_logo', '') : get_avatar_url(get_the_author_meta('user_email'));
     global $user_ID; 
-    if($user_ID && current_user_can('level_10')) {
+    if($user_ID && current_user_can('manage_options')) {
         $edit_this_post_link = '<span class="bull">·</span><a href="'.get_edit_post_link().'">EDIT</a>';
     } else {
         $edit_this_post_link = '';
@@ -344,7 +344,7 @@ function the_video_headPattern_hls(){
     $header = 'single-header';
     $ava = akina_option('focus_logo', '') ? akina_option('focus_logo', '') : get_avatar_url(get_the_author_meta('user_email'));
     global $user_ID; 
-    if($user_ID && current_user_can('level_10')) {
+    if($user_ID && current_user_can('manage_options')) {
         $edit_this_post_link = '<span class="bull">·</span><a href="'.get_edit_post_link().'">EDIT</a>';
     } else {
         $edit_this_post_link = '';
@@ -412,7 +412,7 @@ function the_video_headPattern_normal(){
     $header = 'single-header';
     $ava = akina_option('focus_logo', '') ? akina_option('focus_logo', '') : get_avatar_url(get_the_author_meta('user_email'));
     global $user_ID; 
-    if($user_ID && current_user_can('level_10')) {
+    if($user_ID && current_user_can('manage_options')) {
         $edit_this_post_link = '<span class="bull">·</span><a href="'.get_edit_post_link().'">'._e("EDIT","sakura").'</a>';
     } else {
         $edit_this_post_link = '';
@@ -474,7 +474,7 @@ function header_user_menu(){
           <div class="herder-user-name-u"><?php echo $current_user->display_name; ?></div>
         </div>
         <div class="user-menu-option">
-          <?php if (current_user_can('level_10')) { ?>
+          <?php if (current_user_can('manage_options')) { ?>
             <a href="<?php bloginfo('url'); ?>/wp-admin/" target="_blank"><?php _e('Dashboard','sakura')/*管理中心*/?></a>
             <a href="<?php bloginfo('url'); ?>/wp-admin/post-new.php" target="_blank"><?php _e('New post','sakura')/*撰写文章*/?></a>
           <?php } ?>
@@ -730,7 +730,7 @@ function siren_private_message_hook($comment_content , $comment){
 add_filter('get_comment_text','siren_private_message_hook',10,2);
 
 function siren_mark_private_message($comment_id){
-    if ( $_POST['is-private'] ) {
+    if ( !empty($_POST['is-private']) ) {
         update_comment_meta($comment_id,'_private','true');
     }
 }

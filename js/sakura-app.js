@@ -704,10 +704,11 @@ $.fn.commentPrivate = function () {
         var idp = $(this).data('idp'),
             actionp = $(this).data('actionp'),
             rateHolderp = $(this).children('.has_set_private');
-        var ajax_data = {
-            action: "siren_private",
-            p_id: idp,
-            p_action: actionp
+            var ajax_data = {
+                action: "siren_private",
+                p_id: idp,
+                p_action: actionp,
+                nonce: Poi.nonce
         };
         $.post("/wp-admin/admin-ajax.php", ajax_data, function (data) {
             $(rateHolderp).html(data);
@@ -1943,7 +1944,8 @@ $(function () {
             var ajax_data = {
                 action: "specs_zan",
                 um_id: id,
-                um_action: action
+                um_action: action,
+                nonce: Poi.nonce
             };
             $.post(Poi.ajaxurl, ajax_data, function (data) {
                 $(rateHolder).html(data);

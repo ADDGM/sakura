@@ -16,6 +16,7 @@
 
 	<div class="page-content">
 		<?php
+		global $wpdb;
 		if ( is_home() && current_user_can( 'publish_posts' ) ) : ?>
 
 			<p><?php printf( wp_kses( __( 'Ready to post your first article? <a href="%1$s">Click here to start</a>.', 'sakura' ), array( 'a' => array( 'href' => array() ) ) ), esc_url( admin_url( 'post-new.php' ) ) ); /*准备好发布你的第一篇文章了么？ <a href="%1$s">点击这里开始</a>.*/?></p>
@@ -26,13 +27,13 @@
 			<div class="sorry-inner">
 			<ul class="search-no-reasults">
 				<?php 
-				$result = $wpdb->get_results("SELECT ID,post_title FROM $wpdb->posts where post_status='publish' and post_type='post' ORDER BY ID DESC LIMIT 0 , 20");
+				$result = $wpdb->get_results("SELECT ID,post_title FROM {$wpdb->posts} WHERE post_status='publish' AND post_type='post' ORDER BY ID DESC LIMIT 20");
 				foreach ($result as $post) {
 				setup_postdata($post);
 				$postid = $post->ID;
 				$title = $post->post_title;
 				?>
-				<li><a href="<?php echo get_permalink($postid); ?>" title="<?php echo $title ?>"><?php echo $title ?></a> </li>
+				<li><a href="<?php echo esc_url(get_permalink($postid)); ?>" title="<?php echo esc_attr($title); ?>"><?php echo esc_html($title); ?></a> </li>
 				<?php } ?>
 			</ul>
 			</div>

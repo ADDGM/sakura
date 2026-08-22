@@ -4,10 +4,13 @@
  */
 
 get_header();
-if( !empty($_POST['register_reg']) ) {
+$registration = wp_unslash($_POST);
+if( !empty($registration['register_reg']) && check_admin_referer('sakura_register', 'sakura_register_nonce') ) {
 	$error = '';
-	$sanitized_user_login = sanitize_user( $_POST['user_login'] );
-	$user_email = apply_filters( 'user_registration_email', $_POST['user_email'] );
+	$sanitized_user_login = sanitize_user( $registration['user_login'] ?? '' );
+	$user_email = apply_filters( 'user_registration_email', sanitize_email($registration['user_email'] ?? '') );
+	$user_password = (string) ($registration['user_pass'] ?? '');
+	$user_password_confirmation = (string) ($registration['user_pass2'] ?? '');
 
 	// Check the username
 	if ( $sanitized_user_login == '' ) {
@@ -30,28 +33,28 @@ if( !empty($_POST['register_reg']) ) {
 	}
 
 	// Check the password
-	if(strlen($_POST['user_pass']) < 6){
+	if(strlen($user_password) < 6){
 	  $error .= '<strong>'.__("Error","sakura")./*错误*/'</strong>：'.__("Password length is at least 6 digits.","sakura")./*密码长度至少6位。*/'<br />';
-	}elseif($_POST['user_pass'] != $_POST['user_pass2']){
+	}elseif($user_password !== $user_password_confirmation){
 		$error .= '<strong>'.__("Error","sakura")./*错误*/'</strong>：'.__("Inconsistent password entered twice.","sakura")./*两次输入的密码不一致。*/'<br />';
 	}
 
 	// verification
-	if(akina_option('login_validate') && strlen($_POST['verification']) > 0 ){
+	if(akina_option('login_validate') && !empty($registration['verification']) ){
 		$error .= '<strong>'.__("Error","sakura")./*错误*/'</strong>：'.__("Please drag the slider to verify identity","sakura")./*请拖动滑块验证身份*/'<br />';
 	}
 
 	if($error == '') {
-		$user_id = wp_create_user( $sanitized_user_login, $_POST['user_pass'], $user_email );
+		$user_id = wp_create_user( $sanitized_user_login, $user_password, $user_email );
 		if ( !$user_id ) {
 			$error .= '<strong>'.__("Error","sakura")./*错误*/'</strong>：'.__("Unable to complete registration request...Please contact","sakura")./*无法完成注册请求... 请联系*/'<a href=\"mailto:'. get_option( 'admin_email' ) .'\">'.__("administrator","sakura")./*管理员*/'</a>！<br />';
 		}else if (!is_user_logged_in()) {
-			$user = get_userdatabylogin($sanitized_user_login);
-			$user_id = $user->ID;
+			$user = get_user_by('login', $sanitized_user_login);
+			$user_id = $user ? $user->ID : 0;
 			// 自动登录
-			wp_set_current_user($user_id, $user_login);
+			wp_set_current_user($user_id, $user ? $user->user_login : $sanitized_user_login);
 			wp_set_auth_cookie($user_id);
-			do_action('wp_login', $user_login);
+			do_action('wp_login', $user ? $user->user_login : $sanitized_user_login, $user);
 		}
 	}
 }
@@ -64,7 +67,8 @@ if( !empty($_POST['register_reg']) ) {
 				<div class="ex-register-title">
 					<h3>New Account</h3>
 				</div>
-				<form action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="post">  
+				<form action="<?php echo esc_url(wp_unslash($_SERVER['REQUEST_URI'] ?? '')); ?>" method="post">
+				<?php wp_nonce_field('sakura_register', 'sakura_register_nonce'); ?>
 					<p><input type="text" name="user_login" tabindex="1" id="user_login" class="input" value="<?php if(!empty($sanitized_user_login)) echo $sanitized_user_login; ?>" placeholder="用户名" required /></p>
 					<p><input type="text" name="user_email" tabindex="2" id="user_email" class="input" value="<?php if(!empty($user_email)) echo $user_email; ?>" size="25" placeholder="电子邮箱" required /></p>
 					<p><input id="user_pwd1" class="input" tabindex="3" type="password" tabindex="21" size="25" value="" name="user_pass" placeholder="密码" required /></p>

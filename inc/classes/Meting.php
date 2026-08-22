@@ -106,7 +106,8 @@ class Meting
         curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
         curl_setopt($curl, CURLOPT_IPRESOLVE, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
@@ -824,15 +825,7 @@ class Meting
 
     private function getRandomHex($length)
     {
-        if (function_exists('random_bytes')) {
-            return bin2hex(random_bytes($length / 2));
-        }
-        if (function_exists('mcrypt_create_iv')) {
-            return bin2hex(mcrypt_create_iv($length / 2, MCRYPT_DEV_URANDOM));
-        }
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            return bin2hex(openssl_random_pseudo_bytes($length / 2));
-        }
+        return bin2hex(random_bytes((int) ($length / 2)));
     }
 
     private function bchexdec($hex)
@@ -885,15 +878,11 @@ class Meting
 
         $body = json_encode($api['body']);
 
-        if (function_exists('openssl_encrypt')) {
-            $body = openssl_encrypt($body, 'aes-128-cbc', $nonce, false, $vi);
-            $body = openssl_encrypt($body, 'aes-128-cbc', $skey, false, $vi);
-        } else {
-            $pad = 16 - (strlen($body) % 16);
-            $body = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $nonce, $body.str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
-            $pad = 16 - (strlen($body) % 16);
-            $body = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $skey, $body.str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
+        if (!function_exists('openssl_encrypt')) {
+            throw new RuntimeException('当前 PHP 未启用 OpenSSL，无法请求网易云音乐接口。');
         }
+        $body = openssl_encrypt($body, 'aes-128-cbc', $nonce, false, $vi);
+        $body = openssl_encrypt($body, 'aes-128-cbc', $skey, false, $vi);
 
         if (extension_loaded('bcmath')) {
             $skey = strrev(utf8_encode($skey));
@@ -921,12 +910,10 @@ class Meting
 
         $data = 'songid='.$api['body']['songid'].'&ts='.intval(microtime(true) * 1000);
 
-        if (function_exists('openssl_encrypt')) {
-            $data = openssl_encrypt($data, 'aes-128-cbc', $key, false, $vi);
-        } else {
-            $pad = 16 - (strlen($data) % 16);
-            $data = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $data.str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
+        if (!function_exists('openssl_encrypt')) {
+            throw new RuntimeException('当前 PHP 未启用 OpenSSL，无法请求百度音乐接口。');
         }
+        $data = openssl_encrypt($data, 'aes-128-cbc', $key, false, $vi);
 
         $api['body']['e'] = $data;
 

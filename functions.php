@@ -63,6 +63,8 @@ if (!function_exists('akina_setup')):
             'caption',
         ));
 
+        add_theme_support('title-tag');
+
         /*
          * Enable support for Post Formats.
          * See https://developer.wordpress.org/themes/functionality/post-formats/
@@ -471,8 +473,10 @@ if (!function_exists('akina_comment_format')) {
 function get_author_class($comment_author_email, $user_id)
 {
     global $wpdb;
-    $author_count = count($wpdb->get_results(
-        "SELECT comment_ID as author_count FROM $wpdb->comments WHERE comment_author_email = '$comment_author_email' "));
+    $author_count = (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(comment_ID) FROM {$wpdb->comments} WHERE comment_author_email = %s",
+        $comment_author_email
+    ));
     if ($author_count >= 1 && $author_count < 5) //数字可自行修改，代表评论次数。
     {
         echo '<span class="showGrade0" title="Lv0"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_0.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
@@ -558,12 +562,16 @@ add_action('wp_ajax_specs_zan', 'specs_zan');
 function specs_zan()
 {
     global $wpdb, $post;
-    $id = $_POST["um_id"];
-    $action = $_POST["um_action"];
+    $id = absint(wp_unslash($_POST['um_id'] ?? 0));
+    $action = sanitize_key(wp_unslash($_POST['um_action'] ?? ''));
+    if (!$id || $action !== 'ding' || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'] ?? '')), 'wp_rest')) {
+        wp_send_json_error(array('message' => 'Invalid request.'), 400);
+    }
     if ($action == 'ding') {
         $specs_raters = get_post_meta($id, 'specs_zan', true);
         $expire = time() + 99999999;
-        $domain = ($_SERVER['HTTP_HOST'] != 'localhost') ? $_SERVER['HTTP_HOST'] : false; // make cookies work with localhost
+        $host = sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'] ?? ''));
+        $domain = ($host !== '' && $host !== 'localhost') ? $host : false; // make cookies work with localhost
         setcookie('specs_zan_' . $id, $id, $expire, '/', $domain, false);
         if (!$specs_raters || !is_numeric($specs_raters)) {
             update_post_meta($id, 'specs_zan', 1);
@@ -678,7 +686,7 @@ function akina_body_classes($classes)
     /*if(!wp_is_mobile()) {
     $classes[] = 'serif';
     }*/
-    $classes[] = $_COOKIE['dark'.akina_option('cookie_version', '')] == '1' ? 'dark' : ' ';
+    $classes[] = (($_COOKIE['dark' . akina_option('cookie_version', '')] ?? '') === '1') ? 'dark' : ' ';
     return $classes;
 }
 add_filter('body_class', 'akina_body_classes');
@@ -1326,11 +1334,17 @@ add_action('wp_ajax_nopriv_siren_private', 'siren_private');
 add_action('wp_ajax_siren_private', 'siren_private');
 function siren_private()
 {
-    $comment_id = $_POST["p_id"];
-    $action = $_POST["p_action"];
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => 'Unauthorized request.'), 403);
+    }
+    $comment_id = absint(wp_unslash($_POST['p_id'] ?? 0));
+    $action = sanitize_key(wp_unslash($_POST['p_action'] ?? ''));
+    if (!$comment_id || $action !== 'set_private' || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'] ?? '')), 'wp_rest')) {
+        wp_send_json_error(array('message' => 'Invalid request.'), 400);
+    }
     if ($action == 'set_private') {
         update_comment_meta($comment_id, '_private', 'true');
-        $i_private = get_comment_meta($comment_ID, '_private', true);
+        $i_private = get_comment_meta($comment_id, '_private', true);
         if (!empty($i_private)) {
             echo '否';
         } else {
@@ -1780,7 +1794,7 @@ function DEFAULT_FEATURE_IMAGE()
 //评论回复
 function sakura_comment_notify($comment_id)
 {
-    if (!$_POST['mail-notify']) {
+    if (empty($_POST['mail-notify'])) {
         update_comment_meta($comment_id, 'mail_notify', 'false');
     }
 
@@ -1810,13 +1824,8 @@ function markdown_parser($incoming_comment)
         siren_ajax_comment_err('评论只支持Markdown啦，见谅╮(￣▽￣)╭<br>Markdown Supported while <i class="fa fa-code" aria-hidden="true"></i> Forbidden');
         return ($incoming_comment);
     }
-    $myCustomer = $wpdb->get_row("SELECT * FROM wp_comments");
-    //Add column if not present.
-    if (!isset($myCustomer->comment_markdown)) {
-        $wpdb->query("ALTER TABLE wp_comments ADD comment_markdown text");
-    }
     $comment_markdown_content = $incoming_comment['comment_content'];
-    include 'inc/Parsedown.php';
+    require_once get_template_directory() . '/inc/Parsedown.php';
     $Parsedown = new Parsedown();
     $incoming_comment['comment_content'] = $Parsedown->setUrlsLinked(false)->text($incoming_comment['comment_content']);
     return $incoming_comment;
@@ -1828,12 +1837,39 @@ remove_filter( 'comment_text', 'make_clickable', 9 );
 function save_markdown_comment($comment_ID, $comment_approved)
 {
     global $wpdb, $comment_markdown_content;
-    $comment = get_comment($comment_ID);
-    $comment_content = $comment_markdown_content;
-    //store markdow content
-    $wpdb->query("UPDATE wp_comments SET comment_markdown='" . $comment_content . "' WHERE comment_ID='" . $comment_ID . "';");
+    if (!isset($comment_markdown_content)) {
+        return;
+    }
+    $wpdb->update(
+        $wpdb->comments,
+        array('comment_markdown' => $comment_markdown_content),
+        array('comment_ID' => absint($comment_ID)),
+        array('%s'),
+        array('%d')
+    );
 }
 add_action('comment_post', 'save_markdown_comment', 10, 2);
+
+function sakura_maybe_upgrade_comment_table()
+{
+    global $wpdb;
+    $database_version = '1';
+    if (get_option('sakura_database_version') === $database_version) {
+        return;
+    }
+
+    $column = $wpdb->get_var($wpdb->prepare(
+        "SHOW COLUMNS FROM `{$wpdb->comments}` LIKE %s",
+        'comment_markdown'
+    ));
+    if (!$column) {
+        $wpdb->query("ALTER TABLE `{$wpdb->comments}` ADD `comment_markdown` LONGTEXT NULL");
+    }
+    if (empty($wpdb->last_error)) {
+        update_option('sakura_database_version', $database_version, false);
+    }
+}
+add_action('after_setup_theme', 'sakura_maybe_upgrade_comment_table', 20);
 
 //打开评论HTML标签限制
 function allow_more_tag_in_comment()
@@ -1867,27 +1903,28 @@ function create_sakura_table()
     global $wpdb, $sakura_image_array, $sakura_privkey;
     $sakura_table_name = $wpdb->base_prefix . 'sakura';
     require_once ABSPATH . "wp-admin/includes/upgrade.php";
-    dbDelta("CREATE TABLE IF NOT EXISTS `" . $sakura_table_name . "` (
-        `mate_key` varchar(50) COLLATE utf8_bin NOT NULL,
-        `mate_value` text COLLATE utf8_bin NOT NULL,
+    $charset_collate = $wpdb->get_charset_collate();
+    dbDelta("CREATE TABLE IF NOT EXISTS `" . esc_sql($sakura_table_name) . "` (
+        `mate_key` varchar(50) NOT NULL,
+        `mate_value` text NOT NULL,
         PRIMARY KEY (`mate_key`)
-        ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;");
+        ) {$charset_collate};");
     //default data
-    if (!$wpdb->get_var("SELECT COUNT(*) FROM $sakura_table_name WHERE mate_key = 'manifest_json'")) {
+    if (!$wpdb->get_var("SELECT COUNT(*) FROM `{$sakura_table_name}` WHERE mate_key = 'manifest_json'")) {
         $manifest = array(
             "mate_key" => "manifest_json",
             "mate_value" => file_get_contents(get_template_directory() . "/manifest/manifest.json"),
         );
         $wpdb->insert($sakura_table_name, $manifest);
     }
-    if (!$wpdb->get_var("SELECT COUNT(*) FROM $sakura_table_name WHERE mate_key = 'json_time'")) {
+    if (!$wpdb->get_var("SELECT COUNT(*) FROM `{$sakura_table_name}` WHERE mate_key = 'json_time'")) {
         $time = array(
             "mate_key" => "json_time",
             "mate_value" => date("Y-m-d H:i:s", time()),
         );
         $wpdb->insert($sakura_table_name, $time);
     }
-    if (!$wpdb->get_var("SELECT COUNT(*) FROM $sakura_table_name WHERE mate_key = 'privkey'")) {
+    if (!$wpdb->get_var("SELECT COUNT(*) FROM `{$sakura_table_name}` WHERE mate_key = 'privkey'")) {
         $privkey = array(
             "mate_key" => "privkey",
             "mate_value" => wp_generate_password(8),
@@ -1895,8 +1932,14 @@ function create_sakura_table()
         $wpdb->insert($sakura_table_name, $privkey);
     }
     //reduce sql query
-    $sakura_image_array = $wpdb->get_var("SELECT `mate_value` FROM  $sakura_table_name WHERE `mate_key`='manifest_json'");
-    $sakura_privkey = $wpdb->get_var("SELECT `mate_value` FROM  $sakura_table_name WHERE `mate_key`='privkey'");
+    $sakura_image_array = $wpdb->get_var($wpdb->prepare(
+        "SELECT `mate_value` FROM `{$sakura_table_name}` WHERE `mate_key` = %s",
+        'manifest_json'
+    ));
+    $sakura_privkey = $wpdb->get_var($wpdb->prepare(
+        "SELECT `mate_value` FROM `{$sakura_table_name}` WHERE `mate_key` = %s",
+        'privkey'
+    ));
 }
 add_action('after_setup_theme', 'create_sakura_table');
 
