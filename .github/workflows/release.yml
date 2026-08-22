@@ -1,0 +1,254 @@
+name: 主题打包与发布
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag, for example v3.5.0 or v3.5.0-beta.1'
+        required: true
+        type: string
+      previous_tag:
+        description: 'Optional previous release tag or baseline commit; defaults to the previous tag or .github/release-baseline.txt'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  package-and-release:
+    name: Package Sakura release
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
+      prerelease: ${{ steps.release.outputs.prerelease }}
+      source-sha: ${{ steps.source.outputs.commit-sha }}
+      previous-tag: ${{ steps.baseline.outputs.previous-tag }}
+
+    steps:
+      - name: Resolve release tag
+        id: release
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            TAG="$INPUT_TAG"
+          else
+            TAG="$GITHUB_REF_NAME"
+          fi
+
+          TAG_PATTERN='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-beta\.(0|[1-9][0-9]*))?$'
+          if [[ ! "$TAG" =~ $TAG_PATTERN ]]; then
+            echo "发布标签必须使用 vX.Y.Z 或 vX.Y.Z-beta.N，且数字不能有前导零"
+            exit 1
+          fi
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          if [[ "$TAG" == *-beta.* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "label=测试版" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "label=正式版" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Resolve source commit
+        id: source
+        shell: bash
+        run: echo "commit-sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve release baseline
+        id: baseline
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          INPUT_PREVIOUS_TAG: ${{ inputs.previous_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PREVIOUS_TAG="$INPUT_PREVIOUS_TAG"
+          if [[ -z "$PREVIOUS_TAG" ]]; then
+            PREVIOUS_TAG="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          fi
+          if [[ -z "$PREVIOUS_TAG" && -s .github/release-baseline.txt ]]; then
+            PREVIOUS_TAG="$(tr -d '[:space:]' < .github/release-baseline.txt)"
+          fi
+          if [[ -z "$PREVIOUS_TAG" ]]; then
+            echo "无法确定 Release 基线，请提供 previous_tag 或配置 .github/release-baseline.txt"
+            exit 1
+          fi
+          git rev-parse --verify "$PREVIOUS_TAG^{commit}" >/dev/null
+          echo "previous-tag=${PREVIOUS_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Lint PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          find . -type f -name '*.php' -not -path './.git/*' -print0 \
+            | xargs -0 -n1 php -l
+
+      - name: Test release scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          php scripts/validate-commit-messages.php --self-test
+          php scripts/generate-release-notes.php --self-test
+
+      - name: Generate Chinese release notes
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          PREVIOUS_TAG: ${{ steps.baseline.outputs.previous-tag }}
+          REPOSITORY: ${{ github.repository }}
+          PRERELEASE: ${{ steps.release.outputs.prerelease }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PRERELEASE_ARG=()
+          if [[ "$PRERELEASE" == "true" ]]; then
+            PRERELEASE_ARG+=(--prerelease)
+          fi
+          php scripts/generate-release-notes.php \
+            --tag="$TAG" \
+            --previous-tag="$PREVIOUS_TAG" \
+            --repository="$REPOSITORY" \
+            --environment='WordPress 7.0、7.1' \
+            "${PRERELEASE_ARG[@]}"
+
+      - name: Build installable theme ZIP
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+          SOURCE_SHA: ${{ steps.source.outputs.commit-sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          git archive --format=tar --prefix=sakura/ "$TAG" | tar -xf - -C dist
+          rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
+          {
+            echo "tag=${TAG}"
+            echo "version=${VERSION}"
+            echo "source_sha=${SOURCE_SHA}"
+            echo "event=${GITHUB_EVENT_NAME}"
+            echo "ref=${GITHUB_REF}"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "run_number=${GITHUB_RUN_NUMBER}"
+            echo "target=WordPress 7.0, 7.1 / PHP 8.0, 8.1, 8.2"
+          } > dist/sakura/build-info.txt
+          (cd dist && zip -qr "${GITHUB_WORKSPACE}/dist/sakura-${VERSION}.zip" sakura)
+          rm -rf dist/sakura
+          unzip -Z1 "dist/sakura-${VERSION}.zip" | grep -q '^sakura/style.css$'
+          sha256sum "dist/sakura-${VERSION}.zip" > "dist/sakura-${VERSION}.zip.sha256"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: sakura-${{ steps.release.outputs.version }}
+          path: |
+            dist/sakura-${{ steps.release.outputs.version }}.zip
+            dist/sakura-${{ steps.release.outputs.version }}.zip.sha256
+            release-notes.zh-CN.md
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+          PRERELEASE: ${{ steps.release.outputs.prerelease }}
+          SOURCE_SHA: ${{ steps.source.outputs.commit-sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_ARGS=(--verify-tag --target "$SOURCE_SHA" --title "Sakura ${TAG}" --notes-file release-notes.zh-CN.md)
+          if [[ "$PRERELEASE" == "true" ]]; then
+            RELEASE_ARGS+=(--prerelease --latest=false)
+          else
+            RELEASE_ARGS+=(--latest)
+          fi
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "GitHub Release ${TAG} 已存在，更新说明并覆盖同名资产"
+            gh release edit "$TAG" "${RELEASE_ARGS[@]}"
+            gh release upload "$TAG" \
+              "dist/sakura-${VERSION}.zip#sakura ${VERSION} theme" \
+              "dist/sakura-${VERSION}.zip.sha256#SHA256 checksums" \
+              "release-notes.zh-CN.md#中文更新记录" \
+              --clobber
+          else
+            gh release create "$TAG" \
+              "dist/sakura-${VERSION}.zip#sakura ${VERSION} theme" \
+              "dist/sakura-${VERSION}.zip.sha256#SHA256 checksums" \
+              "release-notes.zh-CN.md#中文更新记录" \
+              "${RELEASE_ARGS[@]}"
+          fi
+
+  notify:
+    name: Telegram release notification
+    env:
+      TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      RELEASE_TAG: ${{ needs.package-and-release.outputs.tag || inputs.tag || github.ref_name }}
+      SOURCE_SHA: ${{ needs.package-and-release.outputs.source-sha }}
+    if: ${{ always() }}
+    needs: package-and-release
+    permissions: {}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Send Telegram notification
+        if: ${{ env.TELEGRAM_TO != '' && env.TELEGRAM_TOKEN != '' }}
+        continue-on-error: true
+        uses: appleboy/telegram-action@v1.0.1
+        with:
+          to: ${{ env.TELEGRAM_TO }}
+          token: ${{ env.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            *Sakura 发布报告*
+
+            *工作流*: `${{ github.workflow }}`
+            *状态*: `${{ needs.package-and-release.result == 'failure' && '❌ 发布失败' || needs.package-and-release.result == 'cancelled' && '⚪ 发布取消' || needs.package-and-release.result == 'success' && '🚀 发布成功' || '⚠️ 发布未完成' }}`
+            *发布任务*: `${{ needs.package-and-release.result }}`
+            *标签*: `${{ env.RELEASE_TAG }}`
+            *类型*: `${{ needs.package-and-release.outputs.prerelease == 'true' && 'Beta / Prerelease' || needs.package-and-release.outputs.prerelease == 'false' && 'Stable' || 'Unknown' }}`
+            *提交*: ${{ env.SOURCE_SHA != '' && format('[{0}]({1}/{2}/commit/{0})', env.SOURCE_SHA, github.server_url, github.repository) || '`未解析`' }}
+            *工作流运行*: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            *触发人*: `${{ github.actor }}`
+
+      - name: Record skipped notification
+        if: ${{ env.TELEGRAM_TO == '' || env.TELEGRAM_TOKEN == '' }}
+        run: |
+          {
+            echo "### Telegram 通知已跳过"
+            echo
+            echo "未配置 TELEGRAM_TO 或 TELEGRAM_TOKEN。"
+          } >> "$GITHUB_STEP_SUMMARY"
