@@ -17,6 +17,14 @@ const SAKURA_COMMIT_TYPES = array(
     '发布',
 );
 
+function sakura_split_git_lines(string $output): array
+{
+    if ($output === '') {
+        return array();
+    }
+    return preg_split('/\r\n|\r|\n/', trim($output)) ?: array();
+}
+
 function sakura_parse_commit_title(string $title): ?array
 {
     $pattern = '/^(新增|修复|兼容|优化|重构|文档|构建|测试|发布)(?:\(([^)]+)\))?[：:]\s*(.+)$/u';
@@ -45,7 +53,7 @@ function sakura_commit_lines(string $range): array
     }
 
     $commits = array();
-    foreach (preg_split('/\R/', trim($output)) as $line) {
+    foreach (sakura_split_git_lines($output) as $line) {
         if ($line === '') {
             continue;
         }
@@ -94,6 +102,12 @@ function sakura_validate_self_test(): int
             fwrite(STDERR, "自测失败：非法提交通过：{$title}\n");
             return 1;
         }
+    }
+
+    $lines = sakura_split_git_lines("a\t文档(维护): 补充兼容性说明\r\nb\t兼容(主题): 支持新版 WordPress\n");
+    if (count($lines) !== 2 || strpos($lines[0], '补充兼容性说明') === false || strpos($lines[1], '支持新版 WordPress') === false) {
+        fwrite(STDERR, "自测失败：中文 Git 输出被错误分行。\n");
+        return 1;
     }
 
     echo "提交规范自测通过。\n";

@@ -47,7 +47,7 @@ function sakura_release_commits(string $range): array
     $output = sakura_release_git_command('log --no-merges --format=%H%x09%s%x09%an ' . escapeshellarg($range));
 
     $commits = array();
-    foreach (preg_split('/\R/', trim($output)) as $line) {
+    foreach (sakura_split_git_lines($output) as $line) {
         if ($line === '') {
             continue;
         }
@@ -69,7 +69,7 @@ function sakura_release_commits(string $range): array
 function sakura_release_files(string $previous, string $tag): array
 {
     $output = sakura_release_git_command('diff --name-only ' . escapeshellarg($previous) . ' ' . escapeshellarg($tag));
-    return array_values(array_filter(preg_split('/\R/', trim($output))));
+    return array_values(array_filter(sakura_split_git_lines($output)));
 }
 
 function sakura_release_file_summary(array $files): string
