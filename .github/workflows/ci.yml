@@ -1,0 +1,238 @@
+name: 主题兼容性检查
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: PHP ${{ matrix.php }} 兼容性检查
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        php: ['8.0', '8.1', '8.2']
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Lint PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          find . -type f -name '*.php' -not -path './.git/*' -print0 \
+            | xargs -0 -n1 php -l
+
+      - name: Test release scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          php scripts/validate-commit-messages.php --self-test
+          php scripts/generate-release-notes.php --self-test
+
+      - name: Build installable test package
+        shell: bash
+        env:
+          PHP_VERSION: ${{ matrix.php }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          git archive --format=tar --prefix=sakura/ HEAD | tar -xf - -C dist
+          rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
+          {
+            echo "event=${GITHUB_EVENT_NAME}"
+            echo "ref=${GITHUB_REF}"
+            echo "ref_name=${GITHUB_REF_NAME}"
+            echo "sha=$(git rev-parse HEAD)"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "run_number=${GITHUB_RUN_NUMBER}"
+            echo "php=${PHP_VERSION}"
+          } > dist/sakura/build-info.txt
+          (cd dist && zip -qr "${GITHUB_WORKSPACE}/dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" sakura)
+          rm -rf dist/sakura
+          unzip -Z1 "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" | grep -q '^sakura/style.css$'
+          sha256sum "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" > "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip.sha256"
+
+      - name: Upload test package
+        uses: actions/upload-artifact@v7
+        with:
+          name: sakura-ci-php${{ matrix.php }}-${{ github.run_number }}
+          path: |
+            dist/sakura-ci-${{ github.run_number }}.zip
+            dist/sakura-ci-${{ github.run_number }}.zip.sha256
+          retention-days: 7
+          if-no-files-found: error
+
+  commit-message:
+    name: 中文提交信息检查
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Resolve commit range
+        id: range
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            RANGE="${BASE_SHA}..${HEAD_SHA}"
+          elif [[ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]]; then
+            RANGE="${BEFORE_SHA}..${GITHUB_SHA}"
+          elif [[ -s .github/release-baseline.txt ]]; then
+            RANGE="$(tr -d '[:space:]' < .github/release-baseline.txt)..${GITHUB_SHA}"
+          else
+            echo "无法确定提交检查基线"
+            exit 1
+          fi
+          git rev-parse --verify "${RANGE##*..}^{commit}" >/dev/null
+          echo "range=${RANGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate commit messages
+        run: php scripts/validate-commit-messages.php --range="${{ steps.range.outputs.range }}"
+
+  wordpress-smoke:
+    name: WordPress ${{ matrix.wordpress }} / PHP ${{ matrix.php }} 烟雾测试
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        wordpress: ['7.0', '7.1']
+        php: ['8.0', '8.1', '8.2']
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up PHP and WP-CLI
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: wp-cli
+          coverage: none
+
+      - name: Install WordPress
+        shell: bash
+        env:
+          WORDPRESS_VERSION: ${{ matrix.wordpress }}
+        run: |
+          set -euo pipefail
+          mkdir -p wp-root
+          wp core download --version="$WORDPRESS_VERSION" --force --path=wp-root
+          wp config create \
+            --dbname=wordpress \
+            --dbuser=root \
+            --dbpass=root \
+            --dbhost=127.0.0.1:3306 \
+            --skip-check \
+            --path=wp-root
+          wp core install \
+            --url=http://localhost \
+            --title=Sakura \
+            --admin_user=admin \
+            --admin_password=admin-password \
+            --admin_email=admin@example.com \
+            --path=wp-root
+          mkdir -p wp-root/wp-content/themes/sakura
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.spec-workflow' \
+            --exclude='.zcf' \
+            --exclude='wp-admin' \
+            --exclude='wp-content' \
+            --exclude='wp-includes' \
+            ./ wp-root/wp-content/themes/sakura/
+          wp theme activate sakura --path=wp-root
+
+      - name: Run theme smoke test
+        run: wp --path=wp-root eval-file "$GITHUB_WORKSPACE/scripts/wordpress-smoke.php"
+
+  notify:
+    name: Telegram CI notification
+    env:
+      TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+    if: ${{ always() }}
+    needs: build
+    permissions: {}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Send Telegram notification
+        if: ${{ env.TELEGRAM_TO != '' && env.TELEGRAM_TOKEN != '' }}
+        continue-on-error: true
+        uses: appleboy/telegram-action@v1.0.1
+        with:
+          to: ${{ env.TELEGRAM_TO }}
+          token: ${{ env.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            *Sakura CI 构建报告*
+
+            *工作流*: `${{ github.workflow }}`
+            *状态*: `${{ needs.build.result == 'failure' && '❌ 构建失败' || needs.build.result == 'cancelled' && '⚪ 构建取消' || needs.build.result == 'success' && '✅ 构建成功' || '⚠️ 构建未完成' }}`
+            *任务*: `${{ needs.build.result }}`
+            *触发事件*: `${{ github.event_name }}`
+            *分支*: `${{ github.ref_name }}`
+            *提交*: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            *工作流运行*: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            *触发人*: `${{ github.actor }}`
+
+      - name: Record skipped notification
+        if: ${{ env.TELEGRAM_TO == '' || env.TELEGRAM_TOKEN == '' }}
+        run: |
+          {
+            echo "### Telegram 通知已跳过"
+            echo
+            echo "未配置 TELEGRAM_TO 或 TELEGRAM_TOKEN。"
+          } >> "$GITHUB_STEP_SUMMARY"
