@@ -55,9 +55,11 @@ jobs:
           PHP_VERSION: ${{ matrix.php }}
         run: |
           set -euo pipefail
+          VERSION="3.5.0-dev.${GITHUB_RUN_NUMBER}"
           mkdir -p dist
           git archive --format=tar --prefix=sakura/ HEAD | tar -xf - -C dist
           rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
+          sed -i -E "s/^Version: .*/Version: ${VERSION}/" dist/sakura/style.css
           {
             echo "event=${GITHUB_EVENT_NAME}"
             echo "ref=${GITHUB_REF}"
@@ -66,10 +68,17 @@ jobs:
             echo "run_id=${GITHUB_RUN_ID}"
             echo "run_number=${GITHUB_RUN_NUMBER}"
             echo "php=${PHP_VERSION}"
+            echo "theme_version=${VERSION}"
           } > dist/sakura/build-info.txt
           (cd dist && zip -qr "${GITHUB_WORKSPACE}/dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" sakura)
           rm -rf dist/sakura
           unzip -Z1 "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" | grep -q '^sakura/style.css$'
+          THEME_HEADER="$(unzip -p "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" sakura/style.css | tr -d '\r')"
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx "Version: ${VERSION}"
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Author: ADDGM'
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Requires at least: 7.0'
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Tested up to: 7.1'
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Requires PHP: 8.0'
           sha256sum "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" > "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip.sha256"
 
       - name: Upload test package

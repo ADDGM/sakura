@@ -126,6 +126,8 @@ jobs:
           PREVIOUS_TAG: ${{ steps.baseline.outputs.previous-tag }}
           REPOSITORY: ${{ github.repository }}
           PRERELEASE: ${{ steps.release.outputs.prerelease }}
+          VERSION: ${{ steps.release.outputs.version }}
+          SOURCE_SHA: ${{ steps.source.outputs.commit-sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -137,7 +139,12 @@ jobs:
             --tag="$TAG" \
             --previous-tag="$PREVIOUS_TAG" \
             --repository="$REPOSITORY" \
-            --environment='WordPress 7.0、7.1' \
+            --version="$VERSION" \
+            --published-at="$(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+            --trigger="$GITHUB_EVENT_NAME" \
+            --workflow-url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            --run-number="$GITHUB_RUN_NUMBER" \
+            --source-sha="$SOURCE_SHA" \
             "${PRERELEASE_ARG[@]}"
 
       - name: Build installable theme ZIP
@@ -151,6 +158,7 @@ jobs:
           mkdir -p dist
           git archive --format=tar --prefix=sakura/ "$TAG" | tar -xf - -C dist
           rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
+          sed -i -E "s/^Version: .*/Version: ${VERSION}/" dist/sakura/style.css
           {
             echo "tag=${TAG}"
             echo "version=${VERSION}"
@@ -164,6 +172,12 @@ jobs:
           (cd dist && zip -qr "${GITHUB_WORKSPACE}/dist/sakura-${VERSION}.zip" sakura)
           rm -rf dist/sakura
           unzip -Z1 "dist/sakura-${VERSION}.zip" | grep -q '^sakura/style.css$'
+          THEME_HEADER="$(unzip -p "dist/sakura-${VERSION}.zip" sakura/style.css | tr -d '\r')"
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx "Version: ${VERSION}"
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Author: ADDGM'
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Requires at least: 7.0'
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Tested up to: 7.1'
+          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Requires PHP: 8.0'
           sha256sum "dist/sakura-${VERSION}.zip" > "dist/sakura-${VERSION}.zip.sha256"
 
       - name: Upload release artifact
@@ -198,14 +212,14 @@ jobs:
             echo "GitHub Release ${TAG} 已存在，更新说明并覆盖同名资产"
             gh release edit "$TAG" "${RELEASE_ARGS[@]}"
             gh release upload "$TAG" \
-              "dist/sakura-${VERSION}.zip#sakura ${VERSION} theme" \
-              "dist/sakura-${VERSION}.zip.sha256#SHA256 checksums" \
+              "dist/sakura-${VERSION}.zip#Sakura ${VERSION} 主题包" \
+              "dist/sakura-${VERSION}.zip.sha256#SHA-256 校验文件" \
               "release-notes.zh-CN.md#中文更新记录" \
               --clobber
           else
             gh release create "$TAG" \
-              "dist/sakura-${VERSION}.zip#sakura ${VERSION} theme" \
-              "dist/sakura-${VERSION}.zip.sha256#SHA256 checksums" \
+              "dist/sakura-${VERSION}.zip#Sakura ${VERSION} 主题包" \
+              "dist/sakura-${VERSION}.zip.sha256#SHA-256 校验文件" \
               "release-notes.zh-CN.md#中文更新记录" \
               "${RELEASE_ARGS[@]}"
           fi

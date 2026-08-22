@@ -107,7 +107,22 @@ function sakura_release_file_summary(array $files): string
     return implode('、', $summary);
 }
 
-function sakura_render_release_notes(string $tag, string $previous, array $commits, array $files, string $repository, string $environment, bool $prerelease): string
+function sakura_release_trigger_label(string $trigger): string
+{
+    $labels = array(
+        'push' => '标签推送（push）',
+        'workflow_dispatch' => '手动触发（workflow_dispatch）',
+    );
+    return $labels[$trigger] ?? ($trigger !== '' ? $trigger : '未提供');
+}
+
+function sakura_release_metadata(array $release, string $key, string $default = '未提供'): string
+{
+    $value = trim((string) ($release[$key] ?? ''));
+    return $value !== '' ? $value : $default;
+}
+
+function sakura_render_release_notes(string $tag, string $previous, array $commits, array $files, string $repository, array $release, bool $prerelease): string
 {
     $sections = array();
     foreach ($commits as $commit) {
@@ -115,23 +130,57 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
         $sections[$type][] = $commit;
     }
 
+    $version = sakura_release_metadata($release, 'version', strpos($tag, 'v') === 0 ? substr($tag, 1) : $tag);
+    $publishedAt = sakura_release_metadata($release, 'published_at');
+    $trigger = sakura_release_trigger_label(sakura_release_metadata($release, 'trigger', ''));
+    $workflowUrl = sakura_release_metadata($release, 'workflow_url', '');
+    $runNumber = sakura_release_metadata($release, 'run_number', '');
+    $sourceSha = sakura_release_metadata($release, 'source_sha', '');
+    $releaseType = $prerelease ? '测试版（Prerelease）' : '正式版';
+    $workflow = $workflowUrl !== ''
+        ? '[#' . ($runNumber !== '' ? $runNumber : '查看运行') . '](' . $workflowUrl . ')'
+        : '未提供';
+    $source = $sourceSha !== ''
+        ? ($repository !== '' ? '[' . $sourceSha . '](https://github.com/' . $repository . '/commit/' . $sourceSha . ')' : '`' . $sourceSha . '`')
+        : '未提供';
+
     $lines = array(
-        '# Sakura ' . $tag . ' 更新记录',
+        '',
+        '## 版本标签',
+        '',
+        '- `' . $tag . '`',
+        '- 发布类型：' . $releaseType,
+        '',
+        '## 发布信息',
+        '',
+        '- 发布时间：`' . $publishedAt . '`',
+        '- 触发方式：' . $trigger,
+        '- 工作流运行：' . $workflow,
+        '- 源码提交：' . $source,
+        '- 变更基线：`' . $previous . '`',
+        '',
+        '## 支持环境',
+        '',
+        '- WordPress 最低版本为 7.0，已测试至 7.1。',
+        '- PHP 最低版本为 8.0，已测试 8.0、8.1、8.2。',
+        '- 同一个主题包适用于上述已验证环境，不需要按 WordPress 或 PHP 版本分别下载。',
+        '',
+        '## 更新记录',
         '',
         '> 本记录由版本区间 `' . $previous . '..' . $tag . '` 的中文 Git 提交自动生成。',
-        '',
-        '## 变更摘要',
         '',
         '- 变更文件：' . sakura_release_file_summary($files),
         '- 提交数量：' . count($commits),
         '',
     );
 
+    $hasKnownSection = false;
     foreach (SAKURA_RELEASE_SECTIONS as $type => $title) {
         if (empty($sections[$type])) {
             continue;
         }
-        $lines[] = '## ' . $title;
+        $hasKnownSection = true;
+        $lines[] = '### ' . $title;
         $lines[] = '';
         foreach ($sections[$type] as $commit) {
             $shortHash = substr($commit['hash'], 0, 7);
@@ -143,7 +192,8 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
     }
 
     if (!empty($sections['其他'])) {
-        $lines[] = '## 其他变更';
+        $hasKnownSection = true;
+        $lines[] = '### 其他变更';
         $lines[] = '';
         foreach ($sections['其他'] as $commit) {
             $shortHash = substr($commit['hash'], 0, 7);
@@ -153,10 +203,16 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
         $lines[] = '';
     }
 
-    $lines[] = '## 目标环境';
+    if (!$hasKnownSection) {
+        $lines[] = '- 本次版本区间内没有可列出的非合并提交。';
+        $lines[] = '';
+    }
+
+    $lines[] = '## 构建产物';
     $lines[] = '';
-    $lines[] = '- ' . $environment;
-    $lines[] = '- PHP 8.0、8.1、8.2';
+    $lines[] = '- `sakura-' . $version . '.zip`：可在 WordPress 后台直接上传的通用主题包。';
+    $lines[] = '- `sakura-' . $version . '.zip.sha256`：主题包的 SHA-256 校验文件。';
+    $lines[] = '- `release-notes.zh-CN.md`：本页中文更新记录。';
     $lines[] = '';
     $lines[] = '## 升级提示';
     $lines[] = '';
@@ -172,13 +228,31 @@ function sakura_release_self_test(): int
         array('hash' => str_repeat('a', 40), 'title' => '兼容(WordPress): 修复标题 API', 'author' => '测试', 'parsed' => sakura_parse_commit_title('兼容(WordPress): 修复标题 API')),
         array('hash' => str_repeat('b', 40), 'title' => '文档: 更新升级说明', 'author' => '测试', 'parsed' => sakura_parse_commit_title('文档: 更新升级说明')),
     );
-    $notes = sakura_render_release_notes('v3.5.0', 'v3.4.0', $commits, array('functions.php', 'README.md'), 'example/sakura', 'WordPress 7.1', false);
-    if (strpos($notes, '兼容性更新') === false || strpos($notes, '修复标题 API') === false || strpos($notes, '构建与文档（1 个文件）') === false) {
+    $release = array(
+        'version' => '3.5.0',
+        'published_at' => '2026-08-23 03:00:00 UTC',
+        'trigger' => 'push',
+        'workflow_url' => 'https://github.com/example/sakura/actions/runs/123',
+        'run_number' => '12',
+        'source_sha' => str_repeat('c', 40),
+    );
+    $notes = sakura_render_release_notes('v3.5.0', 'v3.4.0', $commits, array('functions.php', 'README.md'), 'example/sakura', $release, false);
+    if (strpos($notes, '# Sakura v3.5.0') === false
+        || strpos($notes, '## 发布信息') === false
+        || strpos($notes, '## 支持环境') === false
+        || strpos($notes, '## 更新记录') === false
+        || strpos($notes, '### 兼容性更新') === false
+        || strpos($notes, '修复标题 API') === false
+        || strpos($notes, '构建与文档（1 个文件）') === false
+        || strpos($notes, '`sakura-3.5.0.zip`') === false) {
         fwrite(STDERR, "Release 说明自测失败。\n");
         return 1;
     }
-    $emptyNotes = sakura_render_release_notes('v3.5.1-beta.1', 'v3.5.0', array(), array(), '', 'WordPress 7.0、7.1', true);
-    if (strpos($emptyNotes, '提交数量：0') === false || strpos($emptyNotes, '未检测到文件差异') === false || strpos($emptyNotes, '此版本为测试版') === false) {
+    $emptyNotes = sakura_render_release_notes('v3.5.1-beta.1', 'v3.5.0', array(), array(), '', array('version' => '3.5.1-beta.1'), true);
+    if (strpos($emptyNotes, '提交数量：0') === false
+        || strpos($emptyNotes, '未检测到文件差异') === false
+        || strpos($emptyNotes, '没有可列出的非合并提交') === false
+        || strpos($emptyNotes, '此版本为测试版') === false) {
         fwrite(STDERR, "Release 空变更区间自测失败。\n");
         return 1;
     }
@@ -194,7 +268,15 @@ $tag = sakura_release_argument('tag');
 $previous = sakura_release_argument('previous-tag');
 $output = sakura_release_argument('output', 'release-notes.zh-CN.md');
 $repository = sakura_release_argument('repository', getenv('GITHUB_REPOSITORY') ?: '');
-$environment = sakura_release_argument('environment', 'WordPress 7.0、7.1');
+$version = sakura_release_argument('version', strpos($tag, 'v') === 0 ? substr($tag, 1) : $tag);
+$release = array(
+    'version' => $version,
+    'published_at' => sakura_release_argument('published-at'),
+    'trigger' => sakura_release_argument('trigger'),
+    'workflow_url' => sakura_release_argument('workflow-url'),
+    'run_number' => sakura_release_argument('run-number'),
+    'source_sha' => sakura_release_argument('source-sha'),
+);
 $prerelease = in_array('--prerelease', $argv, true);
 
 if ($tag === '' || $previous === '' || $output === '') {
@@ -205,7 +287,7 @@ if ($tag === '' || $previous === '' || $output === '') {
 try {
     $commits = sakura_release_commits($previous . '..' . $tag);
     $files = sakura_release_files($previous, $tag);
-    $notes = sakura_render_release_notes($tag, $previous, $commits, $files, $repository, $environment, $prerelease);
+    $notes = sakura_render_release_notes($tag, $previous, $commits, $files, $repository, $release, $prerelease);
     if (file_put_contents($output, $notes) === false) {
         throw new RuntimeException('无法写入 Release 说明：' . $output);
     }
