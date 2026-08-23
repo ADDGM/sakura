@@ -145,6 +145,7 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
         : '未提供';
 
     $lines = array(
+        '# Sakura ' . $tag,
         '',
         '## 版本标签',
         '',
