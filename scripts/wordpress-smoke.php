@@ -34,6 +34,11 @@ $sourceChecks = array(
     array('inc/classes/Meting.php', 'public $temp', 'Meting 未声明临时属性。'),
     array('inc/classes/Meting.php', 'X-Real-IP', 'Meting 仍伪造网易云客户端 IP。'),
     array('inc/classes/Aplayer.php', "str_replace('http://m8.'", 'APlayer 仍强制替换网易云 m8 CDN 主机。'),
+    array('inc/classes/Aplayer.php', 'music_token', 'APlayer 未生成公开播放器签名令牌。'),
+    array('inc/api.php', 'sakura_meting_token_is_valid', 'Meting 未验证公开播放器签名令牌。'),
+    array('inc/api.php', 'public, max-age=', 'Meting 未提供公开播放器缓存头。'),
+    array('inc/swicher.php', 'meting_api', '前端播放器未注入公开签名令牌 URL。'),
+    array('functions.php', 'sakura_set_frontend_cache_headers', '前台页面未按登录状态隔离缓存。'),
     array('tpl/content-thumb.php', 'substr(the_excerpt()', '文章摘要仍把 the_excerpt() 返回值传给 substr()。'),
 );
 foreach ($sourceChecks as $check) {
@@ -91,6 +96,44 @@ if (function_exists('sakura_meting_nonce_is_valid')) {
     $invalidRequest->set_param('meting_nonce', wp_create_nonce('pic#:different-id'));
     if (sakura_meting_nonce_is_valid($invalidRequest, 'pic', $resourceId)) {
         $errors[] = '不匹配资源 ID 的 Meting nonce 被错误接受。';
+    }
+}
+
+if (function_exists('sakura_meting_create_token') && function_exists('sakura_meting_token_is_valid')) {
+    $musicServer = sanitize_key((string) akina_option('aplayer_server', 'netease'));
+    $musicToken = sakura_meting_create_token('pic', '12345', 60, $musicServer);
+    if (!sakura_meting_token_is_valid($musicToken, 'pic', '12345', $musicServer)) {
+        $errors[] = '合法的播放器公开签名令牌未通过。';
+    }
+    if (sakura_meting_token_is_valid($musicToken, 'pic', 'different-id', $musicServer)) {
+        $errors[] = '不匹配资源 ID 的播放器签名令牌被错误接受。';
+    }
+    if (sakura_meting_token_is_valid($musicToken, 'lyric', '12345', $musicServer)) {
+        $errors[] = '不匹配资源类型的播放器签名令牌被错误接受。';
+    }
+    $tokenParts = explode('.', $musicToken, 2);
+    $tokenPayload = json_decode(sakura_meting_base64url_decode($tokenParts[0]), true);
+    if (!is_array($tokenPayload)) {
+        $errors[] = '播放器签名令牌载荷无法解析。';
+    } else {
+        $tokenPayload['cfg'] = str_repeat('0', 64);
+        $alteredPayload = sakura_meting_base64url_encode(wp_json_encode($tokenPayload));
+        $alteredSignature = sakura_meting_base64url_encode(hash_hmac('sha256', $alteredPayload, wp_salt('auth'), true));
+        if (sakura_meting_token_is_valid($alteredPayload . '.' . $alteredSignature, 'pic', '12345', $musicServer)) {
+            $errors[] = '不匹配音乐配置的播放器签名令牌被错误接受。';
+        }
+    }
+    $expiredToken = sakura_meting_create_token('pic', '12345', -1, $musicServer);
+    if (sakura_meting_token_is_valid($expiredToken, 'pic', '12345', $musicServer)) {
+        $errors[] = '过期的播放器签名令牌被错误接受。';
+    }
+    $configuredCookie = (string) akina_option('aplayer_cookie', '');
+    if ($configuredCookie !== '' && strpos($musicToken, $configuredCookie) !== false) {
+        $errors[] = '播放器签名令牌泄露了网易云 Cookie。';
+    }
+    $publicHeaders = sakura_meting_public_cache_headers('lyric');
+    if (strpos($publicHeaders['Cache-Control'], 'public, max-age=') !== 0 || isset($publicHeaders['Vary'])) {
+        $errors[] = '播放器公开缓存头仍依赖 Cookie。';
     }
 }
 

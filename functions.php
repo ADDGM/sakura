@@ -220,6 +220,17 @@ function sakura_scripts()
 }
 add_action('wp_enqueue_scripts', 'sakura_scripts');
 
+function sakura_set_frontend_cache_headers() {
+    if (defined('REST_REQUEST') && REST_REQUEST) {
+        return;
+    }
+    if (is_user_logged_in()) {
+        nocache_headers();
+        header('Vary: Cookie', false);
+    }
+}
+add_action('send_headers', 'sakura_set_frontend_cache_headers');
+
 /**
  * load .php.
  */

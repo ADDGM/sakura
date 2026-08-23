@@ -31,6 +31,123 @@ function sakura_meting_nonce_is_valid(WP_REST_Request $request, $type, $id) {
     return sakura_rest_nonce_is_valid($request);
 }
 
+function sakura_meting_token_ttl($type) {
+    switch ($type) {
+        case 'playlist':
+            return 604800;
+        case 'lyric':
+        case 'pic':
+            return 86400;
+        case 'url':
+            return 3600;
+        default:
+            return 300;
+    }
+}
+
+function sakura_meting_public_cache_seconds($type) {
+    switch ($type) {
+        case 'playlist':
+            return 300;
+        case 'lyric':
+            return 1800;
+        case 'pic':
+            return 3600;
+        case 'url':
+            return 15;
+        default:
+            return 0;
+    }
+}
+
+function sakura_meting_config_fingerprint() {
+    $server = sanitize_key((string) akina_option('aplayer_server', 'netease'));
+    $playlist_id = sanitize_text_field((string) akina_option('aplayer_playlistid', ''));
+    $cookies = (string) akina_option('aplayer_cookie', '');
+
+    return hash_hmac('sha256', $server . "\0" . $playlist_id . "\0" . $cookies, wp_salt('auth'));
+}
+
+function sakura_meting_base64url_encode($value) {
+    return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+}
+
+function sakura_meting_base64url_decode($value) {
+    $value = strtr((string) $value, '-_', '+/');
+    $padding = strlen($value) % 4;
+    if ($padding > 0) {
+        $value .= str_repeat('=', 4 - $padding);
+    }
+
+    return base64_decode($value, true);
+}
+
+function sakura_meting_create_token($type, $id, $ttl = null, $server = null) {
+    $type = sanitize_key((string) $type);
+    $id = sanitize_text_field((string) $id);
+    $server = $server === null
+        ? sanitize_key((string) akina_option('aplayer_server', 'netease'))
+        : sanitize_key((string) $server);
+    $ttl = $ttl === null ? sakura_meting_token_ttl($type) : (int) $ttl;
+    $ttl = max(-86400, min(604800, $ttl));
+    $payload = array(
+        'v' => 1,
+        'server' => $server,
+        'type' => $type,
+        'id' => $id,
+        'exp' => time() + $ttl,
+        'cfg' => sakura_meting_config_fingerprint(),
+    );
+    $encoded_payload = sakura_meting_base64url_encode(wp_json_encode($payload));
+    $signature = hash_hmac('sha256', $encoded_payload, wp_salt('auth'), true);
+
+    return $encoded_payload . '.' . sakura_meting_base64url_encode($signature);
+}
+
+function sakura_meting_token_is_valid($token, $type, $id, $server) {
+    $parts = explode('.', (string) $token, 2);
+    if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
+        return false;
+    }
+    $payload_json = sakura_meting_base64url_decode($parts[0]);
+    $signature = sakura_meting_base64url_decode($parts[1]);
+    if (!is_string($payload_json) || !is_string($signature)) {
+        return false;
+    }
+    $payload = json_decode($payload_json, true);
+    if (!is_array($payload)) {
+        return false;
+    }
+    $expected_signature = hash_hmac('sha256', $parts[0], wp_salt('auth'), true);
+    if (!hash_equals($expected_signature, $signature)) {
+        return false;
+    }
+
+    return isset($payload['v'], $payload['server'], $payload['type'], $payload['id'], $payload['exp'], $payload['cfg'])
+        && (int) $payload['v'] === 1
+        && (string) $payload['server'] === sanitize_key((string) $server)
+        && (string) $payload['type'] === sanitize_key((string) $type)
+        && (string) $payload['id'] === sanitize_text_field((string) $id)
+        && (int) $payload['exp'] >= time()
+        && hash_equals(sakura_meting_config_fingerprint(), (string) $payload['cfg']);
+}
+
+function sakura_meting_no_cache_headers() {
+    return array(
+        'Cache-Control' => 'private, no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma' => 'no-cache',
+        'Expires' => 'Wed, 11 Jan 1984 05:00:00 GMT',
+        'Vary' => 'Cookie',
+    );
+}
+
+function sakura_meting_public_cache_headers($type) {
+    $seconds = sakura_meting_public_cache_seconds($type);
+    return array(
+        'Cache-Control' => 'public, max-age=' . $seconds . ', s-maxage=' . $seconds . ', stale-while-revalidate=60',
+    );
+}
+
 /**
  * Router
  */
@@ -285,54 +402,71 @@ function bgm_bilibili(WP_REST_Request $request) {
 function meting_aplayer(WP_REST_Request $request) {
     $type = sanitize_key((string) $request->get_param('type'));
     $id = sanitize_text_field((string) $request->get_param('id'));
-    $nonce_is_valid = $type === 'playlist'
+    $server = sanitize_key((string) $request->get_param('server'));
+    $music_token = sanitize_text_field((string) $request->get_param('music_token'));
+    $public_request = $music_token !== ''
+        && sakura_meting_token_is_valid($music_token, $type, $id, $server);
+    $legacy_request = $type === 'playlist'
         ? sakura_rest_nonce_is_valid($request)
         : sakura_meting_nonce_is_valid($request, $type, $id);
-    if ($type === '' || $id === '' || !in_array($type, array('playlist', 'url', 'pic', 'lyric'), true) || !$nonce_is_valid) {
+    if ($type === '' || $id === '' || !in_array($type, array('playlist', 'url', 'pic', 'lyric'), true) || (!$public_request && !$legacy_request)) {
         $output = array(
             'status' => 403,
             'success' => false,
             'message' => 'Unauthorized client.'
         );
         $response = new WP_REST_Response($output, 403);
+        $response->set_headers(sakura_meting_no_cache_headers());
     } else {
         try {
             $Meting_API = new \Sakura\API\Aplayer();
             $data = $Meting_API->get_data($type, $id);
         } catch (Throwable $exception) {
-            return new WP_REST_Response(array(
+            $response = new WP_REST_Response(array(
                 'status' => 502,
                 'success' => false,
                 'message' => 'Music service request failed.',
             ), 502);
+            $response->set_headers(sakura_meting_no_cache_headers());
+            return $response;
         }
         if ($type === 'playlist') {
             if (!is_array($data)) {
-                return new WP_REST_Response(array(
+                $response = new WP_REST_Response(array(
                     'status' => 502,
                     'success' => false,
                     'message' => 'Music playlist response is invalid.',
                 ), 502);
+                $response->set_headers(sakura_meting_no_cache_headers());
+                return $response;
             }
             $response = new WP_REST_Response($data, 200);
-            $response->set_headers(array('cache-control' => 'max-age=3600'));
+            $response->set_headers($public_request
+                ? sakura_meting_public_cache_headers($type)
+                : sakura_meting_no_cache_headers());
         } elseif ($type === 'lyric') {
             $response = new WP_REST_Response(null, 200);
-            $response->set_headers(array(
-                'cache-control' => 'max-age=3600',
+            $response->set_headers(array_merge($public_request
+                ? sakura_meting_public_cache_headers($type)
+                : sakura_meting_no_cache_headers(), array(
                 'content-type' => 'text/plain; charset=UTF-8',
-            ));
+            )));
             echo is_string($data) ? $data : '';
         } else {
             if (!is_string($data) || $data === '') {
-                return new WP_REST_Response(array(
+                $response = new WP_REST_Response(array(
                     'status' => 502,
                     'success' => false,
                     'message' => 'Music resource URL is invalid.',
                 ), 502);
+                $response->set_headers(sakura_meting_no_cache_headers());
+                return $response;
             }
             $response = new WP_REST_Response();
             $response->set_status(301);
+            $response->set_headers($public_request
+                ? sakura_meting_public_cache_headers($type)
+                : sakura_meting_no_cache_headers());
             $response->header('Location', $data);
         }
     }

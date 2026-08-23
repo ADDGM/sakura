@@ -72,6 +72,16 @@ mashiro_option.jsdelivr_css_src = "https://cdn.jsdelivr.net/gh/mashirozx/Sakura@
 <?php if (akina_option('aplayer_server') != 'off'): ?>
 mashiro_option.float_player_on = true;
 mashiro_option.meting_api_url = "<?php echo rest_url('sakura/v1/meting/aplayer'); ?>";
+<?php
+$music_token = function_exists('sakura_meting_create_token')
+    ? sakura_meting_create_token('playlist', (string) akina_option('aplayer_playlistid', ''), null, (string) akina_option('aplayer_server', 'netease'))
+    : '';
+$music_api = rest_url('sakura/v1/meting/aplayer') . '?server=:server&type=:type&id=:id&music_token=' . rawurlencode($music_token);
+if ($music_token !== ''): ?>
+if (typeof meting_api === 'undefined') {
+    var meting_api = <?php echo wp_json_encode($music_api); ?>;
+}
+<?php endif; ?>
 <?php endif; ?>
 
 mashiro_option.cover_api = "<?php echo rest_url('sakura/v1/image/cover'); ?>";

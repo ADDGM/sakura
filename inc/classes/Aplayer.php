@@ -21,6 +21,13 @@ class Aplayer
         $server = $this->server;
         $cookies = $this->cookies;
         $playlist_id = $this->playlist_id;
+        $cache_key = $this->cache_key($type, $id);
+        if (function_exists('get_transient')) {
+            $cached = get_transient($cache_key);
+            if ($cached !== false) {
+                return $cached;
+            }
+        }
         $api = new \Sakura\API\Meting($server);
         if (!empty($cookies) && $server === "netease") $api->cookie($cookies);
         switch ($type) {
@@ -55,7 +62,34 @@ class Aplayer
                 $data = $this->song_url($data);
                 break;
         }
+        $this->cache_data($cache_key, $type, $data);
         return $data;
+    }
+
+    private function cache_key($type, $id) {
+        return 'sakura_music_' . hash('sha256', implode("\0", array(
+            (string) $this->server,
+            (string) $this->playlist_id,
+            (string) $this->cookies,
+            (string) $type,
+            (string) $id,
+        )));
+    }
+
+    private function cache_data($cache_key, $type, $data) {
+        if (!function_exists('set_transient') || !function_exists('sakura_meting_public_cache_seconds')) {
+            return;
+        }
+        $cacheable = $type === 'playlist'
+            ? is_array($data)
+            : is_string($data) && $data !== '';
+        if (!$cacheable) {
+            return;
+        }
+        $ttl = sakura_meting_public_cache_seconds($type);
+        if ($ttl > 0) {
+            set_transient($cache_key, $data, $ttl);
+        }
     }
 
     private function format_playlist($data) {
@@ -75,9 +109,9 @@ class Aplayer
             $pic_id = isset($value->pic_id) ? (string) $value->pic_id : '';
             $lyric_id = isset($value->lyric_id) ? (string) $value->lyric_id : '';
             $url_id = (string) $value->url_id;
-            $mp3_url = "$api_url?server=$server&type=url&id=" . rawurlencode($url_id) . '&meting_nonce=' . wp_create_nonce('url#:' . $url_id);
-            $cover = "$api_url?server=$server&type=pic&id=" . rawurlencode($pic_id) . '&meting_nonce=' . wp_create_nonce('pic#:' . $pic_id);
-            $lyric = "$api_url?server=$server&type=lyric&id=" . rawurlencode($lyric_id) . '&meting_nonce=' . wp_create_nonce('lyric#:' . $lyric_id);
+            $mp3_url = $this->resource_url($api_url, $server, 'url', $url_id);
+            $cover = $this->resource_url($api_url, $server, 'pic', $pic_id);
+            $lyric = $this->resource_url($api_url, $server, 'lyric', $lyric_id);
             $playlist[] = array(
                 "name" => $name,
                 "artist" => $artists,
@@ -87,6 +121,21 @@ class Aplayer
             );
         }
         return $playlist;
+    }
+
+    private function resource_url($api_url, $server, $type, $id) {
+        $query = array(
+            'server' => $server,
+            'type' => $type,
+            'id' => $id,
+        );
+        if (function_exists('sakura_meting_create_token')) {
+            $query['music_token'] = sakura_meting_create_token($type, $id, null, $server);
+        } else {
+            $query['meting_nonce'] = wp_create_nonce($type . '#:' . $id);
+        }
+
+        return $api_url . '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
     }
 
     private function json_url($data) {
