@@ -32,13 +32,15 @@ foreach (array('akina_setup', 'sakura_scripts', 'DEFAULT_FEATURE_IMAGE', 'conver
 $sourceChecks = array(
     array('inc/classes/Meting.php', 'utf8_encode(', 'Meting 仍使用已弃用的 utf8_encode()。'),
     array('inc/classes/Meting.php', 'public $temp', 'Meting 未声明临时属性。'),
+    array('inc/classes/Meting.php', 'X-Real-IP', 'Meting 仍伪造网易云客户端 IP。'),
+    array('inc/classes/Aplayer.php', "str_replace('http://m8.'", 'APlayer 仍强制替换网易云 m8 CDN 主机。'),
     array('tpl/content-thumb.php', 'substr(the_excerpt()', '文章摘要仍把 the_excerpt() 返回值传给 substr()。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
     if ($source === false) {
         $invalid = true;
-    } elseif ($check[1] === 'utf8_encode(' || $check[1] === 'substr(the_excerpt()') {
+    } elseif ($check[1] === 'utf8_encode(' || $check[1] === 'substr(the_excerpt()' || $check[1] === 'X-Real-IP' || strpos($check[1], "str_replace('http://") === 0) {
         $invalid = strpos($source, $check[1]) !== false;
     } else {
         $invalid = strpos($source, $check[1]) === false;
@@ -46,6 +48,11 @@ foreach ($sourceChecks as $check) {
     if ($invalid) {
         $errors[] = $check[2];
     }
+}
+
+$styleSource = file_get_contents(get_template_directory() . '/style.css');
+if ($styleSource === false || strpos($styleSource, '.site-main::after') === false) {
+    $errors[] = '内容区未清除内部浮动。';
 }
 
 if (convertip('invalid-ip') !== 'Unknown') {
