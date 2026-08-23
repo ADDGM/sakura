@@ -1,5 +1,4 @@
-﻿Sakura🌸: 樱花庄的白猫博客主题
-===
+﻿# Sakura🌸: 樱花庄的白猫博客主题
 
 中文 | [English](README-en.md)
 
@@ -32,9 +31,11 @@
 - `Requires PHP: 8.0` 是允许安装的最低 PHP 版本；当前 CI 会验证 PHP 8.0、8.1 和 8.2。
 - Release 中的主题 ZIP 是通用安装包，不按 WordPress 或 PHP 版本分别构建；只要运行环境满足最低版本并处于已验证矩阵内，即可使用同一个包。
 
-CI 测试包会使用 `3.5.0-dev.<运行编号>` 作为主题版本，Release 包则使用去掉 `v` 前缀后的标签版本，例如标签 `v3.5.0-beta.2` 对应主题版本 `3.5.0-beta.2`。
+CI 会从 `style.css` 自动读取源码基准版本，并使用 `<源码版本>-dev.<运行编号>` 作为测试包版本。Release 包使用去掉 `v` 前缀后的标签版本，例如标签 `v3.5.0-beta.2` 对应主题版本 `3.5.0-beta.2`；发布前会校验标签核心版本与源码基准版本一致。
 
-本维护版本的作者标记为 `ADDGM`，主题说明中保留原作者 Mashiro、Spirit、Louie、Fuzzz 的贡献信息。上传 ZIP 后，WordPress 会从压缩包内 `sakura/style.css` 的主题头读取名称、版本和兼容性信息。
+WordPress 上传主题后会读取并显示完整版本字符串，因此测试包会显示类似 `3.5.0-dev.123`，预发布包会显示 `3.5.0-beta.2`。WordPress 通常不会额外显示“测试版”徽标，需要通过版本号中的 `dev` 或 `beta` 判断；正式版本则显示为 `3.5.0`。
+
+本维护版本的作者标记为 `ADDGM`，主题说明中保留原作者 Mashiro、Spirit、Louie、Fuzzz 2heng 的贡献信息。上传 ZIP 后，WordPress 会从压缩包内 `sakura/style.css` 的主题头读取名称、版本和兼容性信息。
 
 维护版本的提交格式为：
 
@@ -43,15 +44,3 @@ CI 测试包会使用 `3.5.0-dev.<运行编号>` 作为主题版本，Release �
 ```
 
 类型使用 `新增`、`修复`、`兼容`、`优化`、`重构`、`文档`、`构建`、`测试` 或 `发布`。
-
-本仓库国内镜像：<https://git.moezx.cc/mirrors/sakura>
-
-主题交流群：860262481
-
-希望你喜欢！
-
-### 打赏支持~
-[微信支付](https://view.moezx.cc/images/2018/05/28/WeChanQR.png) | [支付宝](https://view.moezx.cc/images/2018/05/28/AliPayQR.jpg) | [PayPal](https://paypal.me/mashirozx)
-
-### 需要服务器吗？
-[![](https://www.vultr.com/media/banners/banner_728x90.png)](https://www.vultr.com/?ref=7674346)

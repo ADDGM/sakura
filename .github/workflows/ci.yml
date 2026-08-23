@@ -48,6 +48,7 @@ jobs:
           set -euo pipefail
           php scripts/validate-commit-messages.php --self-test
           php scripts/generate-release-notes.php --self-test
+          php scripts/theme-metadata.php --self-test
 
       - name: Build installable test package
         shell: bash
@@ -55,11 +56,12 @@ jobs:
           PHP_VERSION: ${{ matrix.php }}
         run: |
           set -euo pipefail
-          VERSION="3.5.0-dev.${GITHUB_RUN_NUMBER}"
+          SOURCE_VERSION="$(php scripts/theme-metadata.php source-version --file=style.css)"
+          VERSION="${SOURCE_VERSION}-dev.${GITHUB_RUN_NUMBER}"
           mkdir -p dist
           git archive --format=tar --prefix=sakura/ HEAD | tar -xf - -C dist
           rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
-          sed -i -E "s/^Version: .*/Version: ${VERSION}/" dist/sakura/style.css
+          php scripts/theme-metadata.php prepare --file=dist/sakura/style.css --version="$VERSION"
           {
             echo "event=${GITHUB_EVENT_NAME}"
             echo "ref=${GITHUB_REF}"
@@ -73,12 +75,10 @@ jobs:
           (cd dist && zip -qr "${GITHUB_WORKSPACE}/dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" sakura)
           rm -rf dist/sakura
           unzip -Z1 "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" | grep -q '^sakura/style.css$'
-          THEME_HEADER="$(unzip -p "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" sakura/style.css | tr -d '\r')"
-          printf '%s\n' "$THEME_HEADER" | grep -Fqx "Version: ${VERSION}"
-          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Author: ADDGM'
-          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Requires at least: 7.0'
-          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Tested up to: 7.1'
-          printf '%s\n' "$THEME_HEADER" | grep -Fqx 'Requires PHP: 8.0'
+          THEME_HEADER_FILE="$(mktemp)"
+          unzip -p "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" sakura/style.css > "$THEME_HEADER_FILE"
+          php scripts/theme-metadata.php verify --file="$THEME_HEADER_FILE" --version="$VERSION"
+          rm -f "$THEME_HEADER_FILE"
           sha256sum "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip" > "dist/sakura-ci-${GITHUB_RUN_NUMBER}.zip.sha256"
 
       - name: Upload test package
