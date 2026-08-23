@@ -21,6 +21,16 @@ function sakura_rest_nonce_is_valid(WP_REST_Request $request) {
     return is_string($nonce) && wp_verify_nonce(sanitize_text_field($nonce), 'wp_rest');
 }
 
+function sakura_meting_nonce_is_valid(WP_REST_Request $request, $type, $id) {
+    $meting_nonce = $request->get_param('meting_nonce');
+    if ($meting_nonce !== null && $meting_nonce !== '') {
+        return is_string($meting_nonce)
+            && wp_verify_nonce(sanitize_text_field($meting_nonce), $type . '#:' . $id);
+    }
+
+    return sakura_rest_nonce_is_valid($request);
+}
+
 /**
  * Router
  */
@@ -275,7 +285,10 @@ function bgm_bilibili(WP_REST_Request $request) {
 function meting_aplayer(WP_REST_Request $request) {
     $type = sanitize_key((string) $request->get_param('type'));
     $id = sanitize_text_field((string) $request->get_param('id'));
-    if ($type === '' || $id === '' || !sakura_rest_nonce_is_valid($request)) {
+    $nonce_is_valid = $type === 'playlist'
+        ? sakura_rest_nonce_is_valid($request)
+        : sakura_meting_nonce_is_valid($request, $type, $id);
+    if ($type === '' || $id === '' || !in_array($type, array('playlist', 'url', 'pic', 'lyric'), true) || !$nonce_is_valid) {
         $output = array(
             'status' => 403,
             'success' => false,
@@ -283,16 +296,41 @@ function meting_aplayer(WP_REST_Request $request) {
         );
         $response = new WP_REST_Response($output, 403);
     } else {
-        $Meting_API = new \Sakura\API\Aplayer();
-        $data = $Meting_API->get_data($type, $id);
+        try {
+            $Meting_API = new \Sakura\API\Aplayer();
+            $data = $Meting_API->get_data($type, $id);
+        } catch (Throwable $exception) {
+            return new WP_REST_Response(array(
+                'status' => 502,
+                'success' => false,
+                'message' => 'Music service request failed.',
+            ), 502);
+        }
         if ($type === 'playlist') {
+            if (!is_array($data)) {
+                return new WP_REST_Response(array(
+                    'status' => 502,
+                    'success' => false,
+                    'message' => 'Music playlist response is invalid.',
+                ), 502);
+            }
             $response = new WP_REST_Response($data, 200);
             $response->set_headers(array('cache-control' => 'max-age=3600'));
         } elseif ($type === 'lyric') {
-            $response = new WP_REST_Response();
-            $response->set_headers(array('cache-control' => 'max-age=3600'));
-            echo $data;
+            $response = new WP_REST_Response(null, 200);
+            $response->set_headers(array(
+                'cache-control' => 'max-age=3600',
+                'content-type' => 'text/plain; charset=UTF-8',
+            ));
+            echo is_string($data) ? $data : '';
         } else {
+            if (!is_string($data) || $data === '') {
+                return new WP_REST_Response(array(
+                    'status' => 502,
+                    'success' => false,
+                    'message' => 'Music resource URL is invalid.',
+                ), 502);
+            }
             $response = new WP_REST_Response();
             $response->set_status(301);
             $response->header('Location', $data);

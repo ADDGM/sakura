@@ -16,7 +16,7 @@ if( $i == 1 ){
 }
 if(has_post_thumbnail()){
 	$large_image_url = wp_get_attachment_image_src( get_post_thumbnail_id($post->ID), 'large');
-	$post_img = $large_image_url[0];
+	$post_img = is_array($large_image_url) ? $large_image_url[0] : DEFAULT_FEATURE_IMAGE();
 }else{
 	$post_img = DEFAULT_FEATURE_IMAGE();
 }
@@ -45,7 +45,7 @@ $the_cat = get_the_category();
 					</span>
 				</div>
 				<div class="float-content">
-					<?php substr(the_excerpt() , 0 , 3); ?>
+					<?php the_excerpt(); ?>
 					<div class="post-bottom">
 						<a href="<?php the_permalink(); ?>" class="button-normal"><i class="iconfont icon-caidan"></i></a>
 					</div>
@@ -54,4 +54,4 @@ $the_cat = get_the_category();
 		</div>
 	</article>
 <?php
-endwhile; 
+endwhile;

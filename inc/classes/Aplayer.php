@@ -26,7 +26,7 @@ class Aplayer
         switch ($type) {
             case 'song':
                 $data = $api->format(true)->song($id);
-                $data = json_decode($data, true)["url"];
+                $data = $this->json_url($data);
                 $data = $this->song_url($data);
                 break;
             // case 'album':
@@ -43,7 +43,7 @@ class Aplayer
                 break;
             case 'pic':
                 $data = $api->format(true)->pic($id);
-                $data = json_decode($data, true)["url"];
+                $data = $this->json_url($data);
                 break;
             // case 'search':
             //     $data = $api->format(true)->search($id);
@@ -51,7 +51,7 @@ class Aplayer
             //     break;
             default:
                 $data = $api->format(true)->url($id);
-                $data = json_decode($data, true)["url"];
+                $data = $this->json_url($data);
                 $data = $this->song_url($data);
                 break;
         }
@@ -62,13 +62,22 @@ class Aplayer
         $server = $this->server;
         $api_url = $this->api_url;
         $data = json_decode($data);
+        if (!is_array($data)) {
+            return array();
+        }
         $playlist = array();
         foreach ((array)$data as $value) {
-            $name = $value->name;
-            $artists = implode(" / ", (array)$value->artist);
-            $mp3_url = "$api_url?server=$server&type=url&id=" . $value->url_id . '&meting_nonce=' . wp_create_nonce('url#:' . $value->url_id);
-            $cover = "$api_url?server=$server&type=pic&id=" . $value->pic_id . '&meting_nonce=' . wp_create_nonce('pic#:' . $value->url_id);
-            $lyric = "$api_url?server=$server&type=lyric&id=" . $value->lyric_id . '&meting_nonce=' . wp_create_nonce('lyric#:' . $value->url_id);
+            if (!is_object($value) || empty($value->url_id)) {
+                continue;
+            }
+            $name = isset($value->name) ? (string) $value->name : '';
+            $artists = implode(" / ", (array) ($value->artist ?? array()));
+            $pic_id = isset($value->pic_id) ? (string) $value->pic_id : '';
+            $lyric_id = isset($value->lyric_id) ? (string) $value->lyric_id : '';
+            $url_id = (string) $value->url_id;
+            $mp3_url = "$api_url?server=$server&type=url&id=" . rawurlencode($url_id) . '&meting_nonce=' . wp_create_nonce('url#:' . $url_id);
+            $cover = "$api_url?server=$server&type=pic&id=" . rawurlencode($pic_id) . '&meting_nonce=' . wp_create_nonce('pic#:' . $pic_id);
+            $lyric = "$api_url?server=$server&type=lyric&id=" . rawurlencode($lyric_id) . '&meting_nonce=' . wp_create_nonce('lyric#:' . $lyric_id);
             $playlist[] = array(
                 "name" => $name,
                 "artist" => $artists,
@@ -78,6 +87,13 @@ class Aplayer
             );
         }
         return $playlist;
+    }
+
+    private function json_url($data) {
+        $decoded = json_decode($data, true);
+        return is_array($decoded) && isset($decoded['url']) && is_string($decoded['url'])
+            ? $decoded['url']
+            : '';
     }
 
     private function song_url($url){
@@ -101,7 +117,8 @@ class Aplayer
     private function format_lyric($data) {
         $server = $this->server;
         $data = json_decode($data, true);
-        $data = $this->lrctran($data['lyric'], $data['tlyric']);
+        $data = is_array($data) ? $data : array();
+        $data = $this->lrctran($data['lyric'] ?? '', $data['tlyric'] ?? '');
         if (empty($data)) {
             $data = "[00:00.000]此歌曲暂无歌词，请您欣赏";
         }

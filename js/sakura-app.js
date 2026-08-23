@@ -889,8 +889,14 @@ if (mashiro_option.float_player_on) {
                             var h = new XMLHttpRequest;
                             h.onreadystatechange = function () {
                                 if (4 === h.readyState && (200 <= h.status && 300 > h.status || 304 === h.status)) {
-                                    var b = JSON.parse(h.responseText);
-                                    a(d, b)
+                                    try {
+                                        var b = JSON.parse(h.responseText);
+                                        if (Array.isArray(b)) {
+                                            a(d, b)
+                                        }
+                                    } catch (e) {
+                                        return;
+                                    }
                                 }
                             }, h.open('get', g, !0), h.send(null)
                         } else if (d.dataset.url) {

@@ -283,7 +283,7 @@ function the_headPattern(){
   $t = ''; // 标题
   $full_image_url = wp_get_attachment_image_src(get_post_thumbnail_id(get_the_ID()), 'full');
   if(is_single()){
-    $full_image_url = $full_image_url[0];
+    $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
     if (have_posts()) : while (have_posts()) : the_post();
     $center = 'single-center';
     $header = 'single-header';
@@ -298,7 +298,7 @@ function the_headPattern(){
     $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(get_post_time('U', true),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
     endwhile; endif;
   }elseif(is_page()){
-    $full_image_url = $full_image_url[0];
+    $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
     $t .= the_title( '<h1 class="entry-title">', '</h1>', false);
   }elseif(is_archive()){
     $full_image_url = z_taxonomy_image_url();
@@ -337,8 +337,8 @@ function the_video_headPattern_hls(){
     }
 
   if(is_single()){
-    $full_image_url = $full_image_url[0];
-    $thubm_image_url = $thubm_image_url[0];
+    $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
+    $thubm_image_url = is_array($thubm_image_url) ? $thubm_image_url[0] : '';
     if (have_posts()) : while (have_posts()) : the_post();
     $center = 'single-center';
     $header = 'single-header';
@@ -353,8 +353,8 @@ function the_video_headPattern_hls(){
     $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(get_post_time('U', true),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
     endwhile; endif;
   }elseif(is_page()){
-    $full_image_url = $full_image_url[0];
-    $thubm_image_url = $thubm_image_url[0];
+    $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
+    $thubm_image_url = is_array($thubm_image_url) ? $thubm_image_url[0] : '';
     $t .= the_title( '<h1 class="entry-title">', '</h1>', false);
   }elseif(is_archive()){
     $full_image_url = z_taxonomy_image_url();
@@ -405,8 +405,8 @@ function the_video_headPattern_normal(){
     }
 
   if(is_single()){
-    $full_image_url = $full_image_url[0];
-    $thubm_image_url = $thubm_image_url[0];
+    $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
+    $thubm_image_url = is_array($thubm_image_url) ? $thubm_image_url[0] : '';
     if (have_posts()) : while (have_posts()) : the_post();
     $center = 'single-center';
     $header = 'single-header';
@@ -421,8 +421,8 @@ function the_video_headPattern_normal(){
     $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(get_post_time('U', true),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
     endwhile; endif;
   }elseif(is_page()){
-    $full_image_url = $full_image_url[0];
-    $thubm_image_url = $thubm_image_url[0];
+    $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
+    $thubm_image_url = is_array($thubm_image_url) ? $thubm_image_url[0] : '';
     $t .= the_title( '<h1 class="entry-title">', '</h1>', false);
   }elseif(is_archive()){
     $full_image_url = z_taxonomy_image_url();
@@ -513,7 +513,7 @@ function get_prev_thumbnail_url() {
     return get_random_bg_url(); // 首页图
   } else if ( has_post_thumbnail($prev_post->ID) ) { 
     $img_src = wp_get_attachment_image_src( get_post_thumbnail_id( $prev_post->ID ), 'large'); 
-    return $img_src[0]; // 特色图
+    return is_array($img_src) ? $img_src[0] : get_random_bg_url(); // 特色图
   } 
   else { 
     $content = $prev_post->post_content; 
@@ -530,9 +530,12 @@ function get_prev_thumbnail_url() {
 // 下一篇
 function get_next_thumbnail_url() { 
   $next_post = get_next_post(); 
+  if (!$next_post) {
+    return get_random_bg_url(); // 首页图
+  }
   if ( has_post_thumbnail($next_post->ID) ) { 
     $img_src = wp_get_attachment_image_src( get_post_thumbnail_id( $next_post->ID ), 'large'); 
-    return $img_src[0]; 
+    return is_array($img_src) ? $img_src[0] : get_random_bg_url();
   } 
   else { 
     $content = $next_post->post_content; 

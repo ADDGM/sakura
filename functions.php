@@ -10,10 +10,6 @@
 define('SAKURA_VERSION', wp_get_theme()->get('Version'));
 define('BUILD_VERSION', '3');
 
-//ini_set('display_errors', true);
-//error_reporting(E_ALL);
-error_reporting(E_ALL ^ E_NOTICE);
-
 if (!function_exists('akina_setup')):
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -250,22 +246,40 @@ require get_template_directory() . '/inc/categories-images.php';
 //Comment Location Start
 function convertip($ip)
 {
-    error_reporting(E_ALL ^ E_NOTICE);
-    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
-        $file_contents = file_get_contents('http://ip.taobao.com/outGetIpInfo?accessKey=alibaba-inc&ip='.$ip);
-        $result = json_decode($file_contents,true);
-        if ($result['data']['country'] != '中国') {
-            return $result['data']['country'];
+    $ip = is_string($ip) ? trim($ip) : '';
+    if ($ip === '' || filter_var($ip, FILTER_VALIDATE_IP) === false) {
+        return 'Unknown';
+    }
+
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+        $response = wp_remote_get('http://ip.taobao.com/outGetIpInfo?accessKey=alibaba-inc&ip=' . rawurlencode($ip), array('timeout' => 5));
+        if (is_wp_error($response)) {
+            return 'Unknown';
+        }
+        $result = json_decode(wp_remote_retrieve_body($response), true);
+        $data = is_array($result) && isset($result['data']) && is_array($result['data']) ? $result['data'] : array();
+        if (($data['country'] ?? '') !== '中国') {
+            return $data['country'] ?? 'Unknown';
         } else {
-            return $result['data']['region'].'&nbsp;·&nbsp;'.$result['data']['city'].'&nbsp;·&nbsp;'.$result['data']['isp'];
+            return ($data['region'] ?? '') . '&nbsp;·&nbsp;' . ($data['city'] ?? '') . '&nbsp;·&nbsp;' . ($data['isp'] ?? '');
         }
-    } else {
-        $dat_path = dirname(__FILE__) . '/inc/QQWry.Dat';
-        if (!$fd = @fopen($dat_path, 'rb')) {
-            return 'IP date file not exists or access denied';
+    }
+
+    $ip_parts = explode('.', $ip);
+    if (count($ip_parts) !== 4) {
+        return 'Unknown';
+    }
+    foreach ($ip_parts as $part) {
+        if ($part === '' || !ctype_digit($part) || (int) $part > 255) {
+            return 'Unknown';
         }
-        $ip = explode('.', $ip);
-        $ipNum = intval($ip[0]) * 16777216 + intval($ip[1]) * 65536 + intval($ip[2]) * 256 + intval($ip[3]);
+    }
+
+    $dat_path = dirname(__FILE__) . '/inc/QQWry.Dat';
+    if (!$fd = @fopen($dat_path, 'rb')) {
+        return 'IP date file not exists or access denied';
+    }
+    $ipNum = intval($ip_parts[0]) * 16777216 + intval($ip_parts[1]) * 65536 + intval($ip_parts[2]) * 256 + intval($ip_parts[3]);
         $DataBegin = fread($fd, 4);
         $DataEnd = fread($fd, 4);
         $ipbegin = implode('', unpack('L', $DataBegin));
@@ -404,7 +418,6 @@ function convertip($ip)
         }
 
         return $ipaddr;
-    }
 }
 //Comment Location End
 
@@ -1098,7 +1111,8 @@ function custom_smilies_src($img_src, $img, $siteurl)
 function push_smilies()
 {
     global $wpsmiliestrans;
-    foreach ($wpsmiliestrans as $k => $v) {
+    $return_smiles = '';
+    foreach ((array) ($wpsmiliestrans ?? array()) as $k => $v) {
         $Sname = str_replace(":", "", $k);
         $Svalue = $v;
         $return_smiles = $return_smiles . '<span title="' . $Sname . '" onclick="grin(' . "'" . $Sname . "'" . ')"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/smilies/' . $Svalue . '" /></span>';

@@ -25,6 +25,7 @@ class Meting
     public $proxy = null;
     public $format = false;
     public $header;
+    public $temp = array();
 
     public function __construct($value = 'netease')
     {
@@ -144,8 +145,14 @@ class Meting
     private function clean($raw, $rule)
     {
         $raw = json_decode($raw, true);
+        if (!is_array($raw)) {
+            return json_encode(array());
+        }
         if (!empty($rule)) {
             $raw = $this->pickup($raw, $rule);
+        }
+        if (!is_array($raw)) {
+            return json_encode(array());
         }
         if (!isset($raw[0]) && count($raw)) {
             $raw = array($raw);
@@ -885,7 +892,7 @@ class Meting
         $body = openssl_encrypt($body, 'aes-128-cbc', $skey, false, $vi);
 
         if (extension_loaded('bcmath')) {
-            $skey = strrev(utf8_encode($skey));
+            $skey = strrev($skey);
             $skey = $this->bchexdec($this->str2hex($skey));
             $skey = bcpowmod($skey, $pubkey, $modulus);
             $skey = $this->bcdechex($skey);
