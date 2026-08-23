@@ -148,6 +148,9 @@ class Meting
         if (!is_array($raw)) {
             return json_encode(array());
         }
+        if ($this->server === 'netease' && $rule === 'playlist.tracks') {
+            $raw = $this->complete_netease_playlist($raw);
+        }
         if (!empty($rule)) {
             $raw = $this->pickup($raw, $rule);
         }
@@ -160,6 +163,78 @@ class Meting
         $result = array_map(array($this, 'format_'.$this->server), $raw);
 
         return json_encode($result);
+    }
+
+    private function complete_netease_playlist($raw)
+    {
+        if (!isset($raw['playlist']) || !is_array($raw['playlist'])) {
+            return array();
+        }
+
+        $playlist = $raw['playlist'];
+        $tracks = isset($playlist['tracks']) && is_array($playlist['tracks'])
+            ? $playlist['tracks']
+            : array();
+        $track_ids = isset($playlist['trackIds']) && is_array($playlist['trackIds'])
+            ? $playlist['trackIds']
+            : array();
+
+        if (empty($track_ids) || count($tracks) >= count($track_ids)) {
+            $raw['playlist']['tracks'] = $tracks;
+            return $raw;
+        }
+
+        $ordered_ids = array();
+        foreach ($track_ids as $track) {
+            $track_id = is_array($track) ? ($track['id'] ?? null) : null;
+            if ($track_id !== null && $track_id !== '' && !in_array((string) $track_id, $ordered_ids, true)) {
+                $ordered_ids[] = (string) $track_id;
+            }
+        }
+        if (empty($ordered_ids)) {
+            $raw['playlist']['tracks'] = $tracks;
+            return $raw;
+        }
+
+        $known = array();
+        foreach ($tracks as $track) {
+            if (is_array($track) && isset($track['id'])) {
+                $known[(string) $track['id']] = $track;
+            }
+        }
+
+        $missing_ids = array_values(array_diff($ordered_ids, array_keys($known)));
+        foreach (array_chunk($missing_ids, 50) as $id_batch) {
+            $api = array(
+                'method' => 'POST',
+                'url' => 'http://music.163.com/api/v3/song/detail/',
+                'body' => array(
+                    'c' => json_encode(array_map(function ($id) {
+                        return array('id' => (int) $id, 'v' => 0);
+                    }, $id_batch)),
+                ),
+                'encode' => 'netease_AESCBC',
+            );
+            $details = json_decode($this->exec($api), true);
+            if (!isset($details['songs']) || !is_array($details['songs'])) {
+                continue;
+            }
+            foreach ($details['songs'] as $detail) {
+                if (is_array($detail) && isset($detail['id'])) {
+                    $known[(string) $detail['id']] = $detail;
+                }
+            }
+        }
+
+        $result = array();
+        foreach ($ordered_ids as $track_id) {
+            if (isset($known[$track_id])) {
+                $result[] = $known[$track_id];
+            }
+        }
+
+        $raw['playlist']['tracks'] = empty($result) ? $tracks : $result;
+        return $raw;
     }
 
     public function search($keyword, $option = null)
@@ -790,7 +865,6 @@ class Meting
                 'Referer'         => 'https://music.163.com/',
                 'Cookie'          => 'appver=1.5.9; os=osx; __remember_me=true; osver=%E7%89%88%E6%9C%AC%2010.13.5%EF%BC%88%E7%89%88%E5%8F%B7%2017F77%EF%BC%89;',
                 'User-Agent'      => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko)',
-                'X-Real-IP'       => long2ip(mt_rand(1884815360, 1884890111)),
                 'Accept'          => '*/*',
                 'Accept-Language' => 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
                 'Connection'      => 'keep-alive',
