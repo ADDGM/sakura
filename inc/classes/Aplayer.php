@@ -98,16 +98,10 @@ class Aplayer
 
     private function song_url($url){
         $server = $this->server;
-        if ($server == 'netease') {
-            if (is_string($url) && preg_match('#^http://#i', $url)) {
-                $url = 'https://' . substr($url, 7);
-            }
-        }elseif ($server == 'xiami') {
+        if ($server == 'xiami') {
             $url = str_replace('http://', 'https://', $url);
         }elseif ($server == 'baidu') {
             $url = str_replace('http://zhangmenshiting.qianqian.com', 'https://gss3.baidu.com/y0s1hSulBw92lNKgpU_Z2jR7b2w6buu', $url);
-        }else{
-            $url = $url;
         }
         return $url;
     }
