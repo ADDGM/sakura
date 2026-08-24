@@ -179,12 +179,17 @@ function sakura_scripts()
     } else {
         wp_enqueue_script('js_lib', 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@' . SAKURA_VERSION . '/cdn/js/lib.min.js', array(), SAKURA_VERSION, true);
     }
+    $app_dependencies = array();
+    if (akina_option('aplayer_server') != 'off') {
+        wp_enqueue_script('aplayer_localization', get_template_directory_uri() . '/js/aplayer-localization.js', array('js_lib'), SAKURA_VERSION, true);
+        $app_dependencies[] = 'aplayer_localization';
+    }
     if (akina_option('app_no_jsdelivr_cdn')) {
         wp_enqueue_style('saukra_css', get_stylesheet_uri(), array(), SAKURA_VERSION);
-        wp_enqueue_script('app', get_template_directory_uri() . '/js/sakura-app.js', array(), SAKURA_VERSION, true);
+        wp_enqueue_script('app', get_template_directory_uri() . '/js/sakura-app.js', $app_dependencies, SAKURA_VERSION, true);
     } else {
         wp_enqueue_style('saukra_css', 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@' . SAKURA_VERSION . '/style.min.css', array(), SAKURA_VERSION);
-        wp_enqueue_script('app', 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@' . SAKURA_VERSION . '/js/sakura-app.min.js', array(), SAKURA_VERSION, true);
+        wp_enqueue_script('app', 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@' . SAKURA_VERSION . '/js/sakura-app.min.js', $app_dependencies, SAKURA_VERSION, true);
     }
     //wp_enqueue_script('github_card', 'https://cdn.jsdelivr.net/github-cards/latest/widget.js', array(), SAKURA_VERSION, true);
 

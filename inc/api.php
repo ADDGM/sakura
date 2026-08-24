@@ -31,6 +31,16 @@ function sakura_meting_nonce_is_valid(WP_REST_Request $request, $type, $id) {
     return sakura_rest_nonce_is_valid($request);
 }
 
+function sakura_meting_legacy_request_present(WP_REST_Request $request) {
+    $meting_nonce = $request->get_param('meting_nonce');
+    $wp_nonce = $request->get_param('_wpnonce');
+    $header_nonce = $request->get_header('X-WP-Nonce');
+
+    return ($meting_nonce !== null && $meting_nonce !== '')
+        || ($wp_nonce !== null && $wp_nonce !== '')
+        || ($header_nonce !== null && $header_nonce !== '');
+}
+
 function sakura_meting_token_ttl($type) {
     switch ($type) {
         case 'playlist':
@@ -404,7 +414,9 @@ function meting_aplayer(WP_REST_Request $request) {
     $id = sanitize_text_field((string) $request->get_param('id'));
     $server = sanitize_key((string) $request->get_param('server'));
     $music_token = sanitize_text_field((string) $request->get_param('music_token'));
+    $legacy_request_present = sakura_meting_legacy_request_present($request);
     $public_request = $music_token !== ''
+        && !$legacy_request_present
         && sakura_meting_token_is_valid($music_token, $type, $id, $server);
     $legacy_request = $type === 'playlist'
         ? sakura_rest_nonce_is_valid($request)

@@ -1050,14 +1050,23 @@ class Meting
     private function netease_url($result)
     {
         $data = json_decode($result, true);
-        if (isset($data['data'][0]['uf']['url'])) {
-            $data['data'][0]['url'] = $data['data'][0]['uf']['url'];
+        $song = isset($data['data'][0]) && is_array($data['data'][0])
+            ? $data['data'][0]
+            : array();
+        $url = isset($song['url']) && $this->is_http_url($song['url'])
+            ? $song['url']
+            : '';
+        $uf_url = isset($song['uf']) && is_array($song['uf'])
+            ? ($song['uf']['url'] ?? '')
+            : '';
+        if ($this->is_http_url($uf_url)) {
+            $url = $uf_url;
         }
-        if (isset($data['data'][0]['url'])) {
+        if ($url !== '') {
             $url = array(
-                'url'  => $data['data'][0]['url'],
-                'size' => $data['data'][0]['size'],
-                'br'   => $data['data'][0]['br'] / 1000,
+                'url'  => $url,
+                'size' => isset($song['size']) && is_numeric($song['size']) ? $song['size'] : 0,
+                'br'   => isset($song['br']) && is_numeric($song['br']) ? $song['br'] / 1000 : -1,
             );
         } else {
             $url = array(
@@ -1068,6 +1077,15 @@ class Meting
         }
 
         return json_encode($url);
+    }
+
+    private function is_http_url($url)
+    {
+        if (!is_string($url) || trim($url) === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return false;
+        }
+
+        return in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), array('http', 'https'), true);
     }
 
     private function tencent_url($result)

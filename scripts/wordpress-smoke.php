@@ -35,10 +35,15 @@ $sourceChecks = array(
     array('inc/classes/Meting.php', 'X-Real-IP', 'Meting 仍伪造网易云客户端 IP。'),
     array('inc/classes/Aplayer.php', "str_replace('http://m8.'", 'APlayer 仍强制替换网易云 m8 CDN 主机。'),
     array('inc/classes/Aplayer.php', 'music_token', 'APlayer 未生成公开播放器签名令牌。'),
+    array('inc/classes/Meting.php', 'is_http_url', 'Meting 未校验网易云音频 URL。'),
     array('inc/api.php', 'sakura_meting_token_is_valid', 'Meting 未验证公开播放器签名令牌。'),
+    array('inc/api.php', 'sakura_meting_legacy_request_present', 'Meting 未识别旧播放器请求。'),
     array('inc/api.php', 'public, max-age=', 'Meting 未提供公开播放器缓存头。'),
     array('inc/swicher.php', 'meting_api', '前端播放器未注入公开签名令牌 URL。'),
     array('functions.php', 'sakura_set_frontend_cache_headers', '前台页面未按登录状态隔离缓存。'),
+    array('functions.php', 'aplayer_localization', '前端未加载 APlayer 中文提示兼容脚本。'),
+    array('js/aplayer-localization.js', '音频加载失败', 'APlayer 音频错误提示未完成中文化。'),
+    array('js/aplayer-localization.js', '歌词加载失败', 'APlayer 歌词错误提示未完成中文化。'),
     array('tpl/content-thumb.php', 'substr(the_excerpt()', '文章摘要仍把 the_excerpt() 返回值传给 substr()。'),
 );
 foreach ($sourceChecks as $check) {
@@ -97,6 +102,22 @@ if (function_exists('sakura_meting_nonce_is_valid')) {
     if (sakura_meting_nonce_is_valid($invalidRequest, 'pic', $resourceId)) {
         $errors[] = '不匹配资源 ID 的 Meting nonce 被错误接受。';
     }
+
+    if (!function_exists('sakura_meting_legacy_request_present')) {
+        $errors[] = '旧播放器请求识别函数不存在。';
+    } else {
+        $legacyRequest = new WP_REST_Request('GET', '/sakura/v1/meting/aplayer');
+        $legacyRequest->set_param('meting_nonce', 'legacy-placeholder');
+        if (!sakura_meting_legacy_request_present($legacyRequest)) {
+            $errors[] = '带 meting_nonce 的旧播放器请求未被识别。';
+        }
+
+        $publicTokenRequest = new WP_REST_Request('GET', '/sakura/v1/meting/aplayer');
+        $publicTokenRequest->set_param('music_token', 'public-placeholder');
+        if (sakura_meting_legacy_request_present($publicTokenRequest)) {
+            $errors[] = '不带旧 nonce 的公开播放器请求被错误识别为旧请求。';
+        }
+    }
 }
 
 if (function_exists('sakura_meting_create_token') && function_exists('sakura_meting_token_is_valid')) {
@@ -134,6 +155,41 @@ if (function_exists('sakura_meting_create_token') && function_exists('sakura_met
     $publicHeaders = sakura_meting_public_cache_headers('lyric');
     if (strpos($publicHeaders['Cache-Control'], 'public, max-age=') !== 0 || isset($publicHeaders['Vary'])) {
         $errors[] = '播放器公开缓存头仍依赖 Cookie。';
+    }
+    if (sakura_meting_public_cache_seconds('url') !== 15) {
+        $errors[] = '音频 URL 公共缓存 TTL 被意外修改。';
+    }
+}
+
+if (!class_exists('Sakura\\API\\Meting')) {
+    require_once get_template_directory() . '/inc/classes/Meting.php';
+}
+if (class_exists('Sakura\\API\\Meting')) {
+    $meting = new \Sakura\API\Meting('netease');
+    $neteaseUrl = new ReflectionMethod($meting, 'netease_url');
+    $neteaseUrl->setAccessible(true);
+    $fallbackResult = json_decode($neteaseUrl->invoke($meting, wp_json_encode(array(
+        'data' => array(array(
+            'url' => 'https://example.com/original.mp3',
+            'uf' => array('url' => ''),
+            'size' => 1024,
+            'br' => 128000,
+        )),
+    ))), true);
+    if (!is_array($fallbackResult) || $fallbackResult['url'] !== 'https://example.com/original.mp3') {
+        $errors[] = '网易云 uf.url 为空时未回退到原始音频 URL。';
+    }
+
+    $replacementResult = json_decode($neteaseUrl->invoke($meting, wp_json_encode(array(
+        'data' => array(array(
+            'url' => 'https://example.com/original.mp3',
+            'uf' => array('url' => 'https://example.com/replacement.mp3'),
+            'size' => 1024,
+            'br' => 128000,
+        )),
+    ))), true);
+    if (!is_array($replacementResult) || $replacementResult['url'] !== 'https://example.com/replacement.mp3') {
+        $errors[] = '网易云合法的 uf.url 未被优先使用。';
     }
 }
 
