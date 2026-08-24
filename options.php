@@ -141,7 +141,7 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Change web background', 'sakura'), /*切换网页背景*/
-        'desc' => __('The foreground switches the background of the webpage. There are 8 urls separated by commas. The order corresponds to the foreground scheme tool button position (the order of the buttons is from left to right, top to bottom). If no background is needed, fill in the corresponding position as none.<strong>Note: If the theme is updated from v3.2.3 and below, be sure to change the [Version Control] parameter under the [Other] tab of this configuration page to any new value!</strong>', 'sakura'), /*前台切换网页背景，共8个url，使用英文逗号分隔，顺序对应前台切换主题按钮位置（按钮顺序从左至右，从上至下）,如不需要背景则填写对应位置为none。<strong>注意：如果主题是从v3.2.3及以下更新过来的，请务必将本配置页的【其他】标签下的【版本控制】参数修改为任意新值！</strong>*/
+        'desc' => __('The foreground switches the background of the webpage. There are 8 urls separated by commas. The order corresponds to the foreground scheme tool button position (the order of the buttons is from left to right, top to bottom). If no background is needed, fill in the corresponding position as none.<strong>Note: If the theme is updated from v3.2.3 and below, be sure to change the [Frontend cache version] parameter under the [Other] tab of this configuration page to any new value!</strong>', 'sakura'), /*前台切换网页背景，共8个url，使用英文逗号分隔，顺序对应前台切换主题按钮位置（按钮顺序从左至右，从上至下）,如不需要背景则填写对应位置为none。<strong>注意：如果主题是从v3.2.3及以下更新过来的，请务必将本配置页的【其他】标签下的【前端缓存版本】参数修改为任意新值！</strong>*/
         'id' => 'sakura_skin_bg',
         'std' => 'none,https://cdn.jsdelivr.net/gh/spirit1431007/cdn@1.6/img/sakura.png,https://cdn.jsdelivr.net/gh/spirit1431007/cdn@1.6/img/plaid2dbf8.jpg,https://cdn.jsdelivr.net/gh/spirit1431007/cdn@1.6/img/star02.png,https://cdn.jsdelivr.net/gh/spirit1431007/cdn@1.6/img/kyotoanimation.png,https://cdn.jsdelivr.net/gh/spirit1431007/cdn@1.6/img/dot_orange.gif,https://api.mashiro.top/bing/,https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.2/other-sites/api-index/images/me.png',
         'type' => 'textarea');
@@ -1091,14 +1091,14 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Netease Cloud Music cookie', 'sakura'),
-        'desc' => __('VIP 歌曲需要登录网易云音乐账号才能播放。请先登录已购买 VIP 的网易云音乐网页版，按 F12 打开开发者工具，在 Network（网络）面板刷新页面，找到 music.163.com 请求并复制请求头中的 Cookie 完整内容粘贴到这里。请勿填写账号密码；Cookie 过期后需要重新获取。', 'sakura'),
+        'desc' => __('For Netease Cloud Music, log in to the web version with a VIP account, press F12 to open Developer Tools, switch to the Network tab, refresh the page, find a request to music.163.com, and copy the complete Cookie value from its request headers here. Do not enter your account password. Obtain a new Cookie after it expires.', 'sakura'),
         'id' => 'aplayer_cookie',
         'std' => '',
         'type' => 'textarea');
 
     $options[] = array(
         'name' => __('Frontend cache version', 'sakura'), /*前端缓存版本*/
-        'desc' => __('用于刷新主题前端 Cookie 和部分静态资源缓存。更新主题或修改前端代码后仍显示旧效果时，可填写一个新的任意值（如 v2）；平时留空即可。修改后，深色模式、背景和评论表单等浏览器记忆设置可能恢复默认。此选项与网易云音乐 Cookie 无关。', 'sakura'),
+        'desc' => __('Refreshes the theme frontend Cookie and selected static-resource caches. If an updated theme or frontend code still shows an old result, enter a new value such as v2; leave it blank normally. Changing this value may reset browser-stored preferences such as dark mode, background, and comment form settings. This option is unrelated to the Netease Cloud Music Cookie.', 'sakura'),
         'id' => 'cookie_version',
         'std' => '',
         'type' => 'text');

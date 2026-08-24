@@ -512,7 +512,7 @@ msgid ""
 "button position (the order of the buttons is from left to right, top to "
 "bottom). If no background is needed, fill in the corresponding position as "
 "none.<strong>Note: If the theme is updated from v3.2.3 and below, be sure to "
-"change the [Version Control] parameter under the [Other] tab of this "
+"change the [Frontend cache version] parameter under the [Other] tab of this "
 "configuration page to any new value!</strong>"
 msgstr ""
 
@@ -1588,17 +1588,24 @@ msgstr ""
 
 #: options.php:1094
 msgid ""
-"For Netease Cloud Music, fill in your vip account's cookies if you want to "
-"play special tracks.<b>If you don't know what does mean, left it blank.</b>"
+"For Netease Cloud Music, log in to the web version with a VIP account, press "
+"F12 to open Developer Tools, switch to the Network tab, refresh the page, "
+"find a request to music.163.com, and copy the complete Cookie value from its "
+"request headers here. Do not enter your account password. Obtain a new Cookie "
+"after it expires."
 msgstr ""
 
 #: options.php:1100
-msgid "Version Control"
+msgid "Frontend cache version"
 msgstr ""
 
 #: options.php:1101
 msgid ""
-"Used to update frontend cookies and browser caches, any string can be used"
+"Refreshes the theme frontend Cookie and selected static-resource caches. If "
+"an updated theme or frontend code still shows an old result, enter a new "
+"value such as v2; leave it blank normally. Changing this value may reset "
+"browser-stored preferences such as dark mode, background, and comment form "
+"settings. This option is unrelated to the Netease Cloud Music Cookie."
 msgstr ""
 
 #: options.php:1107
