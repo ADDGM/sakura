@@ -209,6 +209,17 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
         $lines[] = '';
     }
 
+    $compareRange = $previous . '...' . $tag;
+    $lines[] = '## 完整更新日志';
+    $lines[] = '';
+    if ($repository !== '') {
+        $compareUrl = 'https://github.com/' . $repository . '/compare/' . rawurlencode($previous) . '...' . rawurlencode($tag);
+        $lines[] = '- [查看 `' . $compareRange . '` 的完整变更记录](' . $compareUrl . ')';
+    } else {
+        $lines[] = '- 比较范围：`' . $compareRange . '`';
+    }
+    $lines[] = '';
+
     $lines[] = '## 构建产物';
     $lines[] = '';
     $lines[] = '- `sakura-' . $version . '.zip`：可在 WordPress 后台直接上传的通用主题包。';
@@ -245,6 +256,8 @@ function sakura_release_self_test(): int
         || strpos($notes, '### 兼容性更新') === false
         || strpos($notes, '修复标题 API') === false
         || strpos($notes, '构建与文档（1 个文件）') === false
+        || strpos($notes, '## 完整更新日志') === false
+        || strpos($notes, 'https://github.com/example/sakura/compare/v3.4.0...v3.5.0') === false
         || strpos($notes, '`sakura-3.5.0.zip`') === false) {
         fwrite(STDERR, "Release 说明自测失败。\n");
         return 1;
@@ -253,6 +266,8 @@ function sakura_release_self_test(): int
     if (strpos($emptyNotes, '提交数量：0') === false
         || strpos($emptyNotes, '未检测到文件差异') === false
         || strpos($emptyNotes, '没有可列出的非合并提交') === false
+        || strpos($emptyNotes, '比较范围：`v3.5.0...v3.5.1-beta.1`') === false
+        || strpos($emptyNotes, 'https://github.com//compare/') !== false
         || strpos($emptyNotes, '此版本为测试版') === false) {
         fwrite(STDERR, "Release 空变更区间自测失败。\n");
         return 1;
