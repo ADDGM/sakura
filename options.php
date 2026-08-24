@@ -1091,14 +1091,14 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Netease Cloud Music cookie', 'sakura'),
-        'desc' => __('For Netease Cloud Music, fill in your vip account\'s cookies if you want to play special tracks.<b>If you don\'t know what does mean, left it blank.</b>', 'sakura'),
+        'desc' => __('VIP 歌曲需要登录网易云音乐账号才能播放。请先登录已购买 VIP 的网易云音乐网页版，按 F12 打开开发者工具，在 Network（网络）面板刷新页面，找到 music.163.com 请求并复制请求头中的 Cookie 完整内容粘贴到这里。请勿填写账号密码；Cookie 过期后需要重新获取。', 'sakura'),
         'id' => 'aplayer_cookie',
         'std' => '',
         'type' => 'textarea');
 
     $options[] = array(
-        'name' => __('Version Control', 'sakura'), /*版本控制*/
-        'desc' => __('Used to update frontend cookies and browser caches, any string can be used', 'sakura'), /*用于更新前端 cookie 及浏览器缓存，可使用任意字符串*/
+        'name' => __('Frontend cache version', 'sakura'), /*前端缓存版本*/
+        'desc' => __('用于刷新主题前端 Cookie 和部分静态资源缓存。更新主题或修改前端代码后仍显示旧效果时，可填写一个新的任意值（如 v2）；平时留空即可。修改后，深色模式、背景和评论表单等浏览器记忆设置可能恢复默认。此选项与网易云音乐 Cookie 无关。', 'sakura'),
         'id' => 'cookie_version',
         'std' => '',
         'type' => 'text');
