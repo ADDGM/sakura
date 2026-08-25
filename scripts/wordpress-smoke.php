@@ -45,6 +45,9 @@ $sourceChecks = array(
     array('js/aplayer-localization.js', '音频加载失败', 'APlayer 音频错误提示未完成中文化。'),
     array('js/aplayer-localization.js', '歌词加载失败', 'APlayer 歌词错误提示未完成中文化。'),
     array('comments.php', '<!--此栏不可见--></div>', '评论信息容器未在自定义 QQ 字段后稳定闭合。'),
+    array('comments.php', 'if ( ! is_user_logged_in() )', '登录用户仍会输出匿名评论头像辅助字段。'),
+    array('comments.php', 'submit-comment-tips popup', '评论提交按钮缺少中文提示容器。'),
+    array('comments.php', "esc_attr__( 'Submit comment', 'sakura' )", '评论提交按钮缺少可访问的提示属性。'),
     array('js/sakura-app.js', "off('change.sakuraUpload'", '评论图片上传事件未使用幂等的命名空间绑定。'),
     array('js/sakura-app.js', '<label class="insert-image-tips popup" for="upload-img-file">', '评论图片上传按钮未使用可访问的 label 触发文件控件。'),
     array('tpl/content-thumb.php', 'substr(the_excerpt()', '文章摘要仍把 the_excerpt() 返回值传给 substr()。'),
@@ -56,7 +59,12 @@ $sourceChecks = array(
     array('js/sakura-app.js', '    aplayerF();', '播放器未执行移动端兼容初始化。'),
     array('inc/css/optionsframework.css', '@media (max-width: 782px)', '主题设置页缺少移动端响应式规则。'),
     array('inc/css/optionsframework.css', '#optionsframework input.of-radio', '主题设置页未隔离普通单选控件样式。'),
+    array('inc/css/optionsframework.css', '#optionsframework .of-radio-option', '主题设置页普通单选控件缺少独立布局规则。'),
+    array('inc/options-interface.php', 'class="of-radio-option"', '主题设置页普通单选控件缺少选项包装。'),
+    array('inc/options-interface.php', 'class="of-multicheck-option"', '主题设置页多选控件缺少选项包装。'),
+    array('inc/options-framework.php', "defined( 'SAKURA_VERSION' ) ? SAKURA_VERSION : false", '主题设置页资源未使用主题版本控制缓存。'),
     array('style.css', '.site-top .lower nav > .menu > ul', '中等宽度导航未区分顶级菜单和下拉菜单。'),
+    array('style.css', '.submit-comment-tips:focus-within', '评论提交按钮缺少键盘焦点提示样式。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);

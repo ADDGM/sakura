@@ -82,6 +82,10 @@ msgstr "取消回复"
 msgid "BiuBiuBiu~"
 msgstr "BiuBiuBiu~"
 
+#: comments.php
+msgid "Submit comment"
+msgstr "提交评论"
+
 #: comments.php:63
 msgid "You are a surprise that I will only meet once in my life"
 msgstr "你是我一生只会遇见一次的惊喜"

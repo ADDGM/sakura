@@ -80,6 +80,10 @@ msgstr ""
 msgid "BiuBiuBiu~"
 msgstr ""
 
+#: comments.php
+msgid "Submit comment"
+msgstr ""
+
 #: comments.php:63
 msgid "You are a surprise that I will only meet once in my life"
 msgstr ""

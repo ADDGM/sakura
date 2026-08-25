@@ -215,13 +215,29 @@ input[type="submit" i], input[type="reset" i]{
 	margin-bottom:10px;
 	width:100%;
 }
-#optionsframework .section-radio label, #optionsframework .section-multicheck label {
-	display: inline-flex;
-	float:none;
-	max-width:90%;
+#optionsframework .of-radio-option,
+#optionsframework .of-multicheck-option {
+	display: block;
+	max-width: 100%;
+	min-height: 21px;
 	line-height: 16px;
 	margin-bottom: 5px;
-	margin-right: 14px;
+}
+#optionsframework .of-radio-option input.of-radio,
+#optionsframework .of-multicheck-option input.checkbox {
+	display: inline-block;
+	float: none;
+	clear: none;
+	margin: 2px 4px 0 0;
+	vertical-align: middle;
+}
+#optionsframework .of-radio-option label,
+#optionsframework .of-multicheck-option label {
+	display: inline;
+	float: none;
+	max-width: 90%;
+	line-height: 16px;
+	margin: 0 14px 0 0;
 	vertical-align: middle;
 }
 

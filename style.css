@@ -3580,6 +3580,49 @@ a.page-numbers {
   padding: 0;
 }
 
+.submit-comment-tips {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 0;
+}
+
+.popup .submit-comment-popuptext {
+  visibility: hidden;
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  width: 76px;
+  margin-left: -38px;
+  padding: 8px 3px;
+  color: #fff;
+  background-color: #555;
+  border-radius: 6px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.popup .submit-comment-popuptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.submit-comment-tips:hover > .submit-comment-popuptext,
+.submit-comment-tips:focus-within > .submit-comment-popuptext {
+  visibility: visible;
+  -webkit-animation: fadeIn 0.2s;
+  animation: fadeIn 0.2s;
+}
+
 .comment-respond input[type="submit"] {
   flex: 1 1 auto;
   width: auto;

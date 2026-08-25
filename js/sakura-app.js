@@ -249,16 +249,18 @@ function add_upload_tips() {
 
     var file = form.find('#upload-img-file').first();
     var tip = form.find('.insert-image-tips').first();
+    var submitAnchor = form.find('.submit-comment-tips').first();
+    var insertAfter = submitAnchor.length ? submitAnchor : form.find('#submit').first();
     form.find('#upload-img-file').not(file).remove();
     form.find('.insert-image-tips').not(tip).remove();
 
     if (!file.length) {
         file = $('<input id="upload-img-file" type="file" accept="image/*" multiple="multiple" class="insert-image-button">');
-        form.find('#submit').after(file);
+        insertAfter.after(file);
     }
     if (!tip.length) {
         tip = $('<label class="insert-image-tips popup" for="upload-img-file"><i class="fa fa-picture-o" aria-hidden="true"></i><span class="insert-img-popuptext" id="uploadTipPopup">上传图片</span></label>');
-        form.find('#submit').after(tip);
+        file.after(tip);
     } else if (tip.prop('tagName') !== 'LABEL') {
         tip = $('<label class="insert-image-tips popup" for="upload-img-file"></label>').html(tip.html());
         form.find('.insert-image-tips').first().replaceWith(tip);
