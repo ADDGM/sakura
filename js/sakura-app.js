@@ -397,10 +397,13 @@ $(document).ready(function () {
                     checkskinSecter();
                 }
                 if (tagid == "dark-bg") {
-                    addComment.I("content").classList.add('notransition');
-                    addComment.I("content").style.backgroundColor = "#fff";
-                    addComment.I("content").offsetHeight;
-                    addComment.I("content").classList.remove('notransition');
+                    var contentElement = document.getElementById("content");
+                    if (contentElement) {
+                        contentElement.classList.add('notransition');
+                        contentElement.style.backgroundColor = "#fff";
+                        contentElement.offsetHeight;
+                        contentElement.classList.remove('notransition');
+                    }
                     $("html").css("background", "#31363b");
                     $("body").addClass("dark");
                     setCookie("dark", "1", 0.33);
@@ -410,7 +413,10 @@ $(document).ready(function () {
                     setCookie("dark", "0", 0.33);
                     setCookie("bgImgSetting", tagid, 30);
                     setTimeout(function () {
-                        addComment.I("content").style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+                        var contentElement = document.getElementById("content");
+                        if (contentElement) {
+                            contentElement.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+                        }
                     }, 1000);
                 }
                 switch (tagid) {
@@ -550,8 +556,12 @@ timeSeriesReload();
 
 /*视频feature*/
 function coverVideo() {
-    var video = addComment.I("coverVideo");
-    var btn = addComment.I("coverVideo-btn");
+    var video = document.getElementById("coverVideo");
+    var btn = document.getElementById("coverVideo-btn");
+
+    if (!video) {
+        return;
+    }
 
     if (video.paused) {
         video.play();
@@ -569,8 +579,12 @@ function coverVideo() {
 }
 
 function killCoverVideo() {
-    var video = addComment.I("coverVideo");
-    var btn = addComment.I("coverVideo-btn");
+    var video = document.getElementById("coverVideo");
+    var btn = document.getElementById("coverVideo-btn");
+
+    if (!video) {
+        return;
+    }
 
     if (video.paused) {
         //console.info('none:killCoverVideo()');
@@ -584,8 +598,11 @@ function killCoverVideo() {
 }
 
 function loadHls(){
-    var video = addComment.I('coverVideo');
+    var video = document.getElementById('coverVideo');
     var video_src = $('#coverVideo').attr('data-src');
+    if (!video || !video_src) {
+        return;
+    }
     if (Hls.isSupported()) {
         var hls = new Hls();
         hls.loadSource(video_src);
@@ -759,8 +776,9 @@ function grin(tag, type, before, after) {
     } else {
         tag = ' :' + tag + ': ';
     }
-    if (addComment.I('comment') && addComment.I('comment').type == 'textarea') {
-        myField = addComment.I('comment');
+    var commentField = document.getElementById('comment');
+    if (commentField && commentField.type == 'textarea') {
+        myField = commentField;
     } else {
         return false;
     }
@@ -912,11 +930,13 @@ if (mashiro_option.float_player_on) {
                         }
                     }, e = 0; e < c.length; e++) d()
             };
-        document.addEventListener('DOMContentLoaded', loadMeting, !1);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadMeting, !1);
+        } else {
+            loadMeting();
+        }
     }
-    if (document.body.clientWidth > 860) {
-        aplayerF();
-    }
+    aplayerF();
 }
 
 function getqqinfo() {
@@ -1459,10 +1479,14 @@ var home = location.href,
                     var QueryStorage = [];
                     search_a(Poi.api + "sakura/v1/cache_search/json?_wpnonce=" + Poi.nonce);
 
-                    var otxt = addComment.I("search-input"),
-                        list = addComment.I("PostlistBox"),
-                        Record = list.innerHTML,
+                    var otxt = document.getElementById("search-input"),
+                        list = document.getElementById("PostlistBox"),
+                        Record,
                         searchFlag = null;
+                    if (!otxt || !list) {
+                        return;
+                    }
+                    Record = list.innerHTML;
                     otxt.oninput = function () {
                         if (searchFlag = null) {
                             clearTimeout(searchFlag);
@@ -1573,7 +1597,7 @@ var home = location.href,
                                     break
                             }
                         }
-                        w && (y = y + G + "文章" + E + w + D), u && (y = y + G + "页面" + E + u + D), r && (y = y + G + "分类" + E + r + D), p && (y = y + G + "标签" + E + p + D), F && (y = y + G + "评论" + E + F + D), s = addComment.I("PostlistBox"), s.innerHTML = y
+                        w && (y = y + G + "文章" + E + w + D), u && (y = y + G + "页面" + E + u + D), r && (y = y + G + "分类" + E + r + D), p && (y = y + G + "标签" + E + p + D), F && (y = y + G + "评论" + E + F + D), list.innerHTML = y
                     }
                 }
             });
@@ -1618,9 +1642,9 @@ var home = location.href,
             var intersectionObserver = new IntersectionObserver(function (entries) {
                 if (entries[0].intersectionRatio <= 0) return;
                 var page_next = $('#pagination a').attr("href");
-                var load_key = addComment.I("add_post_time");
+                var load_key = document.getElementById("add_post_time");
                 if (page_next != undefined && load_key) {
-                    var load_time = addComment.I("add_post_time").title;
+                    var load_time = load_key.title;
                     if (load_time != "233") {
                         console.log("%c 自动加载时倒计时 %c", "background:#9a9da2; color:#ffffff; border-radius:4px;", "", "", load_time);
                         load_post_timer = setTimeout(function () {
@@ -1975,7 +1999,7 @@ if ((isWebkit || isOpera || isIe) && document.getElementById && window.addEventL
         if (!(/^[A-z0-9_-]+$/.test(id))) {
             return;
         }
-        element = addComment.I(id);
+        element = document.getElementById(id);
         if (element) {
             if (!(/^(?:a|select|input|button|textarea)$/i.test(element.tagName))) {
                 element.tabIndex = -1;

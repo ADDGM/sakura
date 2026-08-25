@@ -1181,18 +1181,22 @@ a:hover {
 
 @media (max-width: 1200px) {
   .site-top .lower nav {
-    right: calc(-150px - 100%);
+    right: 0;
     position: absolute;
     float: right;
     animation: searchbox 0.2s;
-    min-width: 860px;
+    min-width: 0;
+    max-width: calc(100vw - 300px);
+    overflow-x: auto;
+    overflow-y: hidden;
     z-index: -1;
   }
   .site-top .lower nav.navbar {
-    right: calc(-50px - 100%);
+    right: 0;
   }
-  .site-top .lower nav.navbar ul {
+  .site-top .lower nav ul {
     background: #fff;
+    white-space: nowrap;
   }
 }
 
@@ -5271,7 +5275,7 @@ i.iconfont.down {
     float: right;
     height: 50px;
     line-height: 43px;
-    margin-right: -6px;
+    margin-right: 0;
   }
   .site-title img {
     height: 40px;

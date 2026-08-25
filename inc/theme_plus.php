@@ -15,6 +15,7 @@ show_admin_bar(false);
  * 视频
  */
 function bgvideo(){
+  $dis = '';
   if(!akina_option('focus_amv') || akina_option('focus_height')) $dis = 'display:none;';
   $html = '<div id="video-container" style="'.$dis.'">'; 
   $html .= '<video id="bgvideo" class="video" video-name="" src="" width="auto" preload="auto"></video>';
@@ -465,10 +466,16 @@ function the_video_headPattern_normal(){
 function header_user_menu(){
   global $current_user;wp_get_current_user(); 
   if(is_user_logged_in()){
-    $ava = akina_option('focus_logo') ? akina_option('focus_logo') : get_avatar_url( $current_user->user_email );
+    $avatar_fallback = get_template_directory_uri() . '/images/avatar.jpg';
+    $ava = akina_option('focus_logo')
+      ? akina_option('focus_logo')
+      : get_avatar_url($current_user->user_email, array(
+        'size' => 64,
+        'default' => $avatar_fallback,
+      ));
     ?>
     <div class="header-user-avatar">
-      <img class="faa-spin animated-hover" src="<?php echo get_avatar_url( $current_user->ID, 64 );/*$ava;*/ ?>" width="30" height="30">
+      <img class="faa-spin animated-hover" src="<?php echo esc_url($ava); ?>" width="30" height="30" alt="<?php echo esc_attr($current_user->display_name); ?>" onerror="this.onerror=null;this.src='<?php echo esc_js($avatar_fallback); ?>';">
       <div class="header-user-menu">
         <div class="herder-user-name">Signed in as 
           <div class="herder-user-name-u"><?php echo $current_user->display_name; ?></div>
