@@ -45,6 +45,13 @@ $sourceChecks = array(
     array('js/aplayer-localization.js', '音频加载失败', 'APlayer 音频错误提示未完成中文化。'),
     array('js/aplayer-localization.js', '歌词加载失败', 'APlayer 歌词错误提示未完成中文化。'),
     array('tpl/content-thumb.php', 'substr(the_excerpt()', '文章摘要仍把 the_excerpt() 返回值传给 substr()。'),
+    array('inc/theme_plus.php', '$dis = \'\';', '视频显示变量未初始化。'),
+    array('inc/theme_plus.php', 'esc_url($ava)', '登录头像未使用已解析的头像地址。'),
+    array('inc/theme_plus.php', 'this.onerror=null', '登录头像未配置本地失败回退。'),
+    array('js/sakura-app.js', 'document.getElementById("add_post_time")', '无限滚动仍未使用标准 DOM API。'),
+    array('js/sakura-app.js', 'if (document.readyState === \'loading\')', '播放器未兼容脚本加载时序。'),
+    array('js/sakura-app.js', '    aplayerF();', '播放器未执行移动端兼容初始化。'),
+    array('inc/css/optionsframework.css', '@media (max-width: 782px)', '主题设置页缺少移动端响应式规则。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -63,6 +70,13 @@ foreach ($sourceChecks as $check) {
 $styleSource = file_get_contents(get_template_directory() . '/style.css');
 if ($styleSource === false || strpos($styleSource, '.site-main::after') === false) {
     $errors[] = '内容区未清除内部浮动。';
+}
+$scriptSource = file_get_contents(get_template_directory() . '/js/sakura-app.js');
+if ($scriptSource === false || preg_match('/\baddComment\.I\s*\(/', $scriptSource)) {
+    $errors[] = '主题脚本仍在自定义评论对象外部依赖 addComment.I。';
+}
+if ($scriptSource === false || preg_match('/if\s*\(\s*document\.body\.clientWidth\s*>\s*860\s*\)\s*\{\s*aplayerF\(\);/', $scriptSource)) {
+    $errors[] = '播放器仍限制为桌面宽度初始化。';
 }
 
 if (convertip('invalid-ip') !== 'Unknown') {

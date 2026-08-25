@@ -49,6 +49,8 @@ jobs:
           php scripts/validate-commit-messages.php --self-test
           php scripts/generate-release-notes.php --self-test
           php scripts/theme-metadata.php --self-test
+          php scripts/compile-translations.php --self-test
+          php scripts/compile-translations.php --check
 
       - name: Build installable test package
         shell: bash
