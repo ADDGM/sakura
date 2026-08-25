@@ -44,6 +44,9 @@ $sourceChecks = array(
     array('functions.php', 'aplayer_localization', '前端未加载 APlayer 中文提示兼容脚本。'),
     array('js/aplayer-localization.js', '音频加载失败', 'APlayer 音频错误提示未完成中文化。'),
     array('js/aplayer-localization.js', '歌词加载失败', 'APlayer 歌词错误提示未完成中文化。'),
+    array('comments.php', '<!--此栏不可见--></div>', '评论信息容器未在自定义 QQ 字段后稳定闭合。'),
+    array('js/sakura-app.js', "off('change.sakuraUpload'", '评论图片上传事件未使用幂等的命名空间绑定。'),
+    array('js/sakura-app.js', '<label class="insert-image-tips popup" for="upload-img-file">', '评论图片上传按钮未使用可访问的 label 触发文件控件。'),
     array('tpl/content-thumb.php', 'substr(the_excerpt()', '文章摘要仍把 the_excerpt() 返回值传给 substr()。'),
     array('inc/theme_plus.php', '$dis = \'\';', '视频显示变量未初始化。'),
     array('inc/theme_plus.php', 'esc_url($ava)', '登录头像未使用已解析的头像地址。'),
@@ -52,6 +55,8 @@ $sourceChecks = array(
     array('js/sakura-app.js', 'if (document.readyState === \'loading\')', '播放器未兼容脚本加载时序。'),
     array('js/sakura-app.js', '    aplayerF();', '播放器未执行移动端兼容初始化。'),
     array('inc/css/optionsframework.css', '@media (max-width: 782px)', '主题设置页缺少移动端响应式规则。'),
+    array('inc/css/optionsframework.css', '#optionsframework input.of-radio', '主题设置页未隔离普通单选控件样式。'),
+    array('style.css', '.site-top .lower nav > .menu > ul', '中等宽度导航未区分顶级菜单和下拉菜单。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -71,12 +76,25 @@ $styleSource = file_get_contents(get_template_directory() . '/style.css');
 if ($styleSource === false || strpos($styleSource, '.site-main::after') === false) {
     $errors[] = '内容区未清除内部浮动。';
 }
+if ($styleSource === false || preg_match('/\.insert-image-button\s*\{[^}]*translateY/s', $styleSource)) {
+    $errors[] = '评论图片上传控件仍通过位移覆盖其他控件。';
+}
+if ($styleSource === false || strpos($styleSource, 'width: calc(98% - 46px)') !== false) {
+    $errors[] = '评论提交按钮仍依赖固定宽度为上传控件让位。';
+}
+$optionsStyleSource = file_get_contents(get_template_directory() . '/inc/css/optionsframework.css');
+if ($optionsStyleSource === false || preg_match('/input\[type=checkbox\]\s*,\s*input\[type=radio\]/', $optionsStyleSource)) {
+    $errors[] = '主题设置页仍使用旧规则全局覆盖 WordPress 单选控件。';
+}
 $scriptSource = file_get_contents(get_template_directory() . '/js/sakura-app.js');
 if ($scriptSource === false || preg_match('/\baddComment\.I\s*\(/', $scriptSource)) {
     $errors[] = '主题脚本仍在自定义评论对象外部依赖 addComment.I。';
 }
 if ($scriptSource === false || preg_match('/if\s*\(\s*document\.body\.clientWidth\s*>\s*860\s*\)\s*\{\s*aplayerF\(\);/', $scriptSource)) {
     $errors[] = '播放器仍限制为桌面宽度初始化。';
+}
+if ($scriptSource === false || strpos($scriptSource, 'insertAfter($(".form-submit #submit"))') !== false) {
+    $errors[] = '评论图片上传控件仍使用非幂等的重复插入逻辑。';
 }
 
 if (convertip('invalid-ip') !== 'Unknown') {

@@ -96,7 +96,7 @@ a#options-group-8-tab:before {
     float: left;
 }
 
-input[type=checkbox], input[type=radio] {
+input[type=checkbox] {
     border: 1px solid #b4b9be;
     background: #fff;
     color: #555;
@@ -216,10 +216,13 @@ input[type="submit" i], input[type="reset" i]{
 	width:100%;
 }
 #optionsframework .section-radio label, #optionsframework .section-multicheck label {
-	float:left;
+	display: inline-flex;
+	float:none;
 	max-width:90%;
 	line-height: 16px;
 	margin-bottom: 5px;
+	margin-right: 14px;
+	vertical-align: middle;
 }
 
 @media (max-width: 782px) {
@@ -251,11 +254,22 @@ input[type="submit" i], input[type="reset" i]{
 		max-width: 100%;
 	}
 }
-#optionsframework input.checkbox, #optionsframework input.of-radio {
+#optionsframework input.checkbox {
 	width: 15px;
 	margin-top:2px;
 	float:left;
 	clear:both;
+	border-radius: 50%;
+}
+#optionsframework input.of-radio {
+	display: inline-block;
+	width: 16px;
+	min-width: 16px;
+	height: 16px;
+	margin: 2px 4px 0 0;
+	float: none;
+	clear: none;
+	vertical-align: middle;
 	border-radius: 50%;
 }
 #optionsframework .section-typography .controls {

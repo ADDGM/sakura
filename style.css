@@ -1194,9 +1194,12 @@ a:hover {
   .site-top .lower nav.navbar {
     right: 0;
   }
-  .site-top .lower nav ul {
-    background: #fff;
+  .site-top .lower nav > .menu > ul {
+    background: transparent;
     white-space: nowrap;
+  }
+  .site-top .lower nav > .menu > ul li ul {
+    background: #fff;
   }
 }
 
@@ -3569,14 +3572,17 @@ a.page-numbers {
 
 .comment-respond .form-submit {
   clear: both;
-  display: block;
-  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  overflow: visible;
   margin-bottom: 40px;
   padding: 0;
 }
 
 .comment-respond input[type="submit"] {
-  width: calc(98% - 46px);
+  flex: 1 1 auto;
+  width: auto;
   margin: 0;
   padding: 15px 25px;
   text-transform: none;
@@ -7813,6 +7819,11 @@ a.toc-link {
   pointer-events: none;
 }
 
+.cmt-info-container {
+  position: relative;
+  min-height: 84px;
+}
+
 .comment-user-avatar img {
   width: 100%;
   height: 100%;
@@ -7976,7 +7987,12 @@ a.toc-link {
 }
 
 .insert-image-tips {
-  float: right;
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 46px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   width: 46px;
   margin: 0;
@@ -8002,14 +8018,16 @@ a.toc-link {
 }
 
 .insert-image-button {
-  opacity: 0;
-  width: 46px !important;
-  height: 46px !important;
-  margin: 0 !important;
+  position: absolute;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
   padding: 0 !important;
-  float: right;
-  transform: translateY(-46px);
-  cursor: pointer;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .insert-image-tips-hover {

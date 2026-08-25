@@ -556,7 +556,7 @@ msgstr ""
 
 #: options.php:170
 msgid "logo"
-msgstr ""
+msgstr "标志（Logo）"
 
 #: options.php:171
 msgid "The best height size is 40px。"
@@ -564,7 +564,7 @@ msgstr "最佳高度尺寸40px。"
 
 #: options.php:176
 msgid "Favicon"
-msgstr ""
+msgstr "网站图标"
 
 #: options.php:177
 msgid "It is the small logo on the browser tab, fill in the url"

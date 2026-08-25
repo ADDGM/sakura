@@ -178,19 +178,20 @@ if (Poi.reply_link_version == 'new') {
 }
 
 function attach_image() {
-    var cached = $('.insert-image-tips');
-    $('#upload-img-file').change(function () {
+    var cached = $('.insert-image-tips').first();
+    $(document).off('change.sakuraUpload', '#upload-img-file').on('change.sakuraUpload', '#upload-img-file', function () {
+        var files = this.files;
         if (this.files.length > 10) {
             addComment.createButterbar("每次上传上限为10张.<br>10 files max per request.");
             return 0;
         }
-        for (i = 0; i < this.files.length; i++) {
-            if (this.files[i].size >= 5242880) {
-                alert('图片上传大小限制为5 MB.\n5 MB max per file.\n\n「' + this.files[i].name + '」\n\n这张图太大啦~\nThis image is too large~');
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].size >= 5242880) {
+                alert('图片上传大小限制为5 MB.\n5 MB max per file.\n\n「' + files[i].name + '」\n\n这张图太大啦~\nThis image is too large~');
             }
         }
-        for (var i = 0; i < this.files.length; i++) {
-            var f = this.files[i];
+        for (var i = 0; i < files.length; i++) {
+            var f = files[i];
             var formData = new FormData();
             formData.append('cmt_img_file', f);
             $.ajax({
@@ -213,7 +214,7 @@ function attach_image() {
                         $('#upload-img-show').append('<img class="lazyload upload-image-preview" src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg" data-src="' + get_the_url + '" onclick="window.open(\'' + get_the_url + '\')" onerror="imgError(this)" />');
                         lazyload();
                         addComment.createButterbar("图片上传成功~<br>Uploaded successfully~");
-                        grin(get_the_url, type = 'Img');
+                        grin(get_the_url, 'Img');
                     } else {
                         addComment.createButterbar("上传失败！<br>Uploaded failed!<br> 文件名/Filename: "+f.name+"<br>code: "+res.status+"<br>"+res.message, 3000);
                     }
@@ -241,14 +242,36 @@ function clean_upload_images() {
 }
 
 function add_upload_tips() {
-    $('<div class="insert-image-tips popup"><i class="fa fa-picture-o" aria-hidden="true"></i><span class="insert-img-popuptext" id="uploadTipPopup">上传图片</span></div><input id="upload-img-file" type="file" accept="image/*" multiple="multiple" class="insert-image-button">').insertAfter($(".form-submit #submit"));
+    var form = $('.form-submit').first();
+    if (!form.length) {
+        return;
+    }
+
+    var file = form.find('#upload-img-file').first();
+    var tip = form.find('.insert-image-tips').first();
+    form.find('#upload-img-file').not(file).remove();
+    form.find('.insert-image-tips').not(tip).remove();
+
+    if (!file.length) {
+        file = $('<input id="upload-img-file" type="file" accept="image/*" multiple="multiple" class="insert-image-button">');
+        form.find('#submit').after(file);
+    }
+    if (!tip.length) {
+        tip = $('<label class="insert-image-tips popup" for="upload-img-file"><i class="fa fa-picture-o" aria-hidden="true"></i><span class="insert-img-popuptext" id="uploadTipPopup">上传图片</span></label>');
+        form.find('#submit').after(tip);
+    } else if (tip.prop('tagName') !== 'LABEL') {
+        tip = $('<label class="insert-image-tips popup" for="upload-img-file"></label>').html(tip.html());
+        form.find('.insert-image-tips').first().replaceWith(tip);
+    }
+
+    tip.attr('for', 'upload-img-file');
     attach_image();
-    $("#upload-img-file").hover(function () {
-        $(".insert-image-tips").addClass("insert-image-tips-hover");
-        $("#uploadTipPopup").addClass("show");
-    }, function () {
-        $(".insert-image-tips").removeClass("insert-image-tips-hover");
-        $("#uploadTipPopup").removeClass("show");
+    tip.off('.sakuraUploadHover').on('mouseenter.sakuraUploadHover', function () {
+        tip.addClass('insert-image-tips-hover');
+        tip.find('#uploadTipPopup').addClass('show');
+    }).on('mouseleave.sakuraUploadHover', function () {
+        tip.removeClass('insert-image-tips-hover');
+        tip.find('#uploadTipPopup').removeClass('show');
     });
 }
 
