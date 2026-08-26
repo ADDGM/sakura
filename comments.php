@@ -76,7 +76,7 @@
 						'cancel_reply_link' => __('Cancel Reply', 'sakura'),
 						'label_submit' => __('BiuBiuBiu~', 'sakura'),
 						'submit_button' => '<input name="%1$s" type="submit" id="%2$s" class="%3$s" value="%4$s" title="' . esc_attr__( 'Submit comment', 'sakura' ) . '" aria-label="' . esc_attr__( 'Submit comment', 'sakura' ) . '" />',
-						'submit_field' => '<p class="form-submit"><span class="submit-comment-tips popup"><span class="submit-comment-popuptext">' . esc_html__( 'Submit comment', 'sakura' ) . '</span>%1$s</span>%2$s</p>',
+						'submit_field' => '<p class="form-submit"><span class="submit-comment-tips"><span class="submit-comment-popuptext">' . esc_html__( 'Submit comment', 'sakura' ) . '</span>%1$s</span>%2$s</p>',
 						'comment_field' => '<p style="font-style:italic"><a href="https://segmentfault.com/markdown" target="_blank"><i class="iconfont icon-markdown" style="color:#000"></i></a> Markdown Supported while <i class="fa fa-code" aria-hidden="true"></i> Forbidden</p><div class="comment-textarea"><textarea placeholder="' . __("You are a surprise that I will only meet once in my life", "sakura") . ' ..." name="comment" class="commentbody" id="comment" rows="5" tabindex="4"></textarea><label class="input-label">' . __("You are a surprise that I will only meet once in my life", "sakura") . ' ...</label></div>
                         <div id="upload-img-show"></div>
                         <!--插入表情面版-->

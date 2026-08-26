@@ -3589,7 +3589,7 @@ a.page-numbers {
   min-width: 0;
 }
 
-.popup .submit-comment-popuptext {
+.submit-comment-tips .submit-comment-popuptext {
   visibility: hidden;
   position: absolute;
   z-index: 2;
@@ -3605,7 +3605,7 @@ a.page-numbers {
   pointer-events: none;
 }
 
-.popup .submit-comment-popuptext::after {
+.submit-comment-tips .submit-comment-popuptext::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -3624,8 +3624,10 @@ a.page-numbers {
 }
 
 .comment-respond input[type="submit"] {
+  display: block;
   flex: 1 1 auto;
-  width: auto;
+  width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 15px 25px;
   text-transform: none;

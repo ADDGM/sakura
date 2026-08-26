@@ -46,7 +46,7 @@ $sourceChecks = array(
     array('js/aplayer-localization.js', '歌词加载失败', 'APlayer 歌词错误提示未完成中文化。'),
     array('comments.php', '<!--此栏不可见--></div>', '评论信息容器未在自定义 QQ 字段后稳定闭合。'),
     array('comments.php', 'if ( ! is_user_logged_in() )', '登录用户仍会输出匿名评论头像辅助字段。'),
-    array('comments.php', 'submit-comment-tips popup', '评论提交按钮缺少中文提示容器。'),
+    array('comments.php', "'submit_field' => '<p class=\"form-submit\"><span class=\"submit-comment-tips\">", '评论提交按钮缺少专用提示容器。'),
     array('comments.php', "esc_attr__( 'Submit comment', 'sakura' )", '评论提交按钮缺少可访问的提示属性。'),
     array('js/sakura-app.js', "off('change.sakuraUpload'", '评论图片上传事件未使用幂等的命名空间绑定。'),
     array('js/sakura-app.js', '<label class="insert-image-tips popup" for="upload-img-file">', '评论图片上传按钮未使用可访问的 label 触发文件控件。'),
@@ -81,6 +81,10 @@ foreach ($sourceChecks as $check) {
 }
 
 $styleSource = file_get_contents(get_template_directory() . '/style.css');
+$commentsSource = file_get_contents(get_template_directory() . '/comments.php');
+if ($commentsSource === false || strpos($commentsSource, 'submit-comment-tips popup') !== false) {
+    $errors[] = '评论提交容器仍依赖通用 popup 布局类。';
+}
 if ($styleSource === false || strpos($styleSource, '.site-main::after') === false) {
     $errors[] = '内容区未清除内部浮动。';
 }
@@ -89,6 +93,12 @@ if ($styleSource === false || preg_match('/\.insert-image-button\s*\{[^}]*transl
 }
 if ($styleSource === false || strpos($styleSource, 'width: calc(98% - 46px)') !== false) {
     $errors[] = '评论提交按钮仍依赖固定宽度为上传控件让位。';
+}
+if ($styleSource === false || strpos($styleSource, '.submit-comment-tips .submit-comment-popuptext') === false) {
+    $errors[] = '评论提交提示仍依赖通用 popup 后代选择器。';
+}
+if ($styleSource === false || !preg_match('/\.comment-respond input\[type="submit"\]\s*\{[^}]*display:\s*block;[^}]*width:\s*100%;/s', $styleSource)) {
+    $errors[] = '评论提交按钮未填满提交区域。';
 }
 $optionsStyleSource = file_get_contents(get_template_directory() . '/inc/css/optionsframework.css');
 if ($optionsStyleSource === false || preg_match('/input\[type=checkbox\]\s*,\s*input\[type=radio\]/', $optionsStyleSource)) {
