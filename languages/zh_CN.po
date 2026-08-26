@@ -599,12 +599,12 @@ msgid "Describe the site in concise text, with a maximum of 120 words."
 msgstr "用简洁的文字描述本站点，字数建议在120个字以内。"
 
 #: options.php:204
-msgid "Expand the nav menu"
-msgstr "展开导航菜单"
+msgid "Expand the nav menu on wide screens"
+msgstr "宽屏展开导航菜单"
 
 #: options.php:205
-msgid "Check to enable, default shrink"
-msgstr "勾选开启，默认收缩"
+msgid "Enable to expand the navigation menu by default on wide screens. It will still collapse automatically when space is limited."
+msgstr "启用后在宽屏上默认展开导航菜单；空间不足时仍会自动折叠。"
 
 #: options.php:211
 msgid "Head decoration"

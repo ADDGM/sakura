@@ -1,10 +1,6 @@
 <?php
 function customizer_css() { ?>
 <style type="text/css">
-<?php // Style Settings
-if ( akina_option('shownav') ) { ?>
-.site-top .lower nav {display: block !important;}
-<?php } // Style Settings ?>
 <?php // theme-skin
 if ( akina_option('theme_skin') ) { ?>
 .author-profile i , .post-like a , .post-share .show-share , .sub-text , .we-info a , span.sitename , .post-more i:hover , #pagination a:hover , .post-content a:hover , .float-content i:hover{ color: <?php echo akina_option('theme_skin'); ?> }

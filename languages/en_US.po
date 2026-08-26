@@ -584,11 +584,11 @@ msgid "Describe the site in concise text, with a maximum of 120 words."
 msgstr ""
 
 #: options.php:204
-msgid "Expand the nav menu"
+msgid "Expand the nav menu on wide screens"
 msgstr ""
 
 #: options.php:205
-msgid "Check to enable, default shrink"
+msgid "Enable to expand the navigation menu by default on wide screens. It will still collapse automatically when space is limited."
 msgstr ""
 
 #: options.php:211

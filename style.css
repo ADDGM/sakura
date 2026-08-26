@@ -1123,6 +1123,14 @@ a:hover {
   display: block;
 }
 
+.site-top .lower.nav-default-open nav {
+  display: block;
+}
+
+.site-top .lower.nav-default-open #show-nav {
+  display: none;
+}
+
 .m-nav {
   display: none;
 }
@@ -1179,25 +1187,47 @@ a:hover {
   max-width: 100%;
 }
 
-@media (max-width: 1200px) {
+@media (min-width: 861px) and (max-width: 1200px) {
+  .site-top .lower.nav-default-open #show-nav {
+    display: block;
+  }
+
   .site-top .lower nav {
-    right: 0;
-    position: absolute;
+    right: auto;
+    position: relative;
     float: right;
     animation: searchbox 0.2s;
-    min-width: 0;
-    max-width: calc(100vw - 300px);
-    overflow-x: auto;
-    overflow-y: hidden;
-    z-index: -1;
+    width: max-content;
+    max-width: calc(100vw - 320px);
+    overflow: visible;
+    z-index: 1;
+    box-sizing: border-box;
   }
+
+  .site-top .lower.nav-default-open nav {
+    display: none;
+  }
+
   .site-top .lower nav.navbar {
-    right: 0;
+    display: block;
   }
+
+  .site-top .lower nav > ul.menu,
   .site-top .lower nav > .menu > ul {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
     background: transparent;
     white-space: nowrap;
   }
+
+  .site-top .lower nav > ul.menu > li,
+  .site-top .lower nav > .menu > ul > li {
+    float: none;
+    flex: 0 0 auto;
+  }
+
+  .site-top .lower nav > ul.menu li ul,
   .site-top .lower nav > .menu > ul li ul {
     background: #fff;
   }

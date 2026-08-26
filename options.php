@@ -201,8 +201,8 @@ function optionsframework_options()
         'type' => 'text');
 
     $options[] = array(
-        'name' => __('Expand the nav menu', 'sakura'), /*展开导航菜单*/
-        'desc' => __('Check to enable, default shrink', 'sakura'), /*勾选开启，默认收缩*/
+        'name' => __('Expand the nav menu on wide screens', 'sakura'), /*宽屏展开导航菜单*/
+        'desc' => __('Enable to expand the navigation menu by default on wide screens. It will still collapse automatically when space is limited.', 'sakura'), /*启用后在宽屏上默认展开导航菜单；空间不足时仍会自动折叠。*/
         'id' => 'shownav',
         'std' => '0',
         'type' => 'checkbox');

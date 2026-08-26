@@ -63,7 +63,14 @@ $sourceChecks = array(
     array('inc/options-interface.php', 'class="of-radio-option"', '主题设置页普通单选控件缺少选项包装。'),
     array('inc/options-interface.php', 'class="of-multicheck-option"', '主题设置页多选控件缺少选项包装。'),
     array('inc/options-framework.php', "defined( 'SAKURA_VERSION' ) ? SAKURA_VERSION : false", '主题设置页资源未使用主题版本控制缓存。'),
-    array('style.css', '.site-top .lower nav > .menu > ul', '中等宽度导航未区分顶级菜单和下拉菜单。'),
+    array('header.php', 'nav-default-open', '导航未使用状态类表达宽屏默认展开。'),
+    array('header.php', 'id="show-nav"', '桌面导航缺少折叠按钮。'),
+    array('style.css', '@media (min-width: 861px) and (max-width: 1200px)', '导航缺少中等宽度专用断点。'),
+    array('style.css', '.site-top .lower nav > ul.menu > li', '中等宽度导航未兼容自定义菜单结构。'),
+    array('style.css', '.site-top .lower nav > .menu > ul > li', '中等宽度导航未兼容页面回退菜单结构。'),
+    array('style.css', 'flex-wrap: nowrap;', '中等宽度导航未保持顶级菜单单行排列。'),
+    array('style.css', 'overflow: visible;', '中等宽度导航会裁切二级菜单。'),
+    array('style.css', '#mo-nav.open', '移动端左侧抽屉导航规则缺失。'),
     array('style.css', '.submit-comment-tips:focus-within', '评论提交按钮缺少键盘焦点提示样式。'),
 );
 foreach ($sourceChecks as $check) {
@@ -82,6 +89,14 @@ foreach ($sourceChecks as $check) {
 
 $styleSource = file_get_contents(get_template_directory() . '/style.css');
 $commentsSource = file_get_contents(get_template_directory() . '/comments.php');
+$headerSource = file_get_contents(get_template_directory() . '/header.php');
+$decorateSource = file_get_contents(get_template_directory() . '/inc/decorate.php');
+if ($headerSource === false || strpos($headerSource, "if(!akina_option('shownav'))") !== false) {
+    $errors[] = '桌面导航折叠按钮仍受宽屏默认展开设置控制。';
+}
+if ($decorateSource === false || strpos($decorateSource, '.site-top .lower nav {display: block !important;}') !== false) {
+    $errors[] = '宽屏默认展开设置仍通过内联 !important 破坏响应式导航。';
+}
 if ($commentsSource === false || strpos($commentsSource, 'submit-comment-tips popup') !== false) {
     $errors[] = '评论提交容器仍依赖通用 popup 布局类。';
 }

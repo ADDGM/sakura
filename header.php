@@ -106,12 +106,12 @@ window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
 					<?php header_user_menu(); if(akina_option('top_search') == 'yes') { ?>
 					<div class="searchbox"><i class="iconfont js-toggle-search iconsearch icon-search"></i></div>
 					<?php } ?>
-					<div class="lower"><?php if(!akina_option('shownav')){ ?>
+					<div class="lower<?php echo akina_option('shownav') ? ' nav-default-open' : ''; ?>">
 						<div id="show-nav" class="showNav">
 							<div class="line line1"></div>
 							<div class="line line2"></div>
 							<div class="line line3"></div>
-						</div><?php } ?>
+						</div>
 						<nav><?php wp_nav_menu( array( 'depth' => 2, 'theme_location' => 'primary', 'container' => false ) ); ?></nav><!-- #site-navigation -->
 					</div>	
 				</div>
