@@ -1,26 +1,37 @@
 /* Options Framework Admin Styles */
 
-body {
+/*
+ * 全部规则限定在主题设置页容器内，不再影响该页面上的其他后台元素。
+ * 标签页位于 #optionsframework 之外，因此用 #optionsframework-wrap 作前缀；
+ * 表单控件则收紧到 #optionsframework。
+ *
+ * 注意：以下规则刻意保留原有书写顺序（包括 .nav-tab-active 的两处定义）。
+ * 加前缀后各选择器的相对特异性不变，层叠结果与作用域化之前完全一致。
+ *
+ * 原 body 规则中的 background 已移除：它会遮挡 Sakura/Custom 后台配色方案
+ * 注入的 body 背景，导致设置页与其他后台页面外观不一致。
+ */
+
+#optionsframework-wrap {
 	font-family:miranafont,"Hiragino Sans GB",STXihei,"Microsoft YaHei",SimSun,sans-serif;
-	background:#F5F5F5 ;
 	height: auto;
 }
 
-.nav-tab-wrapper {
+#optionsframework-wrap .nav-tab-wrapper {
 	position: relative;
     max-width: 900px;
     margin: auto !important;
 }
 
-.wrap h2.nav-tab-wrapper {
+#optionsframework-wrap h2.nav-tab-wrapper {
 	border-bottom:none
 }
 
-.metabox-holder {
+#optionsframework-metabox {
 	padding-top:0 !important
 }
 
-.nav-tab-active {
+#optionsframework-wrap .nav-tab-active {
 	border-bottom: none;
     background: #fff;
     color: #000;
@@ -30,11 +41,11 @@ body {
     color: #4B6894;
 }
 
-.nav-tab-active:hover {
+#optionsframework-wrap .nav-tab-active:hover {
     background: #fff;
 }
 
-.nav-tab {
+#optionsframework-wrap .nav-tab {
 	background: none;
 	border:none;
 	padding: 10px 15px;
@@ -44,59 +55,59 @@ body {
     border-radius: 3px 3px 0 0;
 }
 
-.nav-tab-active {
+#optionsframework-wrap .nav-tab-active {
 	background:#fff
 }
 
-a#options-group-1-tab:before {
+#optionsframework-wrap a#options-group-1-tab:before {
 	font-family: "dashicons";
     content: "\f111";
 	float: left;
 }
 
-a#options-group-2-tab:before {
+#optionsframework-wrap a#options-group-2-tab:before {
     font-family: "dashicons";
     content: "\f102";
     float: left;
 }
 
-a#options-group-3-tab:before {
+#optionsframework-wrap a#options-group-3-tab:before {
     font-family: "dashicons";
     content: "\f123";
     float: left;
 }
 
-a#options-group-4-tab:before {
+#optionsframework-wrap a#options-group-4-tab:before {
     font-family: "dashicons";
     content: "\f487";
     float: left;
 }
 
-a#options-group-5-tab:before {
+#optionsframework-wrap a#options-group-5-tab:before {
     font-family: "dashicons";
     content: "\f101";
     float: left;
 }
 
-a#options-group-6-tab:before {
+#optionsframework-wrap a#options-group-6-tab:before {
     font-family: "dashicons";
     content: "\f110";
     float: left;
 }
 
-a#options-group-7-tab:before {
+#optionsframework-wrap a#options-group-7-tab:before {
     font-family: "dashicons";
     content: "\f325";
     float: left;
 }
 
-a#options-group-8-tab:before { 
+#optionsframework-wrap a#options-group-8-tab:before {
     font-family: "dashicons";
     content: "\f487";
     float: left;
 }
 
-input[type=checkbox] {
+#optionsframework input[type=checkbox] {
     border: 1px solid #b4b9be;
     background: #fff;
     color: #555;
@@ -115,34 +126,34 @@ input[type=checkbox] {
     box-shadow: none
 }
 
-input[type="button"]{
+/* 红色按钮与保存按钮（#FF6464）同属主题设置页的既有设计语言，予以保留。
+   作用域收紧后，该规则不再影响 #optionsframework 之外的任何元素。 */
+#optionsframework input[type="button"]{
 	box-shadow: none !important;
     border: none !important;
 	background:#FF5858 !important;
 	color:#fff !important
-} 
+}
 
-input[type=text], 
-input[type=password], 
-input[type=checkbox], 
-input[type=color], 
-input[type=date], 
-input[type=datetime], 
-input[type=datetime-local], 
-input[type=email], 
-input[type=month], 
-input[type=number], 
-input[type=radio], 
-input[type=tel], 
-input[type=time], 
-input[type=url], 
-input[type=week], 
-input[type=search], 
-select, textarea{
+#optionsframework input[type=text],
+#optionsframework input[type=password],
+#optionsframework input[type=checkbox],
+#optionsframework input[type=color],
+#optionsframework input[type=date],
+#optionsframework input[type=datetime],
+#optionsframework input[type=datetime-local],
+#optionsframework input[type=email],
+#optionsframework input[type=month],
+#optionsframework input[type=number],
+#optionsframework input[type=radio],
+#optionsframework input[type=tel],
+#optionsframework input[type=time],
+#optionsframework input[type=url],
+#optionsframework input[type=week],
+#optionsframework input[type=search],
+#optionsframework select,
+#optionsframework textarea{
 	box-shadow:none
-} 
-input[type="submit" i], input[type="reset" i]{
-	
 }
 
 #optionsframework h4 {
@@ -475,31 +486,10 @@ input[type="submit" i], input[type="reset" i]{
 	clear: both;
 }
 
-input.of-radio-img-radio{display: none;}
-.of-radio-img-label{display: none;}
-.of-radio-color{
+#optionsframework input.of-radio-img-radio{display: none;}
+#optionsframework .of-radio-img-label{display: none;}
+#optionsframework .of-radio-color{
 	display: inline-block;width: 20px;height: 20px;margin: 0 5px 0 0;
-}
-#optionsframework .controls .of-radio-img-img {
-	border:3px solid #f9f9f9;
-	margin:0 5px 10px 0;
-	/*display:none;*/
-	cursor:pointer;
-	float:left;
-}
-#optionsframework .controls .of-radio-img-selected {
-	border:3px solid #ccc
-}
-#optionsframework .controls .of-radio-img-img:hover {
-	opacity:.8;
-}
-#optionsframework .controls .of-border-width {
-	width:80px;
-	float:left
-}
-#optionsframework .controls .of-border-style {
-	width:120px;
-	float:left
 }
 
 
