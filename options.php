@@ -957,9 +957,11 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Other custom panel styles(CSS)', 'sakura'), /*其他自定义面板样式(CSS)*/
-        'desc' => __('If you need to adjust other styles of the panel, put the style here.', 'sakura'), /*如果还需要对面板其他样式进行调整可以把style放到这里*/
+        'desc' => __('If you need to adjust other styles of the panel, put the style here. This only takes effect when the color scheme is set to Custom. The default value contains a commented-out example, uncomment it and fill in your own image URL to set a dashboard background.', 'sakura'), /*如果还需要对面板其他样式进行调整可以把style放到这里。仅在配色方案选择 Custom 时生效。默认值中包含一段已注释的示例，取消注释并填入你自己的图片地址即可设置后台背景。*/
         'id' => 'dash_scheme_css_rules',
-        'std' => '#adminmenu .wp-has-current-submenu .wp-submenu a,#adminmenu .wp-has-current-submenu.opensub .wp-submenu a,#adminmenu .wp-submenu a,#adminmenu a.wp-has-current-submenu:focus+.wp-submenu a,#wpadminbar .ab-submenu .ab-item,#wpadminbar .quicklinks .menupop ul li a,#wpadminbar .quicklinks .menupop.hover ul li a,#wpadminbar.nojs .quicklinks .menupop:hover ul li a,.folded #adminmenu .wp-has-current-submenu .wp-submenu a{color:#f3f2f1}body{background-image:url(https://view.moezx.cc/images/2019/04/21/windows10-2019-4-21-i3.jpg);background-size:cover;background-repeat:no-repeat;background-attachment:fixed;}#wpcontent{background:rgba(255,255,255,.8)}',
+        'std' => "/* Custom dashboard styles. Uncomment and replace the URL with your own image: */
+/* body { background-image: url(https://example.com/your-background.jpg); background-size: cover; background-repeat: no-repeat; background-attachment: fixed; } */
+/* #wpcontent { background: rgba(255, 255, 255, .8); } */",
         'type' => 'textarea');
 
     $options[] = array(
