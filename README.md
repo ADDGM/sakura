@@ -84,6 +84,12 @@ Release 工作流的 `workflow_dispatch` 仅用于重建已有标签的产物、
 
 本维护版本的作者标记为 `ADDGM`，主题说明中保留原作者 Mashiro、Spirit、Louie、Fuzzz 2heng 的贡献信息。上传 ZIP 后，WordPress 会从压缩包内 `sakura/style.css` 的主题头读取名称、版本和兼容性信息。
 
+### 内置素材说明
+
+`images/dash-sakura-bg.webp` 为 Sakura 后台配色方案的预设背景图，来自上游 Sakura 主题原先通过 `view.moezx.cc` 外链引用的同一张图片，现内置到主题以摆脱对外部域名的依赖，版权归原作者所有。该图已由原始 PNG（223 KB）转为 WebP（18 KB）；不支持 WebP 的浏览器会退化为纯色后台背景，不影响任何功能。
+
+后台配色「Custom」方案的默认自定义 CSS 只包含一段已注释的示例，不引用任何外部资源。如需为后台设置背景图，请在「主题设置 → 后台配置 → 其他自定义面板样式(CSS)」中取消注释并填入你自己的图片地址。
+
 维护版本的提交格式为：
 
 ```text
