@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Sakura
+"
+"MIME-Version: 1.0
+"
+"Content-Type: text/plain; charset=UTF-8
+"
+"Content-Transfer-Encoding: 8bit
+"
+"Language: ja
+"
+"Plural-Forms: nplurals=1; plural=0;
+"
+
+#: functions.php:1565
+msgid "Why not try the new admin dashboard color scheme %1$shere%2$s?"
+msgstr "新しい%1$s管理画面の配色%2$sを試しますか？"

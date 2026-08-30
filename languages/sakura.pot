@@ -1343,7 +1343,7 @@ msgid "Other custom panel styles(CSS)"
 msgstr ""
 
 #: options.php:960
-msgid "If you need to adjust other styles of the panel, put the style here."
+msgid "If you need to adjust other styles of the panel, put the style here. This only takes effect when the color scheme is set to Custom. The default value contains a commented-out example, uncomment it and fill in your own image URL to set a dashboard background."
 msgstr ""
 
 #: options.php:966
@@ -1776,4 +1776,8 @@ msgstr ""
 
 #: user/page-register.php:95
 msgid "Registration is not open yet."
+msgstr ""
+
+#: functions.php:1565
+msgid "Why not try the new admin dashboard color scheme %1$shere%2$s?"
 msgstr ""
