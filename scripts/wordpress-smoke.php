@@ -72,6 +72,14 @@ $sourceChecks = array(
     array('style.css', 'overflow: visible;', '中等宽度导航会裁切二级菜单。'),
     array('style.css', '#mo-nav.open', '移动端左侧抽屉导航规则缺失。'),
     array('style.css', '.submit-comment-tips:focus-within', '评论提交按钮缺少键盘焦点提示样式。'),
+    array('inc/css/dash-scheme.css', 'var(--sakura-dash-', '后台配色资源未使用 CSS 变量。'),
+    array('functions.php', "add_action('admin_init', 'sakura_register_dash_schemes')", '后台配色未在 admin_init 注册。'),
+    array('functions.php', 'sanitize_hex_color', '后台配色未校验颜色取值。'),
+    array('functions.php', "wp_add_inline_style('colors'", '后台配色未通过内联样式注入变量。'),
+    array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
+    array('functions.php', "check_ajax_referer('sakura-dismiss-scheme-tip')", '配色提示关闭动作缺少 nonce 校验。'),
+    array('inc/css/optionsframework.css', '#optionsframework-wrap .nav-tab', '主题设置页标签样式未收紧作用域。'),
+    array('inc/css/optionsframework.css', '#optionsframework input[type="button"]', '主题设置页按钮样式未收紧作用域。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -83,6 +91,27 @@ foreach ($sourceChecks as $check) {
         $invalid = strpos($source, $check[1]) === false;
     }
     if ($invalid) {
+        $errors[] = $check[2];
+    }
+}
+
+// 旧的动态配色端点必须彻底移除：它无鉴权且直接回显查询参数，构成反射型 CSS 注入。
+if (file_exists(get_template_directory() . '/inc/dash-scheme.php')) {
+    $errors[] = '旧后台配色端点 inc/dash-scheme.php 仍存在。';
+}
+
+// 以下片段一旦重新出现即视为回归。
+$absentChecks = array(
+    array('functions.php', 'dash-scheme.php?', '后台配色仍通过查询字符串传入动态样式端点。'),
+    array('functions.php', 'urlencode($rules)', '后台配色仍把自定义 CSS 拼入资源 URL。'),
+    array('inc/css/optionsframework.css', "\nbody {", '主题设置页仍覆盖全局 body 样式。'),
+    array('inc/css/optionsframework.css', "\ninput[type=", '主题设置页仍无作用域地覆盖表单控件。'),
+    array('inc/css/optionsframework.css', "\n.nav-tab", '主题设置页仍无作用域地覆盖标签页样式。'),
+    array('options.php', 'windows10-2019-4-21-i3.jpg', '后台配色默认值仍引用已失效的外部背景图。'),
+);
+foreach ($absentChecks as $check) {
+    $source = file_get_contents(get_template_directory() . '/' . $check[0]);
+    if ($source === false || strpos($source, $check[1]) !== false) {
         $errors[] = $check[2];
     }
 }
