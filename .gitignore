@@ -33,3 +33,4 @@ mise
 .playwright-mcp/
 .agents/
 .zcf
+.codegraph
