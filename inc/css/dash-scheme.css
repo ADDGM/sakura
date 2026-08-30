@@ -1,0 +1,561 @@
+/*!
+ * Sakura Dashboard Color Scheme
+ *
+ * 本文件为纯静态资源，不含任何用户数据，可被浏览器与 CDN 正常缓存。
+ * 所有可变颜色均以 CSS 自定义属性承载，实际取值由 functions.php 中的
+ * sakura_dash_scheme_inline_style() 依据当前用户所选方案内联注入。
+ *
+ * 此处 :root 的取值为 Sakura 预设，同时充当内联变量缺失时的回退值。
+ */
+
+:root {
+	/* 主色板：与 wp_admin_css_color() 的四色预览一一对应 */
+	--sakura-dash-base: #8fbbb1;         /* 子菜单、工具栏下拉背景 */
+	--sakura-dash-primary: #bfd8d2;      /* 管理菜单、管理工具栏主色 */
+	--sakura-dash-highlight: #fedcd2;    /* 当前项、悬停强调 */
+	--sakura-dash-notification: #df744a; /* 通知与计数徽章 */
+
+	/* 图标 */
+	--sakura-dash-icon-base: #e5f8ff;
+	--sakura-dash-icon-focus: #fff;
+	--sakura-dash-icon-current: #fff;
+
+	/* 版面。背景图一律由 PHP 内联注入，避免 custom 方案误继承 Sakura 预设图，
+	   同时绕开 CSS 相对路径在子主题与 CDN 场景下的解析差异。 */
+	--sakura-dash-body-bg: #f1f1f1;
+	--sakura-dash-body-image: none;
+	--sakura-dash-content-bg: transparent;
+
+	/* 文本与链接 */
+	--sakura-dash-menu-text: #fff;
+	--sakura-dash-submenu-link: #f3f2f1;
+	--sakura-dash-link: #0073aa;
+	--sakura-dash-link-hover: #0096dd;
+
+	/* 主按钮 */
+	--sakura-dash-button-bg: #bfd8d2;
+	--sakura-dash-button-border: #8fbbb1;
+	--sakura-dash-button-text: #fff;
+
+	/* 键盘焦点轮廓 */
+	--sakura-dash-focus-ring: #8fbbb1;
+}
+
+/* ---------------------------------------------------------------- 版面 */
+
+body {
+	background-color: var(--sakura-dash-body-bg);
+	background-image: var(--sakura-dash-body-image);
+	background-attachment: fixed;
+}
+
+#wpcontent {
+	background: var(--sakura-dash-content-bg);
+}
+
+a {
+	color: var(--sakura-dash-link);
+}
+
+a:active,
+a:focus,
+a:hover {
+	color: var(--sakura-dash-link-hover);
+}
+
+.subsubsub a:hover,
+.subsubsub a.current:hover {
+	color: var(--sakura-dash-link-hover);
+}
+
+/* ------------------------------------------------------------ 核心控件 */
+
+input[type="checkbox"]:checked::before {
+	color: var(--sakura-dash-primary);
+}
+
+input[type="radio"]:checked::before {
+	background: var(--sakura-dash-primary);
+}
+
+.wp-core-ui input[type="reset"]:active,
+.wp-core-ui input[type="reset"]:hover {
+	color: var(--sakura-dash-link-hover);
+}
+
+.wp-core-ui .button-primary {
+	background: var(--sakura-dash-button-bg);
+	border-color: var(--sakura-dash-button-border);
+	color: var(--sakura-dash-button-text);
+	box-shadow: 0 1px 0 var(--sakura-dash-button-border);
+}
+
+.wp-core-ui .button-primary:hover,
+.wp-core-ui .button-primary:focus {
+	background: var(--sakura-dash-highlight);
+	border-color: var(--sakura-dash-button-border);
+	color: var(--sakura-dash-button-text);
+	box-shadow: 0 1px 0 var(--sakura-dash-button-border);
+}
+
+.wp-core-ui .button-primary:focus {
+	box-shadow:
+		inset 0 1px 0 var(--sakura-dash-button-border),
+		0 0 0 2px var(--sakura-dash-focus-ring);
+}
+
+.wp-core-ui .button-primary:active,
+.wp-core-ui .button-primary.active,
+.wp-core-ui .button-primary.active:hover,
+.wp-core-ui .button-primary.active:focus {
+	background: var(--sakura-dash-button-border);
+	border-color: var(--sakura-dash-button-border);
+	box-shadow: inset 0 2px 0 var(--sakura-dash-button-border);
+}
+
+.wp-core-ui .button-primary:disabled,
+.wp-core-ui .button-primary[disabled],
+.wp-core-ui .button-primary.disabled,
+.wp-core-ui .button-primary.button-primary-disabled {
+	color: #f6f7f7;
+	background: var(--sakura-dash-button-bg);
+	border-color: var(--sakura-dash-button-border);
+	opacity: 0.7;
+	text-shadow: none;
+}
+
+.wp-core-ui .button-primary.button-hero {
+	box-shadow: 0 2px 0 var(--sakura-dash-button-border);
+}
+
+.wp-core-ui .button-primary.button-hero:active {
+	box-shadow: inset 0 3px 0 var(--sakura-dash-button-border);
+}
+
+/* 键盘焦点：不依赖颜色变化，始终给出可见轮廓 */
+.wp-core-ui .button:focus-visible,
+.wp-core-ui .button-primary:focus-visible,
+.wp-core-ui .button-secondary:focus-visible,
+#adminmenu a:focus-visible,
+#wpadminbar a.ab-item:focus-visible {
+	outline: 2px solid var(--sakura-dash-focus-ring);
+	outline-offset: 1px;
+}
+
+/* -------------------------------------------------- WordPress 颜色工具类 */
+
+.wp-core-ui .wp-ui-primary {
+	color: #fff;
+	background-color: var(--sakura-dash-primary);
+}
+
+.wp-core-ui .wp-ui-text-primary {
+	color: var(--sakura-dash-primary);
+}
+
+.wp-core-ui .wp-ui-highlight {
+	color: #fff;
+	background-color: var(--sakura-dash-highlight);
+}
+
+.wp-core-ui .wp-ui-text-highlight {
+	color: var(--sakura-dash-highlight);
+}
+
+.wp-core-ui .wp-ui-notification {
+	color: #fff;
+	background-color: var(--sakura-dash-notification);
+}
+
+.wp-core-ui .wp-ui-text-notification {
+	color: var(--sakura-dash-notification);
+}
+
+.wp-core-ui .wp-ui-text-icon {
+	color: var(--sakura-dash-icon-base);
+}
+
+/* ---------------------------------------------------------- 页面标题区 */
+
+.wrap .page-title-action:hover {
+	color: #fff;
+	background-color: var(--sakura-dash-primary);
+}
+
+.view-switch a.current::before {
+	color: var(--sakura-dash-primary);
+}
+
+.view-switch a:hover::before {
+	color: var(--sakura-dash-notification);
+}
+
+.nav-tab-active,
+.nav-tab-active:hover,
+.about-wrap .nav-tab-active {
+	background-color: var(--sakura-dash-body-bg);
+	border-bottom-color: var(--sakura-dash-body-bg);
+}
+
+/* ---------------------------------------------------------- 管理菜单 */
+
+#adminmenu,
+#adminmenuback,
+#adminmenuwrap {
+	background: var(--sakura-dash-primary);
+}
+
+#adminmenu a {
+	color: var(--sakura-dash-menu-text);
+}
+
+#adminmenu div.wp-menu-image::before {
+	color: var(--sakura-dash-icon-base);
+}
+
+#adminmenu a:hover,
+#adminmenu li.menu-top:hover,
+#adminmenu li.opensub > a.menu-top,
+#adminmenu li > a.menu-top:focus {
+	color: #fff;
+	background-color: var(--sakura-dash-highlight);
+}
+
+#adminmenu li.menu-top:hover div.wp-menu-image::before,
+#adminmenu li.opensub > a.menu-top div.wp-menu-image::before {
+	color: var(--sakura-dash-icon-focus);
+}
+
+#adminmenu .wp-submenu,
+#adminmenu .wp-has-current-submenu .wp-submenu,
+#adminmenu .wp-has-current-submenu.opensub .wp-submenu,
+#adminmenu a.wp-has-current-submenu:focus + .wp-submenu,
+.folded #adminmenu .wp-has-current-submenu .wp-submenu {
+	background: var(--sakura-dash-base);
+}
+
+#adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after {
+	border-right-color: var(--sakura-dash-base);
+}
+
+#adminmenu .wp-submenu .wp-submenu-head {
+	color: var(--sakura-dash-submenu-link);
+}
+
+#adminmenu .wp-submenu a,
+#adminmenu .wp-has-current-submenu .wp-submenu a,
+#adminmenu .wp-has-current-submenu.opensub .wp-submenu a,
+#adminmenu a.wp-has-current-submenu:focus + .wp-submenu a,
+.folded #adminmenu .wp-has-current-submenu .wp-submenu a {
+	color: var(--sakura-dash-submenu-link);
+}
+
+#adminmenu .wp-submenu a:focus,
+#adminmenu .wp-submenu a:hover,
+#adminmenu .wp-has-current-submenu .wp-submenu a:focus,
+#adminmenu .wp-has-current-submenu .wp-submenu a:hover,
+#adminmenu .wp-has-current-submenu.opensub .wp-submenu a:focus,
+#adminmenu .wp-has-current-submenu.opensub .wp-submenu a:hover,
+#adminmenu a.wp-has-current-submenu:focus + .wp-submenu a:focus,
+#adminmenu a.wp-has-current-submenu:focus + .wp-submenu a:hover,
+.folded #adminmenu .wp-has-current-submenu .wp-submenu a:focus,
+.folded #adminmenu .wp-has-current-submenu .wp-submenu a:hover {
+	color: var(--sakura-dash-highlight);
+}
+
+#adminmenu .wp-submenu li.current a,
+#adminmenu .wp-has-current-submenu.opensub .wp-submenu li.current a,
+#adminmenu a.wp-has-current-submenu:focus + .wp-submenu li.current a {
+	color: #fff;
+}
+
+#adminmenu .wp-submenu li.current a:focus,
+#adminmenu .wp-submenu li.current a:hover,
+#adminmenu .wp-has-current-submenu.opensub .wp-submenu li.current a:focus,
+#adminmenu .wp-has-current-submenu.opensub .wp-submenu li.current a:hover,
+#adminmenu a.wp-has-current-submenu:focus + .wp-submenu li.current a:focus,
+#adminmenu a.wp-has-current-submenu:focus + .wp-submenu li.current a:hover {
+	color: var(--sakura-dash-highlight);
+}
+
+ul#adminmenu a.wp-has-current-submenu::after,
+ul#adminmenu > li.current > a.current::after {
+	border-right-color: var(--sakura-dash-body-bg);
+}
+
+#adminmenu li.current a.menu-top,
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+#adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head,
+.folded #adminmenu li.current.menu-top {
+	color: #fff;
+	background: var(--sakura-dash-highlight);
+}
+
+#adminmenu li:hover div.wp-menu-image::before,
+#adminmenu li a:focus div.wp-menu-image::before,
+#adminmenu li.opensub div.wp-menu-image::before,
+#adminmenu a.current:hover div.wp-menu-image::before,
+#adminmenu li.wp-has-current-submenu div.wp-menu-image::before,
+#adminmenu li.wp-has-current-submenu a:focus div.wp-menu-image::before,
+#adminmenu li.wp-has-current-submenu.opensub div.wp-menu-image::before {
+	color: var(--sakura-dash-icon-current);
+}
+
+#adminmenu .awaiting-mod,
+#adminmenu .update-plugins {
+	color: #fff;
+	background: var(--sakura-dash-notification);
+}
+
+#adminmenu li.current a .awaiting-mod,
+#adminmenu li a.wp-has-current-submenu .update-plugins,
+#adminmenu li.menu-top:hover > a .update-plugins,
+#adminmenu li:hover a .awaiting-mod {
+	color: #fff;
+	background: var(--sakura-dash-base);
+}
+
+#collapse-button {
+	color: var(--sakura-dash-icon-base);
+}
+
+#collapse-button:focus,
+#collapse-button:hover {
+	color: var(--sakura-dash-highlight);
+}
+
+/* -------------------------------------------------------- 管理工具栏 */
+
+#wpadminbar {
+	color: #fff;
+	background: var(--sakura-dash-primary);
+}
+
+#wpadminbar .ab-item,
+#wpadminbar a.ab-item,
+#wpadminbar > #wp-toolbar span.ab-label,
+#wpadminbar > #wp-toolbar span.noticon {
+	color: #fff;
+}
+
+#wpadminbar .ab-icon,
+#wpadminbar .ab-icon::before,
+#wpadminbar .ab-item::after,
+#wpadminbar .ab-item::before {
+	color: var(--sakura-dash-icon-base);
+}
+
+#wpadminbar .ab-top-menu > li.menupop.hover > .ab-item,
+#wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus,
+#wpadminbar.nojs .ab-top-menu > li.menupop:hover > .ab-item,
+#wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+#wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus {
+	color: var(--sakura-dash-highlight);
+	background: var(--sakura-dash-base);
+}
+
+#wpadminbar:not(.mobile) > #wp-toolbar a:focus span.ab-label,
+#wpadminbar:not(.mobile) > #wp-toolbar li.hover span.ab-label,
+#wpadminbar:not(.mobile) > #wp-toolbar li:hover span.ab-label {
+	color: var(--sakura-dash-highlight);
+}
+
+#wpadminbar:not(.mobile) li:hover #adminbarsearch::before,
+#wpadminbar:not(.mobile) li:hover .ab-icon::before,
+#wpadminbar:not(.mobile) li:hover .ab-item::after,
+#wpadminbar:not(.mobile) li:hover .ab-item::before {
+	color: #fff;
+}
+
+#wpadminbar .menupop .ab-sub-wrapper {
+	background: var(--sakura-dash-base);
+}
+
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
+	background: var(--sakura-dash-base);
+}
+
+#wpadminbar .ab-submenu .ab-item,
+#wpadminbar .quicklinks .menupop ul li a,
+#wpadminbar .quicklinks .menupop.hover ul li a,
+#wpadminbar.nojs .quicklinks .menupop:hover ul li a {
+	color: var(--sakura-dash-submenu-link);
+}
+
+#wpadminbar .menupop .menupop > .ab-item::before,
+#wpadminbar .quicklinks li .blavatar {
+	color: var(--sakura-dash-icon-base);
+}
+
+#wpadminbar .quicklinks .ab-sub-wrapper .menupop.hover > a,
+#wpadminbar .quicklinks .menupop ul li a:focus,
+#wpadminbar .quicklinks .menupop ul li a:focus strong,
+#wpadminbar .quicklinks .menupop ul li a:hover,
+#wpadminbar .quicklinks .menupop ul li a:hover strong,
+#wpadminbar .quicklinks .menupop.hover ul li a:focus,
+#wpadminbar .quicklinks .menupop.hover ul li a:hover,
+#wpadminbar li #adminbarsearch.adminbar-focused::before,
+#wpadminbar li .ab-item:focus .ab-icon::before,
+#wpadminbar li .ab-item:focus::before,
+#wpadminbar li a:focus .ab-icon::before,
+#wpadminbar li.hover .ab-icon::before,
+#wpadminbar li.hover .ab-item::before,
+#wpadminbar li:hover #adminbarsearch::before,
+#wpadminbar li:hover .ab-icon::before,
+#wpadminbar li:hover .ab-item::before,
+#wpadminbar.nojs .quicklinks .menupop:hover ul li a:focus,
+#wpadminbar.nojs .quicklinks .menupop:hover ul li a:hover {
+	color: var(--sakura-dash-highlight);
+}
+
+#wpadminbar .menupop .menupop > .ab-item:hover::before,
+#wpadminbar .quicklinks .ab-sub-wrapper .menupop.hover > a .blavatar,
+#wpadminbar .quicklinks li a:focus .blavatar,
+#wpadminbar .quicklinks li a:hover .blavatar,
+#wpadminbar.mobile .quicklinks .ab-icon::before,
+#wpadminbar.mobile .quicklinks .ab-item::before {
+	color: var(--sakura-dash-highlight);
+}
+
+#wpadminbar.mobile .quicklinks .hover .ab-icon::before,
+#wpadminbar.mobile .quicklinks .hover .ab-item::before {
+	color: var(--sakura-dash-icon-base);
+}
+
+#wpadminbar #adminbarsearch::before {
+	color: var(--sakura-dash-icon-base);
+}
+
+#wpadminbar #wp-admin-bar-recovery-mode {
+	color: #fff;
+	background-color: var(--sakura-dash-notification);
+}
+
+#wpadminbar #wp-admin-bar-recovery-mode .ab-item,
+#wpadminbar #wp-admin-bar-recovery-mode a.ab-item {
+	color: #fff;
+}
+
+#wpadminbar #wp-admin-bar-user-info .display-name {
+	color: #fff;
+}
+
+#wpadminbar #wp-admin-bar-user-info a:hover .display-name {
+	color: var(--sakura-dash-highlight);
+}
+
+#wpadminbar #wp-admin-bar-user-info .username {
+	color: var(--sakura-dash-submenu-link);
+}
+
+/* ------------------------------------------------------ 指针与媒体库 */
+
+.wp-pointer .wp-pointer-content h3 {
+	background-color: var(--sakura-dash-highlight);
+	border-color: var(--sakura-dash-base);
+}
+
+.wp-pointer .wp-pointer-content h3::before {
+	color: var(--sakura-dash-highlight);
+}
+
+.wp-pointer.wp-pointer-top .wp-pointer-arrow,
+.wp-pointer.wp-pointer-top .wp-pointer-arrow-inner,
+.wp-pointer.wp-pointer-undefined .wp-pointer-arrow,
+.wp-pointer.wp-pointer-undefined .wp-pointer-arrow-inner {
+	border-bottom-color: var(--sakura-dash-highlight);
+}
+
+.media-item .bar,
+.media-progress-bar div {
+	background-color: var(--sakura-dash-highlight);
+}
+
+.details.attachment {
+	box-shadow:
+		inset 0 0 0 3px #fff,
+		inset 0 0 0 7px var(--sakura-dash-highlight);
+}
+
+.attachment.details .check {
+	background-color: var(--sakura-dash-highlight);
+	box-shadow:
+		0 0 0 1px #fff,
+		0 0 0 2px var(--sakura-dash-highlight);
+}
+
+.media-selection .attachment.selection.details .thumbnail {
+	box-shadow:
+		0 0 0 1px #fff,
+		0 0 0 3px var(--sakura-dash-highlight);
+}
+
+/* -------------------------------------------------------- 主题浏览器 */
+
+.theme-browser .theme.active .theme-name,
+.theme-browser .theme.add-new-theme a:focus::after,
+.theme-browser .theme.add-new-theme a:hover::after {
+	background: var(--sakura-dash-highlight);
+}
+
+.theme-browser .theme.add-new-theme a:focus span::after,
+.theme-browser .theme.add-new-theme a:hover span::after {
+	color: var(--sakura-dash-highlight);
+}
+
+.theme-filter.current,
+.theme-section.current {
+	border-bottom-color: var(--sakura-dash-primary);
+}
+
+body.more-filters-opened .more-filters {
+	color: #fff;
+	background-color: var(--sakura-dash-primary);
+}
+
+body.more-filters-opened .more-filters::before {
+	color: #fff;
+}
+
+body.more-filters-opened .more-filters:focus,
+body.more-filters-opened .more-filters:hover {
+	color: #fff;
+	background-color: var(--sakura-dash-highlight);
+}
+
+body.more-filters-opened .more-filters:focus::before,
+body.more-filters-opened .more-filters:hover::before {
+	color: #fff;
+}
+
+/* ------------------------------------------------------------ 小工具 */
+
+.widgets-chooser li.widgets-chooser-selected {
+	color: #fff;
+	background-color: var(--sakura-dash-highlight);
+}
+
+.widgets-chooser li.widgets-chooser-selected::before,
+.widgets-chooser li.widgets-chooser-selected:focus::before {
+	color: #fff;
+}
+
+/* -------------------------------------------------------- 响应式后台 */
+
+div#wp-responsive-toggle a::before {
+	color: var(--sakura-dash-icon-base);
+}
+
+.wp-responsive-open div#wp-responsive-toggle a {
+	border-color: transparent;
+	background: var(--sakura-dash-highlight);
+}
+
+.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle a {
+	background: var(--sakura-dash-base);
+}
+
+.wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon::before {
+	color: var(--sakura-dash-icon-base);
+}

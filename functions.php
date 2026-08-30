@@ -1531,11 +1531,20 @@ function custom_admin_js()
     window.onload=function(){
         lazyload();
 
-        try{
-            document.querySelector("#scheme-tip .notice-dismiss").addEventListener("click", function(){
-                location.href="?scheme-tip-dismissed' . BUILD_VERSION . '";
+        var tip = document.querySelector("#scheme-tip");
+        var dismiss = tip ? tip.querySelector(".notice-dismiss") : null;
+        if (!dismiss) { return; }
+
+        dismiss.addEventListener("click", function(){
+            var payload = new URLSearchParams();
+            payload.append("action", "sakura_dismiss_scheme_tip");
+            payload.append("_ajax_nonce", tip.dataset.nonce || "");
+            fetch("' . esc_url_raw(admin_url('admin-ajax.php')) . '", {
+                method: "POST",
+                credentials: "same-origin",
+                body: payload
             });
-        } catch(e){}
+        });
     }
     </script>';
 }
@@ -1546,67 +1555,205 @@ add_action('admin_footer', 'custom_admin_js');
  */
 function scheme_tip()
 {
-    $msg = '<b>Why not try the new admin dashboard color scheme <a href="/wp-admin/profile.php">here</a>?</b>';
-    if (get_user_locale(get_current_user_id()) == "zh_CN") {
-        $msg = '<b>试一试新后台界面<a href="/wp-admin/profile.php">配色方案</a>吧？</b>';
-    }
-    if (get_user_locale(get_current_user_id()) == "zh_TW") {
-        $msg = '<b>試一試新後台界面<a href="/wp-admin/profile.php">色彩配置</a>吧？</b>';
-    }
-    if (get_user_locale(get_current_user_id()) == "ja") {
-        $msg = '<b>新しい<a href="/wp-admin/profile.php">管理画面の配色</a>を試しますか？</b>';
-    }
-    if (get_user_locale(get_current_user_id()) == "ja-JP") {
-        $msg = '<b>新しい<a href="/wp-admin/profile.php">管理画面の配色</a>を試しますか？</b>';
+    $user_id = get_current_user_id();
+    if (get_user_meta($user_id, 'scheme-tip-dismissed' . BUILD_VERSION)) {
+        return;
     }
 
-    $user_id = get_current_user_id();
-    if (!get_user_meta($user_id, 'scheme-tip-dismissed' . BUILD_VERSION)) {
-        echo '<div class="notice notice-success is-dismissible" id="scheme-tip"><p><b>' . $msg . '</b></p></div>';
-    }
+    $msg = sprintf(
+        /* translators: %1$s: 链接开始标签；%2$s: 链接结束标签 */
+        __('Why not try the new admin dashboard color scheme %1$shere%2$s?', 'sakura'), /*试一试新后台界面%1$s配色方案%2$s吧？*/
+        '<a href="' . esc_url(admin_url('profile.php')) . '">',
+        '</a>'
+    );
+
+    printf(
+        '<div class="notice notice-success is-dismissible" id="scheme-tip" data-nonce="%s"><p><b>%s</b></p></div>',
+        esc_attr(wp_create_nonce('sakura-dismiss-scheme-tip')),
+        wp_kses($msg, array('a' => array('href' => array())))
+    );
 }
 
 add_action('admin_notices', 'scheme_tip');
 
+/**
+ * 关闭配色提示。
+ *
+ * 改为 AJAX 处理，关闭后停留在当前页面，不再通过跳转写入标记——旧实现会在
+ * 文章编辑等页面丢失编辑上下文。
+ */
 function scheme_tip_dismissed()
 {
+    check_ajax_referer('sakura-dismiss-scheme-tip');
+
     $user_id = get_current_user_id();
-    if (isset($_GET['scheme-tip-dismissed' . BUILD_VERSION])) {
+    if ($user_id) {
         add_user_meta($user_id, 'scheme-tip-dismissed' . BUILD_VERSION, 'true', true);
     }
 
+    wp_send_json_success();
 }
-add_action('admin_init', 'scheme_tip_dismissed');
+add_action('wp_ajax_sakura_dismiss_scheme_tip', 'scheme_tip_dismissed');
 
-//dashboard scheme
-function dash_scheme($key, $name, $col1, $col2, $col3, $col4, $base, $focus, $current, $rules = "")
+/*
+ * 后台配色方案（Dashboard color schemes）
+ *
+ * Sakura 与 Custom 共用 inc/css/dash-scheme.css 这一份静态资源，二者差异全部由
+ * sakura_dash_scheme_inline_style() 内联的 CSS 变量承载。资源 URL 中不再出现任何
+ * 颜色值或用户 CSS，因此既不受请求行长度限制，也不存在旧 inc/dash-scheme.php
+ * 的 CSS 注入面。
+ */
+
+/**
+ * Sakura 预设配色，同时用作 Custom 方案取值非法时的回退基准。
+ */
+function sakura_dash_scheme_preset()
 {
-    $hash = "color_1=" . str_replace("#", "", $col1) .
-    "&color_2=" . str_replace("#", "", $col2) .
-    "&color_3=" . str_replace("#", "", $col3) .
-    "&color_4=" . str_replace("#", "", $col4) .
-    "&rules=" . urlencode($rules);
-
-    wp_admin_css_color(
-        $key,
-        $name,
-        get_template_directory_uri() . "/inc/dash-scheme.php?" . $hash,
-        array($col1, $col2, $col3, $col4),
-        array('base' => $base, 'focus' => $focus, 'current' => $current)
+    return array(
+        'base' => '#8fbbb1',
+        'primary' => '#bfd8d2',
+        'highlight' => '#fedcd2',
+        'notification' => '#df744a',
+        'icon_base' => '#e5f8ff',
+        'icon_focus' => '#ffffff',
+        'icon_current' => '#ffffff',
     );
 }
 
-//Sakura
-dash_scheme($key = "sakura", $name = "Sakura🌸",
-    $col1 = '#8fbbb1', $col2 = '#bfd8d2', $col3 = '#fedcd2', $col4 = '#df744a',
-    $base = "#e5f8ff", $focus = "#fff", $current = "#fff",
-    $rules = "#adminmenu .wp-has-current-submenu .wp-submenu a,#adminmenu .wp-has-current-submenu.opensub .wp-submenu a,#adminmenu .wp-submenu a,#adminmenu a.wp-has-current-submenu:focus+.wp-submenu a,#wpadminbar .ab-submenu .ab-item,#wpadminbar .quicklinks .menupop ul li a,#wpadminbar .quicklinks .menupop.hover ul li a,#wpadminbar.nojs .quicklinks .menupop:hover ul li a,.folded #adminmenu .wp-has-current-submenu .wp-submenu a{color:#f3f2f1}body{background-image:url(https://view.moezx.cc/images/2018/01/03/sakura.png);background-attachment:fixed;}#wpcontent{background:rgba(255,255,255,.0)}.wp-core-ui .button-primary{background:#bfd8d2!important;border-color:#8fbbb1 #8fbbb1 #8fbbb1!important;color:#fff!important;box-shadow:0 1px 0 #8fbbb1!important;text-shadow:0 -1px 1px #8fbbb1,1px 0 1px #8fbbb1,0 1px 1px #8fbbb1,-1px 0 1px #8fbbb1!important}");
+/**
+ * 读取 Custom 方案的七个颜色设置。
+ *
+ * 每个取值都经 sanitize_hex_color() 校验，缺失、为 null 或非法时回退到 Sakura
+ * 预设，顺带消除 PHP 8.1+ 对 str_replace() 传入 null 的弃用警告。
+ */
+function sakura_dash_scheme_custom_colors()
+{
+    $preset = sakura_dash_scheme_preset();
+    $map = array(
+        'base' => 'dash_scheme_color_a',
+        'primary' => 'dash_scheme_color_b',
+        'highlight' => 'dash_scheme_color_c',
+        'notification' => 'dash_scheme_color_d',
+        'icon_base' => 'dash_scheme_color_base',
+        'icon_focus' => 'dash_scheme_color_focus',
+        'icon_current' => 'dash_scheme_color_current',
+    );
 
-//custom
-dash_scheme($key = "custom", $name = "Custom",
-    $col1 = akina_option('dash_scheme_color_a'), $col2 = akina_option('dash_scheme_color_b'), $col3 = akina_option('dash_scheme_color_c'), $col4 = akina_option('dash_scheme_color_d'),
-    $base = akina_option('dash_scheme_color_base'), $focus = akina_option('dash_scheme_color_focus'), $current = akina_option('dash_scheme_color_current'),
-    $rules = akina_option('dash_scheme_css_rules'));
+    $colors = array();
+    foreach ($map as $slot => $option_key) {
+        $value = akina_option($option_key);
+        $value = is_string($value) ? sanitize_hex_color(trim($value)) : null;
+        $colors[$slot] = $value ? $value : $preset[$slot];
+    }
+
+    return $colors;
+}
+
+/**
+ * 把已内置到主题的外部资源地址改写为本地地址。
+ *
+ * 映射表只收录本仓库确实存在本地副本的资源，其余外部地址原样保留；数据库中
+ * 用户保存的原始值不作任何修改。
+ */
+function sakura_dash_scheme_localize_urls($css)
+{
+    $legacy = 'view.moezx.cc/images/2018/01/03/sakura.png';
+    $local = get_template_directory_uri() . '/images/dash-sakura-bg.webp';
+
+    return str_replace(
+        array('https://' . $legacy, 'http://' . $legacy, '//' . $legacy),
+        array($local, $local, $local),
+        $css
+    );
+}
+
+/**
+ * 注册 Sakura 与 Custom 两个后台配色方案。
+ */
+function sakura_register_dash_schemes()
+{
+    // 静态资源，URL 不含任何用户数据。缓存键使用主题自有的 sv 参数，避免与
+    // WordPress 自动附加的 ver 参数相互覆盖；取值用随发布递增的 SAKURA_VERSION，
+    // BUILD_VERSION 是固定值，主题升级时无法让浏览器缓存失效。
+    $url = add_query_arg('sv', SAKURA_VERSION, get_template_directory_uri() . '/inc/css/dash-scheme.css');
+
+    foreach (array('sakura' => 'Sakura🌸', 'custom' => 'Custom') as $key => $name) {
+        $colors = ('sakura' === $key) ? sakura_dash_scheme_preset() : sakura_dash_scheme_custom_colors();
+
+        wp_admin_css_color(
+            $key,
+            $name,
+            $url,
+            array($colors['base'], $colors['primary'], $colors['highlight'], $colors['notification']),
+            array(
+                'base' => $colors['icon_base'],
+                'focus' => $colors['icon_focus'],
+                'current' => $colors['icon_current'],
+            )
+        );
+    }
+}
+add_action('admin_init', 'sakura_register_dash_schemes');
+
+/**
+ * 为当前用户所选方案注入 CSS 变量与自定义规则。
+ *
+ * 仅在用户实际选中 sakura/custom 时输出，切回 WordPress 核心方案后无任何残留。
+ */
+function sakura_dash_scheme_inline_style()
+{
+    $scheme = get_user_option('admin_color');
+    if (!in_array($scheme, array('sakura', 'custom'), true)) {
+        return;
+    }
+
+    if ('sakura' === $scheme) {
+        $colors = sakura_dash_scheme_preset();
+        // 预设背景图已内置到主题，不再依赖外部域名。
+        $body_image = 'url("' . esc_url(get_template_directory_uri() . '/images/dash-sakura-bg.webp') . '")';
+        $submenu_link = '#f3f2f1';
+        $button_bg = $colors['primary'];
+    } else {
+        $colors = sakura_dash_scheme_custom_colors();
+        $body_image = 'none';
+        // 与旧版 custom 默认自定义 CSS 中的取值保持一致：该默认值原本用 9 个选择器
+        // 显式设为 #f3f2f1，现已由本变量承担，存量与新用户视觉等价。
+        $submenu_link = '#f3f2f1';
+        $button_bg = $colors['highlight'];
+    }
+
+    $vars = array(
+        '--sakura-dash-base' => $colors['base'],
+        '--sakura-dash-primary' => $colors['primary'],
+        '--sakura-dash-highlight' => $colors['highlight'],
+        '--sakura-dash-notification' => $colors['notification'],
+        '--sakura-dash-icon-base' => $colors['icon_base'],
+        '--sakura-dash-icon-focus' => $colors['icon_focus'],
+        '--sakura-dash-icon-current' => $colors['icon_current'],
+        '--sakura-dash-body-image' => $body_image,
+        '--sakura-dash-submenu-link' => $submenu_link,
+        '--sakura-dash-button-bg' => $button_bg,
+        '--sakura-dash-button-border' => $colors['base'],
+        '--sakura-dash-focus-ring' => $colors['base'],
+    );
+
+    $css = ':root{';
+    foreach ($vars as $property => $value) {
+        $css .= $property . ':' . $value . ';';
+    }
+    $css .= '}';
+
+    if ('custom' === $scheme) {
+        $rules = akina_option('dash_scheme_css_rules');
+        if (is_string($rules) && '' !== trim($rules)) {
+            // 内联输出须防止 </style> 逃逸，做法与 WordPress 核心 wp_custom_css_cb() 一致。
+            $css .= "\n" . sakura_dash_scheme_localize_urls(wp_strip_all_tags($rules));
+        }
+    }
+
+    wp_add_inline_style('colors', $css);
+}
+add_action('admin_enqueue_scripts', 'sakura_dash_scheme_inline_style');
 
 //Set Default Admin Color Scheme for New Users
 function set_default_admin_color($user_id)
@@ -1625,10 +1772,20 @@ function set_default_admin_color($user_id)
 // WordPress Custom Font @ Admin
 function custom_admin_open_sans_font()
 {
-    echo '<link href="https://fonts.googleapis.com/css?family=Noto+Serif+SC&display=swap" rel="stylesheet">' . PHP_EOL;
-    echo '<style>body, #wpadminbar *:not([class="ab-icon"]), .wp-core-ui, .media-menu, .media-frame *, .media-modal *{font-family:"Noto Serif SC","Source Han Serif SC","Source Han Serif","source-han-serif-sc","PT Serif","SongTi SC","MicroSoft Yahei",Georgia,serif !important;}</style>' . PHP_EOL;
+    // 仅做注册规范化：改走 WordPress 样式系统，便于被子主题与插件正常覆盖或注销。
+    // 字体来源与 !important 优先级保持原状，留待 jsdelivr-resource-governance 统一治理。
+    wp_enqueue_style(
+        'sakura-admin-font',
+        'https://fonts.googleapis.com/css?family=Noto+Serif+SC&display=swap',
+        array(),
+        null
+    );
+    wp_add_inline_style(
+        'sakura-admin-font',
+        'body, #wpadminbar *:not([class="ab-icon"]), .wp-core-ui, .media-menu, .media-frame *, .media-modal *{font-family:"Noto Serif SC","Source Han Serif SC","Source Han Serif","source-han-serif-sc","PT Serif","SongTi SC","MicroSoft Yahei",Georgia,serif !important;}'
+    );
 }
-add_action('admin_head', 'custom_admin_open_sans_font');
+add_action('admin_enqueue_scripts', 'custom_admin_open_sans_font');
 
 // WordPress Custom Font @ Admin Frontend Toolbar
 function custom_admin_open_sans_font_frontend_toolbar()
