@@ -51,7 +51,7 @@
 	padding: 10px 15px;
 	font-weight: 300;
     font-size: 15px;
-    color: darkgoldenrod;
+	color: #6d5200;
     border-radius: 3px 3px 0 0;
 }
 
@@ -114,11 +114,10 @@
     clear: none;
     cursor: pointer;
     display: inline-block;
-    line-height: 0;
-    height: 16px;
-    margin: -4px 4px 0 0;
-    outline: none;
-    padding: 0!important;
+	line-height: 0;
+	height: 16px;
+	margin: -4px 4px 0 0;
+	padding: 0!important;
     text-align: center;
     vertical-align: middle;
     width: 16px;
@@ -129,9 +128,9 @@
 /* 红色按钮与保存按钮（#FF6464）同属主题设置页的既有设计语言，予以保留。
    作用域收紧后，该规则不再影响 #optionsframework 之外的任何元素。 */
 #optionsframework input[type="button"]{
-	box-shadow: none !important;
+	box-shadow: none;
     border: none !important;
-	background:#FF5858 !important;
+	background:#b32d2e !important;
 	color:#fff !important
 }
 
@@ -154,6 +153,16 @@
 #optionsframework select,
 #optionsframework textarea{
 	box-shadow:none
+}
+
+#optionsframework-wrap .nav-tab:focus-visible,
+#optionsframework input:focus-visible,
+#optionsframework select:focus-visible,
+#optionsframework textarea:focus-visible,
+#optionsframework button:focus-visible {
+	outline: 2px solid var(--sakura-dash-focus-ring, #2271b1);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 1px #fff;
 }
 
 #optionsframework h4 {
@@ -408,8 +417,9 @@
 	cursor:pointer;
 }
 #optionsframework .controls input.upload_button:hover {
-	border-color:#666666;
-	color:#000;
+	border-color:#8a2424;
+	background:#8a2424 !important;
+	color:#fff !important;
 }
 #optionsframework .screenshot {
 	float:left;
@@ -468,10 +478,11 @@
     background-image: -moz-linear-gradient(center top , #F9F9F9, #ECECEC);
 }
 #optionsframework .button-primary {
-	    float: right;
+	float: right;
     box-shadow: none;
     border: none;
-    background: #FF6464;
+	background: #b32d2e;
+	color: #fff;
     text-shadow: none;
     /* padding: 10px; */
     height: 40px;

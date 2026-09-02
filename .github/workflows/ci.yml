@@ -184,6 +184,7 @@ jobs:
             --dbpass=root \
             --dbhost=127.0.0.1:3306 \
             --skip-check \
+            --extra-php='define("WP_DEBUG", true); define("WP_DEBUG_LOG", true); define("WP_DEBUG_DISPLAY", false);' \
             --path=wp-root
           wp core install \
             --url=http://localhost \
@@ -202,10 +203,20 @@ jobs:
             --exclude='wp-content' \
             --exclude='wp-includes' \
             ./ wp-root/wp-content/themes/sakura/
+          rm -f wp-root/wp-content/debug.log
           wp theme activate sakura --path=wp-root
 
       - name: Run theme smoke test
-        run: wp --path=wp-root eval-file "$GITHUB_WORKSPACE/scripts/wordpress-smoke.php"
+        run: |
+          set +e
+          wp --path=wp-root eval-file "$GITHUB_WORKSPACE/scripts/wordpress-smoke.php"
+          status=$?
+          set -e
+          if [ -f wp-root/wp-content/debug.log ]; then
+            echo '--- wp-content/debug.log ---'
+            cat wp-root/wp-content/debug.log
+          fi
+          exit "$status"
 
   notify:
     name: Telegram CI notification

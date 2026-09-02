@@ -198,8 +198,9 @@ function of_recognized_background_attachment() {
 	return apply_filters( 'of_recognized_background_attachment', $default );
 }
 function of_sanitize_hex( $hex, $default = '' ) {
-	if ( of_validate_hex( $hex ) ) {
-		return $hex;
+	$sanitized = of_normalize_hex( $hex );
+	if ( null !== $sanitized ) {
+		return $sanitized;
 	}
 	return $default;
 }
@@ -231,18 +232,21 @@ function of_recognized_font_styles() {
 	);
 	return apply_filters( 'of_recognized_font_styles', $default );
 }
+function of_normalize_hex( $hex ) {
+	if ( ! is_string( $hex ) && ! is_numeric( $hex ) ) {
+		return null;
+	}
+
+	$hex = trim( (string) $hex );
+	if ( 0 === strpos( $hex, '%23' ) ) {
+		$hex = '#' . substr( $hex, 3 );
+	}
+	elseif ( 0 !== strpos( $hex, '#' ) ) {
+		$hex = '#' . $hex;
+	}
+
+	return sanitize_hex_color( $hex );
+}
 function of_validate_hex( $hex ) {
-	$hex = trim( $hex );
-	if ( 0 === strpos( $hex, '#' ) ) {
-		$hex = substr( $hex, 1 );
-	}
-	elseif ( 0 === strpos( $hex, '%23' ) ) {
-		$hex = substr( $hex, 3 );
-	}
-	if ( 0 === preg_match( '/^[0-9a-fA-F]{6}$/', $hex ) ) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	return null !== of_normalize_hex( $hex );
 }

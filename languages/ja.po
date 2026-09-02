@@ -1,18 +1,76 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Sakura
-"
-"MIME-Version: 1.0
-"
-"Content-Type: text/plain; charset=UTF-8
-"
-"Content-Transfer-Encoding: 8bit
-"
-"Language: ja
-"
-"Plural-Forms: nplurals=1; plural=0;
-"
+"Project-Id-Version: Sakura\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: functions.php:1565
 msgid "Why not try the new admin dashboard color scheme %1$shere%2$s?"
 msgstr "新しい%1$s管理画面の配色%2$sを試しますか？"
+
+#: options.php:903
+msgid "Panel main color A"
+msgstr "パネルのメインカラーA"
+
+#: options.php:906
+msgid "Background color for Custom submenus and toolbar dropdowns."
+msgstr "Customのサブメニューとツールバーのドロップダウンの背景色。"
+
+#: options.php:911
+msgid "Panel main color B"
+msgstr "パネルのメインカラーB"
+
+#: options.php:914
+msgid "Background color for the Custom admin menu and toolbar."
+msgstr "Custom管理メニューとツールバーの背景色。"
+
+#: options.php:919
+msgid "Panel main color C"
+msgstr "パネルのメインカラーC"
+
+#: options.php:922
+msgid "Highlight color for current and hovered Custom items."
+msgstr "Customの現在の項目とホバー項目の強調色。"
+
+#: options.php:927
+msgid "Panel main color D"
+msgstr "パネルのメインカラーD"
+
+#: options.php:930
+msgid "Notification and update badge color for Custom."
+msgstr "Customの通知と更新バッジの色。"
+
+#: options.php:935
+msgid "Panel icon color——base"
+msgstr "パネルアイコンの色——base"
+
+#: options.php:938
+msgid "Default icon color for Custom menus and the toolbar."
+msgstr "Customメニューとツールバーの既定のアイコン色。"
+
+#: options.php:943
+msgid "Panel icon color——focus"
+msgstr "パネルアイコンの色——focus"
+
+#: options.php:946
+msgid "Icon color for focused and hovered Custom items."
+msgstr "フォーカス中およびホバー中のCustom項目のアイコン色。"
+
+#: options.php:951
+msgid "Panel icon color——current"
+msgstr "パネルアイコンの色——current"
+
+#: options.php:954
+msgid "Icon color for the current Custom menu item."
+msgstr "現在のCustomメニュー項目のアイコン色。"
+
+#: options.php:959
+msgid "Custom admin additional styles (CSS)"
+msgstr "Custom管理画面の追加スタイル（CSS）"
+
+#: options.php:960
+msgid "Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. The default value contains a commented-out example; uncomment it and fill in your own image URL to set an admin background."
+msgstr "Customを選択したときにWordPress管理画面全体へ適用される追加CSSです。これはSakuraの全体設定で、Customを使用するすべての管理者に共有されます。既定値にはコメントアウトされた例が含まれています。コメントを外し、画像URLを入力すると管理画面の背景を設定できます。"

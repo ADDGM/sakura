@@ -76,10 +76,22 @@ $sourceChecks = array(
     array('functions.php', "add_action('admin_init', 'sakura_register_dash_schemes')", '后台配色未在 admin_init 注册。'),
     array('functions.php', 'sanitize_hex_color', '后台配色未校验颜色取值。'),
     array('functions.php', "wp_add_inline_style('colors'", '后台配色未通过内联样式注入变量。'),
+    array('functions.php', 'sakura_dash_scheme_custom_preset', 'Custom 默认色没有集中定义。'),
+    array('functions.php', 'sakura_dash_scheme_css', '已保存配色与实时预览没有共用 CSS 生成函数。'),
+    array('functions.php', 'sakura_dash_relative_luminance', '后台配色缺少 WCAG 亮度计算。'),
+    array('functions.php', 'sakura_dash_contrast_ratio', '后台配色缺少 WCAG 对比度计算。'),
+    array('functions.php', 'sakura_dash_readable_foreground', '后台配色缺少可读性前景回退。'),
+    array('functions.php', 'sakura_dash_scheme_prepare_custom_css', 'Custom 附加 CSS 没有旧默认精确降级处理。'),
+    array('functions.php', 'sakura_dash_scheme_preview_script', '个人资料页没有注册后台配色实时预览脚本。'),
+    array('functions.php', "wp_enqueue_style(\n        'sakura-admin-color-scheme-preview'", '个人资料页预览没有加载静态后台配色样式。'),
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
     array('functions.php', "check_ajax_referer('sakura-dismiss-scheme-tip')", '配色提示关闭动作缺少 nonce 校验。'),
     array('inc/css/optionsframework.css', '#optionsframework-wrap .nav-tab', '主题设置页标签样式未收紧作用域。'),
     array('inc/css/optionsframework.css', '#optionsframework input[type="button"]', '主题设置页按钮样式未收紧作用域。'),
+    array('inc/css/optionsframework.css', ':focus-visible', '主题设置页缺少键盘焦点反馈。'),
+    array('inc/options-sanitize.php', 'sanitize_hex_color', 'Options Framework 颜色清理器未复用 WordPress 核心校验。'),
+    array('js/admin-color-scheme-preview.js', 'style.textContent', '个人资料页预览脚本没有使用安全的 textContent 写入样式。'),
+    array('js/admin-color-scheme-preview.js', 'input[name="admin_color"]', '个人资料页预览脚本未监听后台配色选择器。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -108,6 +120,9 @@ $absentChecks = array(
     array('inc/css/optionsframework.css', "\ninput[type=", '主题设置页仍无作用域地覆盖表单控件。'),
     array('inc/css/optionsframework.css', "\n.nav-tab", '主题设置页仍无作用域地覆盖标签页样式。'),
     array('options.php', 'windows10-2019-4-21-i3.jpg', '后台配色默认值仍引用已失效的外部背景图。'),
+    array('options.php', 'Other custom panel styles(CSS)', 'Custom 附加 CSS 设置仍使用旧名称。'),
+    array('functions.php', 'window.onload', '后台通知脚本仍覆盖全局 window.onload。'),
+    array('js/admin-color-scheme-preview.js', 'innerHTML', '后台配色预览脚本仍使用不安全的 innerHTML。'),
 );
 foreach ($absentChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -147,6 +162,108 @@ if ($styleSource === false || !preg_match('/\.comment-respond input\[type="submi
 $optionsStyleSource = file_get_contents(get_template_directory() . '/inc/css/optionsframework.css');
 if ($optionsStyleSource === false || preg_match('/input\[type=checkbox\]\s*,\s*input\[type=radio\]/', $optionsStyleSource)) {
     $errors[] = '主题设置页仍使用旧规则全局覆盖 WordPress 单选控件。';
+}
+$previewSource = file_get_contents(get_template_directory() . '/js/admin-color-scheme-preview.js');
+if ($previewSource === false || !preg_match('/\.textContent\s*=/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]change[\'\"]/', $previewSource)) {
+    $errors[] = '个人资料页后台配色预览脚本缺少安全写入或 change 监听。';
+}
+
+if (function_exists('optionsframework_options') && function_exists('sakura_dash_scheme_custom_preset')) {
+    $customPreset = sakura_dash_scheme_custom_preset();
+    $optionDefinitions = optionsframework_options();
+    $defaultsById = array();
+    foreach ($optionDefinitions as $definition) {
+        if (isset($definition['id'])) {
+            $defaultsById[$definition['id']] = $definition['std'] ?? null;
+        }
+    }
+    $defaultMap = array(
+        'dash_scheme_color_a' => 'base',
+        'dash_scheme_color_b' => 'primary',
+        'dash_scheme_color_c' => 'highlight',
+        'dash_scheme_color_d' => 'notification',
+        'dash_scheme_color_base' => 'icon_base',
+        'dash_scheme_color_focus' => 'icon_focus',
+        'dash_scheme_color_current' => 'icon_current',
+    );
+    foreach ($defaultMap as $optionKey => $presetKey) {
+        if (($defaultsById[$optionKey] ?? null) !== $customPreset[$presetKey]) {
+            $errors[] = "Custom 默认值 {$optionKey} 未与集中预设一致。";
+        }
+    }
+}
+
+if (function_exists('of_normalize_hex')) {
+    foreach (array('#abc' => '#abc', 'abc' => '#abc', '%23abc' => '#abc', '#AABBCC' => '#AABBCC') as $input => $expected) {
+        if (of_normalize_hex($input) !== $expected) {
+            $errors[] = "颜色清理器未正确兼容 {$input}。";
+        }
+    }
+    if (of_sanitize_hex('invalid', '#123456') !== '#123456') {
+        $errors[] = '非法颜色没有回退到指定默认值。';
+    }
+}
+
+if (function_exists('sakura_dash_contrast_ratio') && function_exists('sakura_dash_readable_foreground')) {
+    $blackWhiteRatio = sakura_dash_contrast_ratio('#000000', '#ffffff');
+    if (null === $blackWhiteRatio || $blackWhiteRatio < 20.99) {
+        $errors[] = 'WCAG 黑白对比度计算错误。';
+    }
+    $readable = sakura_dash_readable_foreground('#ffffff', '#fedcd2', 4.5);
+    $readableRatio = sakura_dash_contrast_ratio($readable, '#fedcd2');
+    if (null === $readableRatio || $readableRatio < 4.5) {
+        $errors[] = '浅色背景的文字前景回退未达到 4.5:1。';
+    }
+    $customReadable = sakura_dash_readable_foreground('#ffffff', '#c6742b', 4.5);
+    if (sakura_dash_contrast_ratio($customReadable, '#c6742b') < 4.5) {
+        $errors[] = 'Custom 默认主色的文字前景回退未达到 4.5:1。';
+    }
+}
+
+if (function_exists('sakura_dash_scheme_legacy_custom_css') && function_exists('sakura_dash_scheme_prepare_custom_css')) {
+    $legacyCss = sakura_dash_scheme_legacy_custom_css();
+    foreach (array($legacyCss, "\r\n" . str_replace("\n", "\r\n", $legacyCss) . " \t") as $legacyVariant) {
+        if (sakura_dash_scheme_prepare_custom_css($legacyVariant) !== '') {
+            $errors[] = '旧版 Custom 默认 CSS 没有按精确匹配降级为空。';
+            break;
+        }
+    }
+    if (sakura_dash_scheme_prepare_custom_css($legacyCss . '/* changed */') === '') {
+        $errors[] = '修改过的 Custom CSS 被错误当作旧默认值清空。';
+    }
+}
+
+if (function_exists('sakura_dash_scheme_css')) {
+    if (sakura_dash_scheme_css('fresh') !== '') {
+        $errors[] = '核心后台配色仍残留 Sakura/Custom 内联变量。';
+    }
+    $frameworkFilter = static function ($value) {
+        return array('id' => 'sakura');
+    };
+    $optionFilter = static function ($value) {
+        return array(
+            'dash_scheme_color_a' => '#abc',
+            'dash_scheme_color_b' => 'invalid',
+            'dash_scheme_color_c' => '',
+            'dash_scheme_color_d' => '#aabbcc',
+            'dash_scheme_color_base' => '#fff',
+            'dash_scheme_color_focus' => null,
+            'dash_scheme_color_current' => '#123456',
+            'dash_scheme_css_rules' => '.smoke-test{color:red;}',
+        );
+    };
+    add_filter('pre_option_optionsframework', $frameworkFilter);
+    add_filter('pre_option_sakura', $optionFilter);
+    $smokeColors = sakura_dash_scheme_custom_colors();
+    $customCss = sakura_dash_scheme_css('custom');
+    remove_filter('pre_option_optionsframework', $frameworkFilter);
+    remove_filter('pre_option_sakura', $optionFilter);
+    if ($smokeColors['base'] !== '#abc' || $smokeColors['primary'] !== '#d88e4c' || $smokeColors['highlight'] !== '#695644' || $smokeColors['icon_focus'] !== '#ffffff') {
+        $errors[] = 'Custom 非法或空颜色没有按集中预设安全回退。';
+    }
+    if (strpos($customCss, '.smoke-test{color:red;}') === false || strpos($customCss, '--sakura-dash-primary:') === false) {
+        $errors[] = 'Custom CSS 生成没有同时包含变量和附加规则。';
+    }
 }
 $scriptSource = file_get_contents(get_template_directory() . '/js/sakura-app.js');
 if ($scriptSource === false || preg_match('/\baddComment\.I\s*\(/', $scriptSource)) {
@@ -292,6 +409,16 @@ $routes = rest_get_server()->get_routes();
 foreach ($requiredRoutes as $route) {
     if (!isset($routes[$route])) {
         $errors[] = "缺少 REST 路由：{$route}";
+    }
+}
+
+if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+    $debugLog = WP_CONTENT_DIR . '/debug.log';
+    if (file_exists($debugLog)) {
+        $debugContents = file_get_contents($debugLog);
+        if (is_string($debugContents) && preg_match('/(?:Deprecated|Warning|Notice|Fatal error).*themes[\\\\\/]sakura|themes[\\\\\/].*sakura.*(?:Deprecated|Warning|Notice|Fatal error)/i', $debugContents)) {
+            $errors[] = 'WP_DEBUG 日志包含 Sakura 主题的 Deprecated、Warning、Notice 或 Fatal。';
+        }
     }
 }
 

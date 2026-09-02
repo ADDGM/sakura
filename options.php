@@ -104,6 +104,7 @@ function optionsframework_options()
     $imagepath = get_template_directory_uri() . '/images/';
 
     $options = array();
+    $dash_scheme_custom = sakura_dash_scheme_custom_preset();
 
     //基本设置
     $options[] = array(
@@ -902,62 +903,62 @@ function optionsframework_options()
     $options[] = array(
         'name' => __('Panel main color A', 'sakura'), /*面板主色调A*/
         'id' => 'dash_scheme_color_a',
-        'std' => "#c6742b",
-        'desc' => __('<i>(array) (optional)</i> An array of CSS color definitions which are used to give the user a feel for the theme.', 'sakura'),
+        'std' => $dash_scheme_custom['base'],
+        'desc' => __('Background color for Custom submenus and toolbar dropdowns.', 'sakura'),
         'type' => "color",
     );
 
     $options[] = array(
         'name' => __('Panel main color B', 'sakura'),
         'id' => 'dash_scheme_color_b',
-        'std' => "#d88e4c",
-        'desc' => __('<i>(array) (optional)</i> An array of CSS color definitions which are used to give the user a feel for the theme.', 'sakura'),
+        'std' => $dash_scheme_custom['primary'],
+        'desc' => __('Background color for the Custom admin menu and toolbar.', 'sakura'),
         'type' => "color",
     );
 
     $options[] = array(
         'name' => __('Panel main color C', 'sakura'),
         'id' => 'dash_scheme_color_c',
-        'std' => "#695644",
-        'desc' => __('<i>(array) (optional)</i> An array of CSS color definitions which are used to give the user a feel for the theme.', 'sakura'),
+        'std' => $dash_scheme_custom['highlight'],
+        'desc' => __('Highlight color for current and hovered Custom items.', 'sakura'),
         'type' => "color",
     );
 
     $options[] = array(
         'name' => __('Panel main color D', 'sakura'),
         'id' => 'dash_scheme_color_d',
-        'std' => "#a19780",
-        'desc' => __('<i>(array) (optional)</i> An array of CSS color definitions which are used to give the user a feel for the theme.', 'sakura'),
+        'std' => $dash_scheme_custom['notification'],
+        'desc' => __('Notification and update badge color for Custom.', 'sakura'),
         'type' => "color",
     );
 
     $options[] = array(
         'name' => __('Panel icon color——base', 'sakura'), /*面板图标配色——base*/
         'id' => 'dash_scheme_color_base',
-        'std' => "#e5f8ff",
-        'desc' => __('<i>(array) (optional)</i> An array of CSS color definitions used to color any SVG icons.', 'sakura'),
+        'std' => $dash_scheme_custom['icon_base'],
+        'desc' => __('Default icon color for Custom menus and the toolbar.', 'sakura'),
         'type' => "color",
     );
 
     $options[] = array(
         'name' => __('Panel icon color——focus', 'sakura'),
         'id' => 'dash_scheme_color_focus',
-        'std' => "#fff",
-        'desc' => __('<i>(array) (optional)</i> An array of CSS color definitions used to color any SVG icons.', 'sakura'),
+        'std' => $dash_scheme_custom['icon_focus'],
+        'desc' => __('Icon color for focused and hovered Custom items.', 'sakura'),
         'type' => "color",
     );
 
     $options[] = array(
         'name' => __('Panel icon color——current', 'sakura'),
         'id' => 'dash_scheme_color_current',
-        'std' => "#fff",
-        'desc' => __('<i>(array) (optional)</i> An array of CSS color definitions used to color any SVG icons.', 'sakura'),
+        'std' => $dash_scheme_custom['icon_current'],
+        'desc' => __('Icon color for the current Custom menu item.', 'sakura'),
         'type' => "color",
     );
 
     $options[] = array(
-        'name' => __('Other custom panel styles(CSS)', 'sakura'), /*其他自定义面板样式(CSS)*/
-        'desc' => __('If you need to adjust other styles of the panel, put the style here. This only takes effect when the color scheme is set to Custom. The default value contains a commented-out example, uncomment it and fill in your own image URL to set a dashboard background.', 'sakura'), /*如果还需要对面板其他样式进行调整可以把style放到这里。仅在配色方案选择 Custom 时生效。默认值中包含一段已注释的示例，取消注释并填入你自己的图片地址即可设置后台背景。*/
+        'name' => __('Custom admin additional styles (CSS)', 'sakura'), /*Custom 后台附加样式（CSS）*/
+        'desc' => __('Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. The default value contains a commented-out example; uncomment it and fill in your own image URL to set an admin background.', 'sakura'), /*选择 Custom 时应用到整个 WordPress 后台的附加 CSS。这是 Sakura 全局设置，所有使用 Custom 的管理员共享。默认值包含已注释的示例，取消注释并填写图片地址即可设置后台背景。*/
         'id' => 'dash_scheme_css_rules',
         'std' => "/* Custom dashboard styles. Uncomment and replace the URL with your own image: */
 /* body { background-image: url(https://example.com/your-background.jpg); background-size: cover; background-repeat: no-repeat; background-attachment: fixed; } */

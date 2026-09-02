@@ -1415,49 +1415,65 @@ msgstr ""
 msgid "Panel main color A"
 msgstr "面板主色調A"
 
-#: options.php:906 options.php:914 options.php:922 options.php:930
-msgid ""
-"<i>(array) (optional)</i> An array of CSS color definitions which are used "
-"to give the user a feel for the theme."
-msgstr ""
+#: options.php:906
+msgid "Background color for Custom submenus and toolbar dropdowns."
+msgstr "Custom 子選單與工具列下拉選單的背景色。"
 
 #: options.php:911
 msgid "Panel main color B"
 msgstr "面板主色調B"
 
+#: options.php:914
+msgid "Background color for the Custom admin menu and toolbar."
+msgstr "Custom 管理選單與工具列的背景色。"
+
 #: options.php:919
 msgid "Panel main color C"
 msgstr "面板主色調C"
+
+#: options.php:922
+msgid "Highlight color for current and hovered Custom items."
+msgstr "Custom 目前項目與滑鼠停留項目的強調色。"
 
 #: options.php:927
 msgid "Panel main color D"
 msgstr "面板主色調D"
 
+#: options.php:930
+msgid "Notification and update badge color for Custom."
+msgstr "Custom 通知與更新徽章的顏色。"
+
 #: options.php:935
 msgid "Panel icon color——base"
 msgstr "面板圖示配色——base"
 
-#: options.php:938 options.php:946 options.php:954
-msgid ""
-"<i>(array) (optional)</i> An array of CSS color definitions used to color "
-"any SVG icons."
-msgstr ""
+#: options.php:938
+msgid "Default icon color for Custom menus and the toolbar."
+msgstr "Custom 選單與工具列的預設圖示顏色。"
 
 #: options.php:943
 msgid "Panel icon color——focus"
 msgstr "面板圖示配色——focus"
 
+#: options.php:946
+msgid "Icon color for focused and hovered Custom items."
+msgstr "Custom 聚焦項目與滑鼠停留項目的圖示顏色。"
+
 #: options.php:951
 msgid "Panel icon color——current"
 msgstr "面板圖示配色——current"
 
+#: options.php:954
+msgid "Icon color for the current Custom menu item."
+msgstr "Custom 目前選單項目的圖示顏色。"
+
 #: options.php:959
-msgid "Other custom panel styles(CSS)"
-msgstr "其他自訂面板樣式(CSS)"
+msgid "Custom admin additional styles (CSS)"
+msgstr "Custom 後台附加樣式（CSS）"
 
 #: options.php:960
-msgid "If you need to adjust other styles of the panel, put the style here. This only takes effect when the color scheme is set to Custom. The default value contains a commented-out example, uncomment it and fill in your own image URL to set a dashboard background."
-msgstr "如果還需要對面板其他樣式進行調整可以把style放到這裡。僅在配色方案選擇 Custom 時生效。預設值中包含一段已註釋的範例，取消註釋並填入你自己的圖片位址即可設定後台背景。"
+msgid "Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. The default value contains a commented-out example; uncomment it and fill in your own image URL to set an admin background."
+msgstr "選擇 Custom 時套用到整個 WordPress 後台的附加 CSS。這是 Sakura 全域設定，所有使用 Custom 的管理員共用。預設值包含已註解的範例，取消註解並填入圖片位址即可設定後台背景。"
 
 #: options.php:966
 msgid "Login interface background image"

@@ -2,10 +2,10 @@
  * Sakura Dashboard Color Scheme
  *
  * 本文件为纯静态资源，不含任何用户数据，可被浏览器与 CDN 正常缓存。
- * 所有可变颜色均以 CSS 自定义属性承载，实际取值由 functions.php 中的
- * sakura_dash_scheme_inline_style() 依据当前用户所选方案内联注入。
+ * 所有可变颜色均以 CSS 自定义属性承载，由 functions.php 统一生成，再通过普通后台的
+ * 服务端内联或个人资料页预览脚本注入。
  *
- * 此处 :root 的取值为 Sakura 预设，同时充当内联变量缺失时的回退值。
+ * 此处 :root 的取值为安全的静态回退；启用 Sakura 或 Custom 时由 PHP 内联变量覆盖。
  */
 
 :root {
@@ -16,9 +16,10 @@
 	--sakura-dash-notification: #df744a; /* 通知与计数徽章 */
 
 	/* 图标 */
-	--sakura-dash-icon-base: #e5f8ff;
-	--sakura-dash-icon-focus: #fff;
-	--sakura-dash-icon-current: #fff;
+	--sakura-dash-icon-base: #1d2327;
+	--sakura-dash-icon-submenu: #1d2327;
+	--sakura-dash-icon-focus: #1d2327;
+	--sakura-dash-icon-current: #1d2327;
 
 	/* 版面。背景图一律由 PHP 内联注入，避免 custom 方案误继承 Sakura 预设图，
 	   同时绕开 CSS 相对路径在子主题与 CDN 场景下的解析差异。 */
@@ -27,18 +28,29 @@
 	--sakura-dash-content-bg: transparent;
 
 	/* 文本与链接 */
-	--sakura-dash-menu-text: #fff;
-	--sakura-dash-submenu-link: #f3f2f1;
-	--sakura-dash-link: #0073aa;
-	--sakura-dash-link-hover: #0096dd;
+	--sakura-dash-menu-text: #1d2327;
+	--sakura-dash-submenu-link: #1d2327;
+	--sakura-dash-highlight-text: #1d2327;
+	--sakura-dash-notification-text: #1d2327;
+	--sakura-dash-submenu-hover: #1d2327;
+	--sakura-dash-primary-on-body: #1d2327;
+	--sakura-dash-highlight-on-body: #1d2327;
+	--sakura-dash-notification-on-body: #1d2327;
+	--sakura-dash-control-mark: #1d2327;
+	--sakura-dash-notification-on-white: #1d2327;
+	--sakura-dash-selection-ring: #1d2327;
+	--sakura-dash-link: #2271b1;
+	--sakura-dash-link-hover: #135e96;
 
 	/* 主按钮 */
 	--sakura-dash-button-bg: #bfd8d2;
-	--sakura-dash-button-border: #8fbbb1;
-	--sakura-dash-button-text: #fff;
+	--sakura-dash-button-border: #1d2327;
+	--sakura-dash-button-text: #1d2327;
+	--sakura-dash-button-hover-text: #1d2327;
+	--sakura-dash-button-active-text: #1d2327;
 
 	/* 键盘焦点轮廓 */
-	--sakura-dash-focus-ring: #8fbbb1;
+	--sakura-dash-focus-ring: #1d2327;
 }
 
 /* ---------------------------------------------------------------- 版面 */
@@ -71,11 +83,11 @@ a:hover {
 /* ------------------------------------------------------------ 核心控件 */
 
 input[type="checkbox"]:checked::before {
-	color: var(--sakura-dash-primary);
+	color: var(--sakura-dash-control-mark);
 }
 
 input[type="radio"]:checked::before {
-	background: var(--sakura-dash-primary);
+	background: var(--sakura-dash-control-mark);
 }
 
 .wp-core-ui input[type="reset"]:active,
@@ -94,7 +106,7 @@ input[type="radio"]:checked::before {
 .wp-core-ui .button-primary:focus {
 	background: var(--sakura-dash-highlight);
 	border-color: var(--sakura-dash-button-border);
-	color: var(--sakura-dash-button-text);
+	color: var(--sakura-dash-button-hover-text);
 	box-shadow: 0 1px 0 var(--sakura-dash-button-border);
 }
 
@@ -110,6 +122,7 @@ input[type="radio"]:checked::before {
 .wp-core-ui .button-primary.active:focus {
 	background: var(--sakura-dash-button-border);
 	border-color: var(--sakura-dash-button-border);
+	color: var(--sakura-dash-button-active-text);
 	box-shadow: inset 0 2px 0 var(--sakura-dash-button-border);
 }
 
@@ -139,36 +152,37 @@ input[type="radio"]:checked::before {
 #adminmenu a:focus-visible,
 #wpadminbar a.ab-item:focus-visible {
 	outline: 2px solid var(--sakura-dash-focus-ring);
-	outline-offset: 1px;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 1px #fff;
 }
 
 /* -------------------------------------------------- WordPress 颜色工具类 */
 
 .wp-core-ui .wp-ui-primary {
-	color: #fff;
+	color: var(--sakura-dash-menu-text);
 	background-color: var(--sakura-dash-primary);
 }
 
 .wp-core-ui .wp-ui-text-primary {
-	color: var(--sakura-dash-primary);
+	color: var(--sakura-dash-primary-on-body);
 }
 
 .wp-core-ui .wp-ui-highlight {
-	color: #fff;
+	color: var(--sakura-dash-highlight-text);
 	background-color: var(--sakura-dash-highlight);
 }
 
 .wp-core-ui .wp-ui-text-highlight {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-highlight-on-body);
 }
 
 .wp-core-ui .wp-ui-notification {
-	color: #fff;
+	color: var(--sakura-dash-notification-text);
 	background-color: var(--sakura-dash-notification);
 }
 
 .wp-core-ui .wp-ui-text-notification {
-	color: var(--sakura-dash-notification);
+	color: var(--sakura-dash-notification-on-body);
 }
 
 .wp-core-ui .wp-ui-text-icon {
@@ -178,16 +192,16 @@ input[type="radio"]:checked::before {
 /* ---------------------------------------------------------- 页面标题区 */
 
 .wrap .page-title-action:hover {
-	color: #fff;
+	color: var(--sakura-dash-menu-text);
 	background-color: var(--sakura-dash-primary);
 }
 
 .view-switch a.current::before {
-	color: var(--sakura-dash-primary);
+	color: var(--sakura-dash-control-mark);
 }
 
 .view-switch a:hover::before {
-	color: var(--sakura-dash-notification);
+	color: var(--sakura-dash-notification-on-white);
 }
 
 .nav-tab-active,
@@ -217,7 +231,7 @@ input[type="radio"]:checked::before {
 #adminmenu li.menu-top:hover,
 #adminmenu li.opensub > a.menu-top,
 #adminmenu li > a.menu-top:focus {
-	color: #fff;
+	color: var(--sakura-dash-highlight-text);
 	background-color: var(--sakura-dash-highlight);
 }
 
@@ -260,13 +274,13 @@ input[type="radio"]:checked::before {
 #adminmenu a.wp-has-current-submenu:focus + .wp-submenu a:hover,
 .folded #adminmenu .wp-has-current-submenu .wp-submenu a:focus,
 .folded #adminmenu .wp-has-current-submenu .wp-submenu a:hover {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-submenu-hover);
 }
 
 #adminmenu .wp-submenu li.current a,
 #adminmenu .wp-has-current-submenu.opensub .wp-submenu li.current a,
 #adminmenu a.wp-has-current-submenu:focus + .wp-submenu li.current a {
-	color: #fff;
+	color: var(--sakura-dash-submenu-link);
 }
 
 #adminmenu .wp-submenu li.current a:focus,
@@ -275,19 +289,19 @@ input[type="radio"]:checked::before {
 #adminmenu .wp-has-current-submenu.opensub .wp-submenu li.current a:hover,
 #adminmenu a.wp-has-current-submenu:focus + .wp-submenu li.current a:focus,
 #adminmenu a.wp-has-current-submenu:focus + .wp-submenu li.current a:hover {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-submenu-hover);
 }
 
 ul#adminmenu a.wp-has-current-submenu::after,
 ul#adminmenu > li.current > a.current::after {
-	border-right-color: var(--sakura-dash-body-bg);
+	border-right-color: var(--sakura-dash-icon-base);
 }
 
 #adminmenu li.current a.menu-top,
 #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head,
 .folded #adminmenu li.current.menu-top {
-	color: #fff;
+	color: var(--sakura-dash-highlight-text);
 	background: var(--sakura-dash-highlight);
 }
 
@@ -303,7 +317,7 @@ ul#adminmenu > li.current > a.current::after {
 
 #adminmenu .awaiting-mod,
 #adminmenu .update-plugins {
-	color: #fff;
+	color: var(--sakura-dash-notification-text);
 	background: var(--sakura-dash-notification);
 }
 
@@ -311,7 +325,7 @@ ul#adminmenu > li.current > a.current::after {
 #adminmenu li a.wp-has-current-submenu .update-plugins,
 #adminmenu li.menu-top:hover > a .update-plugins,
 #adminmenu li:hover a .awaiting-mod {
-	color: #fff;
+	color: var(--sakura-dash-submenu-link);
 	background: var(--sakura-dash-base);
 }
 
@@ -321,13 +335,13 @@ ul#adminmenu > li.current > a.current::after {
 
 #collapse-button:focus,
 #collapse-button:hover {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-icon-base);
 }
 
 /* -------------------------------------------------------- 管理工具栏 */
 
 #wpadminbar {
-	color: #fff;
+	color: var(--sakura-dash-menu-text);
 	background: var(--sakura-dash-primary);
 }
 
@@ -335,7 +349,7 @@ ul#adminmenu > li.current > a.current::after {
 #wpadminbar a.ab-item,
 #wpadminbar > #wp-toolbar span.ab-label,
 #wpadminbar > #wp-toolbar span.noticon {
-	color: #fff;
+	color: var(--sakura-dash-menu-text);
 }
 
 #wpadminbar .ab-icon,
@@ -350,21 +364,21 @@ ul#adminmenu > li.current > a.current::after {
 #wpadminbar.nojs .ab-top-menu > li.menupop:hover > .ab-item,
 #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
 #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-submenu-hover);
 	background: var(--sakura-dash-base);
 }
 
 #wpadminbar:not(.mobile) > #wp-toolbar a:focus span.ab-label,
 #wpadminbar:not(.mobile) > #wp-toolbar li.hover span.ab-label,
 #wpadminbar:not(.mobile) > #wp-toolbar li:hover span.ab-label {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-submenu-hover);
 }
 
 #wpadminbar:not(.mobile) li:hover #adminbarsearch::before,
 #wpadminbar:not(.mobile) li:hover .ab-icon::before,
 #wpadminbar:not(.mobile) li:hover .ab-item::after,
 #wpadminbar:not(.mobile) li:hover .ab-item::before {
-	color: #fff;
+	color: var(--sakura-dash-icon-submenu);
 }
 
 #wpadminbar .menupop .ab-sub-wrapper {
@@ -406,7 +420,7 @@ ul#adminmenu > li.current > a.current::after {
 #wpadminbar li:hover .ab-item::before,
 #wpadminbar.nojs .quicklinks .menupop:hover ul li a:focus,
 #wpadminbar.nojs .quicklinks .menupop:hover ul li a:hover {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-submenu-hover);
 }
 
 #wpadminbar .menupop .menupop > .ab-item:hover::before,
@@ -415,12 +429,12 @@ ul#adminmenu > li.current > a.current::after {
 #wpadminbar .quicklinks li a:hover .blavatar,
 #wpadminbar.mobile .quicklinks .ab-icon::before,
 #wpadminbar.mobile .quicklinks .ab-item::before {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-icon-submenu);
 }
 
 #wpadminbar.mobile .quicklinks .hover .ab-icon::before,
 #wpadminbar.mobile .quicklinks .hover .ab-item::before {
-	color: var(--sakura-dash-icon-base);
+	color: var(--sakura-dash-icon-submenu);
 }
 
 #wpadminbar #adminbarsearch::before {
@@ -428,21 +442,21 @@ ul#adminmenu > li.current > a.current::after {
 }
 
 #wpadminbar #wp-admin-bar-recovery-mode {
-	color: #fff;
+	color: var(--sakura-dash-notification-text);
 	background-color: var(--sakura-dash-notification);
 }
 
 #wpadminbar #wp-admin-bar-recovery-mode .ab-item,
 #wpadminbar #wp-admin-bar-recovery-mode a.ab-item {
-	color: #fff;
+	color: var(--sakura-dash-notification-text);
 }
 
 #wpadminbar #wp-admin-bar-user-info .display-name {
-	color: #fff;
+	color: var(--sakura-dash-submenu-link);
 }
 
 #wpadminbar #wp-admin-bar-user-info a:hover .display-name {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-submenu-hover);
 }
 
 #wpadminbar #wp-admin-bar-user-info .username {
@@ -452,19 +466,20 @@ ul#adminmenu > li.current > a.current::after {
 /* ------------------------------------------------------ 指针与媒体库 */
 
 .wp-pointer .wp-pointer-content h3 {
+	color: var(--sakura-dash-highlight-text);
 	background-color: var(--sakura-dash-highlight);
-	border-color: var(--sakura-dash-base);
+	border-color: var(--sakura-dash-selection-ring);
 }
 
 .wp-pointer .wp-pointer-content h3::before {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-icon-focus);
 }
 
 .wp-pointer.wp-pointer-top .wp-pointer-arrow,
 .wp-pointer.wp-pointer-top .wp-pointer-arrow-inner,
 .wp-pointer.wp-pointer-undefined .wp-pointer-arrow,
 .wp-pointer.wp-pointer-undefined .wp-pointer-arrow-inner {
-	border-bottom-color: var(--sakura-dash-highlight);
+	border-bottom-color: var(--sakura-dash-selection-ring);
 }
 
 .media-item .bar,
@@ -475,20 +490,21 @@ ul#adminmenu > li.current > a.current::after {
 .details.attachment {
 	box-shadow:
 		inset 0 0 0 3px #fff,
-		inset 0 0 0 7px var(--sakura-dash-highlight);
+		inset 0 0 0 7px var(--sakura-dash-selection-ring);
 }
 
 .attachment.details .check {
+	color: var(--sakura-dash-highlight-text);
 	background-color: var(--sakura-dash-highlight);
 	box-shadow:
 		0 0 0 1px #fff,
-		0 0 0 2px var(--sakura-dash-highlight);
+		0 0 0 2px var(--sakura-dash-selection-ring);
 }
 
 .media-selection .attachment.selection.details .thumbnail {
 	box-shadow:
 		0 0 0 1px #fff,
-		0 0 0 3px var(--sakura-dash-highlight);
+		0 0 0 3px var(--sakura-dash-selection-ring);
 }
 
 /* -------------------------------------------------------- 主题浏览器 */
@@ -496,49 +512,50 @@ ul#adminmenu > li.current > a.current::after {
 .theme-browser .theme.active .theme-name,
 .theme-browser .theme.add-new-theme a:focus::after,
 .theme-browser .theme.add-new-theme a:hover::after {
+	color: var(--sakura-dash-highlight-text);
 	background: var(--sakura-dash-highlight);
 }
 
 .theme-browser .theme.add-new-theme a:focus span::after,
 .theme-browser .theme.add-new-theme a:hover span::after {
-	color: var(--sakura-dash-highlight);
+	color: var(--sakura-dash-highlight-on-body);
 }
 
 .theme-filter.current,
 .theme-section.current {
-	border-bottom-color: var(--sakura-dash-primary);
+	border-bottom-color: var(--sakura-dash-control-mark);
 }
 
 body.more-filters-opened .more-filters {
-	color: #fff;
+	color: var(--sakura-dash-menu-text);
 	background-color: var(--sakura-dash-primary);
 }
 
 body.more-filters-opened .more-filters::before {
-	color: #fff;
+	color: var(--sakura-dash-icon-base);
 }
 
 body.more-filters-opened .more-filters:focus,
 body.more-filters-opened .more-filters:hover {
-	color: #fff;
+	color: var(--sakura-dash-highlight-text);
 	background-color: var(--sakura-dash-highlight);
 }
 
 body.more-filters-opened .more-filters:focus::before,
 body.more-filters-opened .more-filters:hover::before {
-	color: #fff;
+	color: var(--sakura-dash-icon-focus);
 }
 
 /* ------------------------------------------------------------ 小工具 */
 
 .widgets-chooser li.widgets-chooser-selected {
-	color: #fff;
+	color: var(--sakura-dash-highlight-text);
 	background-color: var(--sakura-dash-highlight);
 }
 
 .widgets-chooser li.widgets-chooser-selected::before,
 .widgets-chooser li.widgets-chooser-selected:focus::before {
-	color: #fff;
+	color: var(--sakura-dash-icon-focus);
 }
 
 /* -------------------------------------------------------- 响应式后台 */
@@ -552,10 +569,14 @@ div#wp-responsive-toggle a::before {
 	background: var(--sakura-dash-highlight);
 }
 
+.wp-responsive-open div#wp-responsive-toggle a::before {
+	color: var(--sakura-dash-icon-focus);
+}
+
 .wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle a {
 	background: var(--sakura-dash-base);
 }
 
 .wp-responsive-open #wpadminbar #wp-admin-bar-menu-toggle .ab-icon::before {
-	color: var(--sakura-dash-icon-base);
+	color: var(--sakura-dash-icon-submenu);
 }
