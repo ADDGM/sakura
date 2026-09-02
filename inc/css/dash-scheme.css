@@ -44,13 +44,13 @@
 
 	/* 主按钮 */
 	--sakura-dash-button-bg: #bfd8d2;
-	--sakura-dash-button-border: #1d2327;
+	--sakura-dash-button-border: #4e776d;
 	--sakura-dash-button-text: #1d2327;
 	--sakura-dash-button-hover-text: #1d2327;
 	--sakura-dash-button-active-text: #1d2327;
 
 	/* 键盘焦点轮廓 */
-	--sakura-dash-focus-ring: #1d2327;
+	--sakura-dash-focus-ring: #4e776d;
 }
 
 /* ---------------------------------------------------------------- 版面 */

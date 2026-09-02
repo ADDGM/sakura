@@ -1643,6 +1643,9 @@ function sakura_dash_scheme_preset()
         'icon_base' => '#e5f8ff',
         'icon_focus' => '#ffffff',
         'icon_current' => '#ffffff',
+        // 深青绿色边界与 Sakura 的菜单底色协调，同时满足浅色按钮上的 3:1 阈值。
+        'button_border' => '#4e776d',
+        'focus_ring' => '#4e776d',
     );
 }
 
@@ -1810,9 +1813,13 @@ function sakura_dash_scheme_variables($scheme)
     $colors = ('sakura' === $scheme) ? sakura_dash_scheme_preset() : sakura_dash_scheme_custom_colors();
     $body_image = 'none';
     $button_bg = $colors['highlight'];
+    $button_border = sakura_dash_readable_foreground($colors['base'], $button_bg, 3);
+    $focus_ring = sakura_dash_readable_foreground($colors['base'], '#f0f0f1', 3);
     if ('sakura' === $scheme) {
         $body_image = 'url("' . esc_url(get_template_directory_uri() . '/images/dash-sakura-bg.webp') . '")';
         $button_bg = $colors['primary'];
+        $button_border = $colors['button_border'];
+        $focus_ring = $colors['focus_ring'];
     }
 
     return array(
@@ -1837,11 +1844,11 @@ function sakura_dash_scheme_variables($scheme)
         '--sakura-dash-notification-on-white' => sakura_dash_readable_foreground($colors['notification'], '#ffffff', 3),
         '--sakura-dash-selection-ring' => sakura_dash_readable_foreground($colors['highlight'], '#ffffff', 3),
         '--sakura-dash-button-bg' => $button_bg,
-        '--sakura-dash-button-border' => sakura_dash_readable_foreground($colors['base'], $button_bg, 3),
+        '--sakura-dash-button-border' => $button_border,
         '--sakura-dash-button-text' => sakura_dash_readable_foreground('#ffffff', $button_bg, 4.5),
         '--sakura-dash-button-hover-text' => sakura_dash_readable_foreground('#ffffff', $colors['highlight'], 4.5),
         '--sakura-dash-button-active-text' => sakura_dash_readable_foreground('#1d2327', $colors['primary'], 4.5),
-        '--sakura-dash-focus-ring' => sakura_dash_readable_foreground($colors['base'], '#f0f0f1', 3),
+        '--sakura-dash-focus-ring' => $focus_ring,
     );
 }
 

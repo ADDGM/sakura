@@ -169,6 +169,9 @@ $dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-
 if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {
     $errors[] = '后台配色主按钮按下态未使用主色背景。';
 }
+if ($dashSchemeSource === false || strpos($dashSchemeSource, '--sakura-dash-button-border: #4e776d') === false || strpos($dashSchemeSource, '--sakura-dash-focus-ring: #4e776d') === false) {
+    $errors[] = '后台配色静态回退未使用 Sakura 协调的按钮边界色。';
+}
 $previewSource = file_get_contents(get_template_directory() . '/js/admin-color-scheme-preview.js');
 if ($previewSource === false || !preg_match('/\.textContent\s*=/', $previewSource) || !preg_match('/\.disabled\s*=/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]change[\'\"]/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]click[\'\"]/', $previewSource)) {
     $errors[] = '个人资料页后台配色预览脚本缺少安全写入、样式表切换或配色卡事件监听。';
@@ -223,6 +226,17 @@ if (function_exists('sakura_dash_contrast_ratio') && function_exists('sakura_das
     $customReadable = sakura_dash_readable_foreground('#ffffff', '#c6742b', 4.5);
     if (sakura_dash_contrast_ratio($customReadable, '#c6742b') < 4.5) {
         $errors[] = 'Custom 默认主色的文字前景回退未达到 4.5:1。';
+    }
+    if (function_exists('sakura_dash_scheme_variables')) {
+        $sakuraVars = sakura_dash_scheme_variables('sakura');
+        $sakuraEdge = $sakuraVars['--sakura-dash-button-border'] ?? '';
+        $sakuraFocus = $sakuraVars['--sakura-dash-focus-ring'] ?? '';
+        if ($sakuraEdge !== '#4e776d' || $sakuraFocus !== '#4e776d') {
+            $errors[] = 'Sakura 按钮边框和焦点环未使用协调的主题边界色。';
+        }
+        if (sakura_dash_contrast_ratio($sakuraEdge, '#bfd8d2') < 3 || sakura_dash_contrast_ratio($sakuraFocus, '#f1f1f1') < 3) {
+            $errors[] = 'Sakura 按钮边框或焦点环对比度未达到 3:1。';
+        }
     }
 }
 
