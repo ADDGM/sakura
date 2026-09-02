@@ -180,7 +180,7 @@ if ($optionsStyleSource === false || preg_match('/#optionsframework input\.check
 if ($optionsStyleSource === false || !preg_match('/#optionsframework-submit\s*\{[^}]*display:\s*flex;[^}]*background:\s*transparent;/s', $optionsStyleSource)) {
     $errors[] = '主题设置页提交区仍未使用稳定的弹性布局和透明背景。';
 }
-if ($optionsStyleSource === false || preg_match('/#optionsframework \.button-primary\s*\{[^}]*background:\s*#b32d2e/s') || preg_match('/#optionsframework \.reset-button\s*\{[^}]*background:\s*#374D6F/s')) {
+if ($optionsStyleSource === false || preg_match('/#optionsframework \.button-primary\s*\{[^}]*background:\s*#b32d2e/s', $optionsStyleSource) || preg_match('/#optionsframework \.reset-button\s*\{[^}]*background:\s*#374D6F/s', $optionsStyleSource)) {
     $errors[] = '主题设置页保存/重置按钮仍使用旧版硬编码红蓝配色。';
 }
 if ($optionsStyleSource === false || strpos($optionsStyleSource, '--sakura-dash-button-bg') === false || strpos($optionsStyleSource, '#optionsframework .button-primary:hover') === false || strpos($optionsStyleSource, '#optionsframework .reset-button:hover') === false) {
