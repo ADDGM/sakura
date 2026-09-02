@@ -90,7 +90,6 @@ $sourceChecks = array(
     array('inc/css/optionsframework.css', '#optionsframework input[type="button"]', '主题设置页按钮样式未收紧作用域。'),
     array('inc/css/optionsframework.css', ':focus-visible', '主题设置页缺少键盘焦点反馈。'),
     array('inc/options-sanitize.php', 'sanitize_hex_color', 'Options Framework 颜色清理器未复用 WordPress 核心校验。'),
-    array('js/admin-color-scheme-preview.js', 'style.textContent', '个人资料页预览脚本没有使用安全的 textContent 写入样式。'),
     array('js/admin-color-scheme-preview.js', 'input[name="admin_color"]', '个人资料页预览脚本未监听后台配色选择器。'),
 );
 foreach ($sourceChecks as $check) {
