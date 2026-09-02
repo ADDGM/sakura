@@ -1974,6 +1974,7 @@ function sakura_dash_scheme_preview_script($hook_suffix)
 
     $data = array(
         'styleId' => 'sakura-admin-color-preview',
+        'styleSheetId' => 'sakura-admin-color-scheme-preview-css',
         'schemes' => array(
             'sakura' => sakura_dash_scheme_css('sakura'),
             'custom' => sakura_dash_scheme_css('custom'),

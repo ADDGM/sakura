@@ -84,12 +84,14 @@ $sourceChecks = array(
     array('functions.php', 'sakura_dash_scheme_prepare_custom_css', 'Custom 附加 CSS 没有旧默认精确降级处理。'),
     array('functions.php', 'sakura_dash_scheme_preview_script', '个人资料页没有注册后台配色实时预览脚本。'),
     array('functions.php', "wp_enqueue_style(\n        'sakura-admin-color-scheme-preview'", '个人资料页预览没有加载静态后台配色样式。'),
+    array('functions.php', "'styleSheetId' => 'sakura-admin-color-scheme-preview-css'", '个人资料页预览未标识静态后台配色样式表。'),
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
     array('functions.php', "check_ajax_referer('sakura-dismiss-scheme-tip')", '配色提示关闭动作缺少 nonce 校验。'),
     array('inc/css/optionsframework.css', '#optionsframework-wrap .nav-tab', '主题设置页标签样式未收紧作用域。'),
     array('inc/css/optionsframework.css', '#optionsframework input[type="button"]', '主题设置页按钮样式未收紧作用域。'),
     array('inc/css/optionsframework.css', ':focus-visible', '主题设置页缺少键盘焦点反馈。'),
     array('inc/options-sanitize.php', 'sanitize_hex_color', 'Options Framework 颜色清理器未复用 WordPress 核心校验。'),
+    array('js/admin-color-scheme-preview.js', 'styleSheetId', '个人资料页预览脚本未控制静态后台配色样式表。'),
     array('js/admin-color-scheme-preview.js', 'input[name="admin_color"]', '个人资料页预览脚本未监听后台配色选择器。'),
 );
 foreach ($sourceChecks as $check) {
@@ -163,8 +165,8 @@ if ($optionsStyleSource === false || preg_match('/input\[type=checkbox\]\s*,\s*i
     $errors[] = '主题设置页仍使用旧规则全局覆盖 WordPress 单选控件。';
 }
 $previewSource = file_get_contents(get_template_directory() . '/js/admin-color-scheme-preview.js');
-if ($previewSource === false || !preg_match('/\.textContent\s*=/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]change[\'\"]/', $previewSource)) {
-    $errors[] = '个人资料页后台配色预览脚本缺少安全写入或 change 监听。';
+if ($previewSource === false || !preg_match('/\.textContent\s*=/', $previewSource) || !preg_match('/\.disabled\s*=/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]change[\'\"]/', $previewSource)) {
+    $errors[] = '个人资料页后台配色预览脚本缺少安全写入、样式表切换或 change 监听。';
 }
 
 if (function_exists('optionsframework_options') && function_exists('sakura_dash_scheme_custom_preset')) {

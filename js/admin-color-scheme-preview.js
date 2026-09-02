@@ -16,12 +16,23 @@
         return style;
     }
 
+    function getPreviewStyleSheet() {
+        return config.styleSheetId
+            ? document.getElementById(config.styleSheetId)
+            : null;
+    }
+
     function applyPreview(scheme) {
-        var css = Object.prototype.hasOwnProperty.call(config.schemes, scheme)
+        var hasPreviewScheme = Object.prototype.hasOwnProperty.call(config.schemes, scheme);
+        var css = hasPreviewScheme
             ? config.schemes[scheme]
             : '';
         var style = getPreviewStyle();
+        var styleSheet = getPreviewStyleSheet();
         style.textContent = css;
+        if (styleSheet) {
+            styleSheet.disabled = !hasPreviewScheme;
+        }
     }
 
     function initializePreview() {
