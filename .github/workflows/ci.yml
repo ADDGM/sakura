@@ -209,9 +209,16 @@ jobs:
       - name: Run theme smoke test
         run: |
           set +e
-          wp --path=wp-root eval-file "$GITHUB_WORKSPACE/scripts/wordpress-smoke.php"
-          status=$?
+          smoke_output="$(wp --path=wp-root eval-file "$GITHUB_WORKSPACE/scripts/wordpress-smoke.php" 2>&1)"
+          smoke_status=$?
+          printf '%s\n' "$smoke_output"
+          while IFS= read -r smoke_line; do
+            if [[ "$smoke_line" == -* ]]; then
+              echo "::error title=WordPress smoke test::$smoke_line"
+            fi
+          done <<< "$smoke_output"
           set -e
+          status=$smoke_status
           if [ -f wp-root/wp-content/debug.log ]; then
             echo '--- wp-content/debug.log ---'
             cat wp-root/wp-content/debug.log
