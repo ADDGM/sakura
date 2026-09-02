@@ -37,6 +37,7 @@
 
     function initializePreview() {
         var choices = document.querySelectorAll('input[name="admin_color"]');
+        var options = document.querySelectorAll('#color-picker .color-option');
         if (!choices.length) {
             return;
         }
@@ -44,6 +45,16 @@
         choices.forEach(function (choice) {
             choice.addEventListener('change', function () {
                 applyPreview(choice.value);
+            });
+        });
+
+        // WordPress 配色卡会直接设置 checked，不一定派发 radio 的 change 事件。
+        options.forEach(function (option) {
+            option.addEventListener('click', function () {
+                var choice = option.querySelector('input[name="admin_color"]');
+                if (choice) {
+                    applyPreview(choice.value);
+                }
             });
         });
 

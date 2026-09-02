@@ -1840,7 +1840,7 @@ function sakura_dash_scheme_variables($scheme)
         '--sakura-dash-button-border' => sakura_dash_readable_foreground($colors['base'], $button_bg, 3),
         '--sakura-dash-button-text' => sakura_dash_readable_foreground('#ffffff', $button_bg, 4.5),
         '--sakura-dash-button-hover-text' => sakura_dash_readable_foreground('#ffffff', $colors['highlight'], 4.5),
-        '--sakura-dash-button-active-text' => sakura_dash_readable_foreground('#ffffff', $colors['base'], 4.5),
+        '--sakura-dash-button-active-text' => sakura_dash_readable_foreground('#1d2327', $colors['primary'], 4.5),
         '--sakura-dash-focus-ring' => sakura_dash_readable_foreground($colors['base'], '#f0f0f1', 3),
     );
 }

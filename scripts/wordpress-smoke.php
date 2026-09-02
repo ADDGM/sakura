@@ -92,6 +92,7 @@ $sourceChecks = array(
     array('inc/css/optionsframework.css', ':focus-visible', '主题设置页缺少键盘焦点反馈。'),
     array('inc/options-sanitize.php', 'sanitize_hex_color', 'Options Framework 颜色清理器未复用 WordPress 核心校验。'),
     array('js/admin-color-scheme-preview.js', 'styleSheetId', '个人资料页预览脚本未控制静态后台配色样式表。'),
+    array('js/admin-color-scheme-preview.js', '#color-picker .color-option', '个人资料页预览脚本未覆盖 WordPress 配色卡片点击入口。'),
     array('js/admin-color-scheme-preview.js', 'input[name="admin_color"]', '个人资料页预览脚本未监听后台配色选择器。'),
 );
 foreach ($sourceChecks as $check) {
@@ -164,9 +165,13 @@ $optionsStyleSource = file_get_contents(get_template_directory() . '/inc/css/opt
 if ($optionsStyleSource === false || preg_match('/input\[type=checkbox\]\s*,\s*input\[type=radio\]/', $optionsStyleSource)) {
     $errors[] = '主题设置页仍使用旧规则全局覆盖 WordPress 单选控件。';
 }
+$dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-scheme.css');
+if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {
+    $errors[] = '后台配色主按钮按下态未使用主色背景。';
+}
 $previewSource = file_get_contents(get_template_directory() . '/js/admin-color-scheme-preview.js');
-if ($previewSource === false || !preg_match('/\.textContent\s*=/', $previewSource) || !preg_match('/\.disabled\s*=/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]change[\'\"]/', $previewSource)) {
-    $errors[] = '个人资料页后台配色预览脚本缺少安全写入、样式表切换或 change 监听。';
+if ($previewSource === false || !preg_match('/\.textContent\s*=/', $previewSource) || !preg_match('/\.disabled\s*=/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]change[\'\"]/', $previewSource) || !preg_match('/\.addEventListener\(\s*[\'\"]click[\'\"]/', $previewSource)) {
+    $errors[] = '个人资料页后台配色预览脚本缺少安全写入、样式表切换或配色卡事件监听。';
 }
 
 if (function_exists('optionsframework_options') && function_exists('sakura_dash_scheme_custom_preset')) {

@@ -120,7 +120,7 @@ input[type="radio"]:checked::before {
 .wp-core-ui .button-primary.active,
 .wp-core-ui .button-primary.active:hover,
 .wp-core-ui .button-primary.active:focus {
-	background: var(--sakura-dash-button-border);
+	background: var(--sakura-dash-primary);
 	border-color: var(--sakura-dash-button-border);
 	color: var(--sakura-dash-button-active-text);
 	box-shadow: inset 0 2px 0 var(--sakura-dash-button-border);
