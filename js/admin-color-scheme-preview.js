@@ -20,7 +20,8 @@
         var css = Object.prototype.hasOwnProperty.call(config.schemes, scheme)
             ? config.schemes[scheme]
             : '';
-        getPreviewStyle().textContent = css;
+        var style = getPreviewStyle();
+        style.textContent = css;
     }
 
     function initializePreview() {
