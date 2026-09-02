@@ -108,7 +108,7 @@
 }
 
 #optionsframework input[type=checkbox] {
-    border: 1px solid #b4b9be;
+    border: 1px solid var(--sakura-dash-focus-ring, #8c8f94);
     background: #fff;
     color: #555;
     clear: none;
@@ -122,11 +122,11 @@
     vertical-align: middle;
     width: 16px;
     min-width: 16px;
-    box-shadow: none
+    box-shadow: none;
+    border-radius: 3px;
 }
 
-/* 红色按钮与保存按钮（#FF6464）同属主题设置页的既有设计语言，予以保留。
-   作用域收紧后，该规则不再影响 #optionsframework 之外的任何元素。 */
+/* 红色上传按钮仅限主题设置页，作用域收紧后不再影响其他后台控件。 */
 #optionsframework input[type="button"]{
 	box-shadow: none;
     border: none !important;
@@ -239,9 +239,9 @@
 #optionsframework .of-multicheck-option {
 	display: block;
 	max-width: 100%;
-	min-height: 21px;
-	line-height: 16px;
-	margin-bottom: 5px;
+	min-height: 24px;
+	line-height: 20px;
+	margin-bottom: 8px;
 }
 #optionsframework .of-radio-option input.of-radio,
 #optionsframework .of-multicheck-option input.checkbox {
@@ -251,12 +251,15 @@
 	margin: 2px 4px 0 0;
 	vertical-align: middle;
 }
+#optionsframework .of-radio-option input.of-radio {
+	margin: 0 8px 0 0;
+}
 #optionsframework .of-radio-option label,
 #optionsframework .of-multicheck-option label {
 	display: inline;
 	float: none;
 	max-width: 90%;
-	line-height: 16px;
+	line-height: 20px;
 	margin: 0 14px 0 0;
 	vertical-align: middle;
 }
@@ -291,22 +294,61 @@
 	}
 }
 #optionsframework input.checkbox {
-	width: 15px;
-	margin-top:2px;
-	float:left;
-	clear:both;
-	border-radius: 50%;
-}
-#optionsframework input.of-radio {
-	display: inline-block;
 	width: 16px;
 	min-width: 16px;
 	height: 16px;
-	margin: 2px 4px 0 0;
+	margin-top: 2px;
+	float:left;
+	clear:both;
+	border-radius: 3px;
+}
+#optionsframework input.of-radio {
+	position: relative;
+	display: inline-block;
+	width: 18px;
+	min-width: 18px;
+	height: 18px;
+	margin: 0 8px 0 0;
+	padding: 0;
 	float: none;
 	clear: none;
 	vertical-align: middle;
+	box-sizing: border-box;
+	border: 2px solid var(--sakura-dash-focus-ring, #2271b1);
 	border-radius: 50%;
+	background: #fff;
+	box-shadow: none;
+	-webkit-appearance: none;
+	appearance: none;
+	cursor: pointer;
+}
+#optionsframework input.of-radio:hover,
+#optionsframework input.of-radio:checked {
+	border-color: var(--sakura-dash-focus-ring, #2271b1);
+}
+#optionsframework input.of-radio:checked {
+	background: var(--sakura-dash-focus-ring, #2271b1);
+}
+#optionsframework input.of-radio:checked::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	display: block;
+	float: none;
+	width: 8px;
+	height: 8px;
+	margin: 0;
+	transform: translate(-50%, -50%);
+	border: 0;
+	border-radius: 50%;
+	background: #fff;
+	outline: none;
+}
+#optionsframework input.of-radio:disabled,
+#optionsframework input.checkbox:disabled {
+	opacity: .65;
+	cursor: default;
 }
 #optionsframework .section-typography .controls {
 	float:none;
@@ -459,35 +501,84 @@
 	bottom: 0px;
 }
 #optionsframework .reset-button {
-	float: left;
-    box-shadow: none;
-    border: none;
-    background: #374D6F;
-    text-shadow: none;
-    color:#fff;
-    height: 40px;
-    width: 100px;
-    border-radius: 0px;
-	cursor:pointer;
+	float: none;
 }
 
 /* Bottom Section */
 
 #optionsframework-submit {
-	padding: 7px 10px;
-    background-image: -moz-linear-gradient(center top , #F9F9F9, #ECECEC);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 20px 10px 0;
+	border-top: 1px solid #E8E8E8;
+	background: transparent;
+}
+#optionsframework-submit .clear {
+	display: none;
+}
+#optionsframework .reset-button,
+#optionsframework .button-primary {
+	box-sizing: border-box;
+	min-height: 40px;
+	height: 40px;
+	width: auto;
+	padding: 0 20px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	box-shadow: none;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 38px;
+	text-shadow: none;
+	cursor: pointer;
+	transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+#optionsframework .reset-button {
+	background: transparent;
+	border-color: var(--sakura-dash-focus-ring, #2271b1);
+	color: #1d2327;
+}
+#optionsframework .reset-button:hover {
+	background: var(--sakura-dash-button-bg, #f0f0f1);
+	border-color: var(--sakura-dash-focus-ring, #2271b1);
+	color: var(--sakura-dash-button-text, #1d2327);
+}
+#optionsframework .reset-button:active {
+	background: var(--sakura-dash-primary, #e0e0e0);
+	color: var(--sakura-dash-button-active-text, #1d2327);
 }
 #optionsframework .button-primary {
-	float: right;
-    box-shadow: none;
-    border: none;
-	background: #b32d2e;
-	color: #fff;
-    text-shadow: none;
-    /* padding: 10px; */
-    height: 40px;
-    width: 100px;
-    border-radius: 0px;
+	margin-left: auto;
+	background: var(--sakura-dash-button-bg, #2271b1);
+	border-color: var(--sakura-dash-button-border, #2271b1);
+	color: var(--sakura-dash-button-text, #fff);
+}
+#optionsframework .button-primary:hover {
+	background: var(--sakura-dash-highlight, #135e96);
+	border-color: var(--sakura-dash-button-border, #135e96);
+	color: var(--sakura-dash-button-hover-text, #fff);
+}
+#optionsframework .button-primary:active {
+	background: var(--sakura-dash-primary, #3858e9);
+	border-color: var(--sakura-dash-button-border, #3858e9);
+	color: var(--sakura-dash-button-active-text, #fff);
+	box-shadow: inset 0 2px 0 rgba(0, 0, 0, .12);
+}
+#optionsframework .button-primary:focus-visible,
+#optionsframework .reset-button:focus-visible {
+	outline: 2px solid var(--sakura-dash-focus-ring, #2271b1);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 1px #fff;
+}
+#optionsframework .button-primary:disabled,
+#optionsframework .button-primary[disabled],
+#optionsframework .reset-button:disabled,
+#optionsframework .reset-button[disabled] {
+	opacity: .65;
+	cursor: default;
 }
 #optionsframework .section:after {
 	content: "";

@@ -165,6 +165,21 @@ $optionsStyleSource = file_get_contents(get_template_directory() . '/inc/css/opt
 if ($optionsStyleSource === false || preg_match('/input\[type=checkbox\]\s*,\s*input\[type=radio\]/', $optionsStyleSource)) {
     $errors[] = '主题设置页仍使用旧规则全局覆盖 WordPress 单选控件。';
 }
+if ($optionsStyleSource === false || !preg_match('/#optionsframework input\.of-radio:checked::before\s*\{[^}]*float:\s*none;[^}]*position:\s*absolute;[^}]*transform:\s*translate\(-50%,\s*-50%\)/s', $optionsStyleSource)) {
+    $errors[] = '主题设置页单选控件未清除核心浮动或未实现选中点居中。';
+}
+if ($optionsStyleSource === false || preg_match('/#optionsframework input\.checkbox\s*\{[^}]*border-radius:\s*50%/s', $optionsStyleSource)) {
+    $errors[] = '主题设置页 checkbox 仍被绘制为圆形。';
+}
+if ($optionsStyleSource === false || !preg_match('/#optionsframework-submit\s*\{[^}]*display:\s*flex;[^}]*background:\s*transparent;/s', $optionsStyleSource)) {
+    $errors[] = '主题设置页提交区仍未使用稳定的弹性布局和透明背景。';
+}
+if ($optionsStyleSource === false || preg_match('/#optionsframework \.button-primary\s*\{[^}]*background:\s*#b32d2e/s') || preg_match('/#optionsframework \.reset-button\s*\{[^}]*background:\s*#374D6F/s')) {
+    $errors[] = '主题设置页保存/重置按钮仍使用旧版硬编码红蓝配色。';
+}
+if ($optionsStyleSource === false || strpos($optionsStyleSource, '--sakura-dash-button-bg') === false || strpos($optionsStyleSource, '#optionsframework .button-primary:hover') === false || strpos($optionsStyleSource, '#optionsframework .reset-button:hover') === false) {
+    $errors[] = '主题设置页保存/重置按钮缺少后台配色令牌或状态规则。';
+}
 $dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-scheme.css');
 if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {
     $errors[] = '后台配色主按钮按下态未使用主色背景。';
