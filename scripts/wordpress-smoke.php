@@ -165,7 +165,13 @@ $optionsStyleSource = file_get_contents(get_template_directory() . '/inc/css/opt
 if ($optionsStyleSource === false || preg_match('/input\[type=checkbox\]\s*,\s*input\[type=radio\]/', $optionsStyleSource)) {
     $errors[] = '主题设置页仍使用旧规则全局覆盖 WordPress 单选控件。';
 }
-if ($optionsStyleSource === false || !preg_match('/#optionsframework input\.of-radio:checked::before\s*\{[^}]*float:\s*none;[^}]*position:\s*absolute;[^}]*transform:\s*translate\(-50%,\s*-50%\)/s', $optionsStyleSource)) {
+$radioCheckedRuleValid = false;
+if ($optionsStyleSource !== false && preg_match('/#optionsframework input\.of-radio:checked::before\s*\{([^}]*)\}/s', $optionsStyleSource, $radioCheckedRule)) {
+    $radioCheckedRuleValid = preg_match('/float:\s*none;/', $radioCheckedRule[1])
+        && preg_match('/position:\s*absolute;/', $radioCheckedRule[1])
+        && preg_match('/transform:\s*translate\(-50%,\s*-50%\)/', $radioCheckedRule[1]);
+}
+if (!$radioCheckedRuleValid) {
     $errors[] = '主题设置页单选控件未清除核心浮动或未实现选中点居中。';
 }
 if ($optionsStyleSource === false || preg_match('/#optionsframework input\.checkbox\s*\{[^}]*border-radius:\s*50%/s', $optionsStyleSource)) {
