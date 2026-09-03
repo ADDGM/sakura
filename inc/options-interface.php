@@ -157,9 +157,9 @@ function optionsframework_fields() {
 				if ( $val != '' && ($val == $key) ) {
 					$selected = ' of-radio-img-selected';
 				}
-				$output .= '<input type="radio" id="' . esc_attr( $value['id'] .'_'. $key) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" '. checked( $val, $key, false ) .' />';
+				$output .= '<input type="radio" id="' . esc_attr( $value['id'] .'_'. $key) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" aria-label="' . esc_attr( $key ) . '" '. checked( $val, $key, false ) .' />';
 				$output .= '<div class="of-radio-img-label">' . esc_html( $key ) . '</div>';
-				$output .= '<img src="' . esc_url( $option ) . '" alt="' . $option .'" class="of-radio-img-img' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;" />';
+				$output .= '<img src="' . esc_url( $option ) . '" alt="' . esc_attr( $key ) . '" class="of-radio-img-img' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;" />';
 			}
 			break;
 			
@@ -175,7 +175,7 @@ function optionsframework_fields() {
 							$checked = ' checked="checked"';
 						}
 					}
-					$output .= '<input type="radio" id="' . esc_attr( $value['id'] .'_'. $key) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" '. $checked .' />';
+					$output .= '<input type="radio" id="' . esc_attr( $value['id'] .'_'. $key) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" aria-label="' . esc_attr( $key ) . '" '. $checked .' />';
 					$output .= '<div class="of-radio-img-label">' . esc_html( $key ) . '</div>';
 					$output .= '<a style="background-color:#'.$key.';" href="javascript:;" class="of-radio-img-img of-radio-color' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;"></a>';
 					// $output .= '<img src="' . esc_url( $option ) . '" alt="' . $option .'" class="of-radio-img-img' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;" />';
@@ -286,7 +286,7 @@ function optionsframework_fields() {
 					if ( $val !=  $value['std']['color'] )
 						$default_color = ' data-default-color="' .$value['std']['color'] . '" ';
 				}
-				$font_color = '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-typography-color  type="text" value="' . esc_attr( $typography_stored['color'] ) . '"' . $default_color .' />';
+				$font_color = '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-typography-color" type="text" value="' . esc_attr( $typography_stored['color'] ) . '"' . $default_color .' />';
 			}
 
 			// Allow modification/injection of typography fields

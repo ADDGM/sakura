@@ -1704,12 +1704,28 @@ function sakura_dash_scheme_custom_colors()
  */
 function sakura_dash_scheme_localize_urls($css)
 {
-    $legacy = 'view.moezx.cc/images/2018/01/03/sakura.png';
-    $local = get_template_directory_uri() . '/images/dash-sakura-bg.webp';
+    $legacy_sakura = 'view.moezx.cc/images/2018/01/03/sakura.png';
+    $local_sakura = get_template_directory_uri() . '/images/dash-sakura-bg.webp';
+    $legacy_custom = 'view.moezx.cc/images/2019/04/21/windows10-2019-4-21-i3.jpg';
+    $local_custom = get_template_directory_uri() . '/images/Custom.jpg';
 
     return str_replace(
-        array('https://' . $legacy, 'http://' . $legacy, '//' . $legacy),
-        array($local, $local, $local),
+        array(
+            'https://' . $legacy_sakura,
+            'http://' . $legacy_sakura,
+            '//' . $legacy_sakura,
+            'https://' . $legacy_custom,
+            'http://' . $legacy_custom,
+            '//' . $legacy_custom,
+        ),
+        array(
+            $local_sakura,
+            $local_sakura,
+            $local_sakura,
+            $local_custom,
+            $local_custom,
+            $local_custom,
+        ),
         $css
     );
 }
@@ -1822,6 +1838,11 @@ function sakura_dash_scheme_variables($scheme)
         $focus_ring = $colors['focus_ring'];
     }
 
+    // 主题设置页只消费这些语义令牌，不直接依赖某个配色方案的具体色值。
+    $options_control_border = sakura_dash_readable_foreground($colors['base'], '#ffffff', 3);
+    $options_control_hover = sakura_dash_readable_foreground($colors['primary'], '#ffffff', 3);
+    $options_danger_text = sakura_dash_readable_foreground('#ffffff', $colors['notification'], 4.5);
+
     return array(
         '--sakura-dash-base' => $colors['base'],
         '--sakura-dash-primary' => $colors['primary'],
@@ -1849,11 +1870,21 @@ function sakura_dash_scheme_variables($scheme)
         '--sakura-dash-button-hover-text' => sakura_dash_readable_foreground('#ffffff', $colors['highlight'], 4.5),
         '--sakura-dash-button-active-text' => sakura_dash_readable_foreground('#1d2327', $colors['primary'], 4.5),
         '--sakura-dash-focus-ring' => $focus_ring,
+        '--sakura-dash-options-surface' => '#ffffff',
+        '--sakura-dash-options-surface-alt' => '#f6f7f7',
+        '--sakura-dash-options-surface-emphasis' => $colors['highlight'],
+        '--sakura-dash-options-text' => '#1d2327',
+        '--sakura-dash-options-muted-text' => '#50575e',
+        '--sakura-dash-options-border' => '#dcdcde',
+        '--sakura-dash-options-control-border' => $options_control_border,
+        '--sakura-dash-options-control-hover' => $options_control_hover,
+        '--sakura-dash-options-danger' => $colors['notification'],
+        '--sakura-dash-options-danger-text' => $options_danger_text,
     );
 }
 
 /**
- * 返回 Sakura 旧版本写入数据库的完整 Custom 默认 CSS。
+ * 返回 Sakura 旧版本写入数据库的完整 Custom CSS，供默认值兼容判断使用。
  */
 function sakura_dash_scheme_legacy_custom_css()
 {
@@ -1861,7 +1892,46 @@ function sakura_dash_scheme_legacy_custom_css()
 }
 
 /**
- * 清理 Custom 附加 CSS，并对完全等于旧默认值的存量设置作无数据库降级。
+ * 返回新装 Custom 方案的活动默认 CSS。
+ *
+ * 旧版规则继续作为默认方案的一部分，但其中的死链背景会在输出时改为主题
+ * 自带的 Custom.jpg。这样默认值无需依赖外部服务，也不会把用户 CSS 写回数据库。
+ */
+function sakura_dash_scheme_default_custom_css()
+{
+    $css = str_replace(
+        'color:#f3f2f1',
+        'color:var(--sakura-dash-submenu-link)',
+        sakura_dash_scheme_legacy_custom_css()
+    );
+
+    return sakura_dash_scheme_localize_urls($css);
+}
+
+/**
+ * 返回上一版发布的注释示例，用于识别无数据库迁移的历史默认设置。
+ */
+function sakura_dash_scheme_commented_custom_css()
+{
+    return "/* Custom dashboard styles. Uncomment and replace the URL with your own image: */
+/* body { background-image: url(https://example.com/your-background.jpg); background-size: cover; background-repeat: no-repeat; background-attachment: fixed; } */
+/* #wpcontent { background: rgba(255, 255, 255, .8); } */";
+}
+
+/**
+ * 返回 Custom 附加 CSS 设置的默认提示。
+ *
+ * 源码默认规则由 sakura_dash_scheme_default_custom_css() 始终提供；此字段只
+ * 保存用户要追加或覆盖的规则，因此留空或只保留注释即可恢复源码默认效果。
+ */
+function sakura_dash_scheme_custom_css_rules_default()
+{
+    return "/* Custom built-in rules are loaded automatically. Add CSS here only to extend or override them. */
+/* Example: body { background-image: none; } */";
+}
+
+/**
+ * 清理 Custom 附加 CSS，并把历史默认值视为空附加规则。
  */
 function sakura_dash_scheme_prepare_custom_css($rules)
 {
@@ -1870,9 +1940,22 @@ function sakura_dash_scheme_prepare_custom_css($rules)
     }
 
     $normalized = trim(str_replace(array("\r\n", "\r"), "\n", $rules));
-    $legacy = trim(str_replace(array("\r\n", "\r"), "\n", sakura_dash_scheme_legacy_custom_css()));
-    if ($normalized === $legacy) {
+    $without_comments = preg_replace('/\/\*.*?\*\//s', '', $normalized);
+    if (is_string($without_comments) && '' === trim($without_comments)) {
         return '';
+    }
+
+    $default_variants = array(
+        sakura_dash_scheme_legacy_custom_css(),
+        sakura_dash_scheme_commented_custom_css(),
+        sakura_dash_scheme_default_custom_css(),
+        sakura_dash_scheme_custom_css_rules_default(),
+    );
+    foreach ($default_variants as $default_variant) {
+        $default_variant = trim(str_replace(array("\r\n", "\r"), "\n", $default_variant));
+        if ($normalized === $default_variant) {
+            return '';
+        }
     }
 
     // 内联输出须防止 </style> 逃逸，做法与 WordPress 核心 wp_custom_css_cb() 一致。
@@ -1896,6 +1979,11 @@ function sakura_dash_scheme_css($scheme)
     $css .= '}';
 
     if ('custom' === $scheme) {
+        $default_css = sakura_dash_scheme_default_custom_css();
+        if ('' !== $default_css) {
+            $css .= "\n" . $default_css;
+        }
+
         $rules = sakura_dash_scheme_prepare_custom_css(akina_option('dash_scheme_css_rules'));
         if ('' !== $rules) {
             $css .= "\n" . $rules;

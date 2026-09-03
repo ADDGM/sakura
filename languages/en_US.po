@@ -1432,7 +1432,7 @@ msgid "Custom admin additional styles (CSS)"
 msgstr ""
 
 #: options.php:960
-msgid "Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. The default value contains a commented-out example; uncomment it and fill in your own image URL to set an admin background."
+msgid "Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. Classic Custom rules and the bundled Custom.jpg background are loaded automatically; add CSS here only to extend or override them. Leave it empty or commented to restore the source defaults."
 msgstr ""
 
 #: options.php:966

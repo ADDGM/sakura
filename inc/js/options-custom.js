@@ -78,14 +78,29 @@ jQuery(document).ready(function($) {
 		}
 	}
 
-	// Image Options
-	$('.of-radio-img-img').click(function(){
-		$(this).parent().parent().find('.of-radio-img-img').removeClass('of-radio-img-selected');
-		$(this).addClass('of-radio-img-selected');
+	// Image and color radio options keep their visual state in sync for mouse and keyboard input.
+	function syncImageRadio(radio) {
+		var $radio = $(radio);
+		var $controls = $radio.closest('.controls');
+		$controls.find('.of-radio-img-img').removeClass('of-radio-img-selected');
+		if ($radio.prop('checked')) {
+			$radio.next('.of-radio-img-label').next('.of-radio-img-img').addClass('of-radio-img-selected');
+		}
+	}
+
+	$('.of-radio-img-radio').on('change', function() {
+		syncImageRadio(this);
+	});
+
+	$('.of-radio-img-img').on('click', function() {
+		var $radio = $(this).prev('.of-radio-img-label').prev('.of-radio-img-radio');
+		$radio.prop('checked', true).trigger('change').trigger('focus');
 	});
 
 	$('.of-radio-img-label').hide();
 	$('.of-radio-img-img').show();
-	$('.of-radio-img-radio').hide();
+	$('.of-radio-img-radio').each(function() {
+		syncImageRadio(this);
+	});
 
 });

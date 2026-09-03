@@ -958,11 +958,9 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Custom admin additional styles (CSS)', 'sakura'), /*Custom 后台附加样式（CSS）*/
-        'desc' => __('Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. The default value contains a commented-out example; uncomment it and fill in your own image URL to set an admin background.', 'sakura'), /*选择 Custom 时应用到整个 WordPress 后台的附加 CSS。这是 Sakura 全局设置，所有使用 Custom 的管理员共享。默认值包含已注释的示例，取消注释并填写图片地址即可设置后台背景。*/
+        'desc' => __('Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. Classic Custom rules and the bundled Custom.jpg background are loaded automatically; add CSS here only to extend or override them. Leave it empty or commented to restore the source defaults.', 'sakura'), /*选择 Custom 时应用到整个 WordPress 后台的附加 CSS。这是 Sakura 全局设置，所有使用 Custom 的管理员共享。经典 Custom 规则和内置 Custom.jpg 背景会自动加载；这里只需填写要追加或覆盖的 CSS。留空或只保留注释即可恢复源码默认效果。*/
         'id' => 'dash_scheme_css_rules',
-        'std' => "/* Custom dashboard styles. Uncomment and replace the URL with your own image: */
-/* body { background-image: url(https://example.com/your-background.jpg); background-size: cover; background-repeat: no-repeat; background-attachment: fixed; } */
-/* #wpcontent { background: rgba(255, 255, 255, .8); } */",
+        'std' => sakura_dash_scheme_custom_css_rules_default(),
         'type' => 'textarea');
 
     $options[] = array(

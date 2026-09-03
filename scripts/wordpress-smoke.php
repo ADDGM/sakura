@@ -81,19 +81,28 @@ $sourceChecks = array(
     array('functions.php', 'sakura_dash_relative_luminance', '后台配色缺少 WCAG 亮度计算。'),
     array('functions.php', 'sakura_dash_contrast_ratio', '后台配色缺少 WCAG 对比度计算。'),
     array('functions.php', 'sakura_dash_readable_foreground', '后台配色缺少可读性前景回退。'),
-    array('functions.php', 'sakura_dash_scheme_prepare_custom_css', 'Custom 附加 CSS 没有旧默认精确降级处理。'),
+    array('functions.php', 'sakura_dash_scheme_default_custom_css', 'Custom 默认 CSS 没有集中定义。'),
+    array('functions.php', 'sakura_dash_scheme_commented_custom_css', 'Custom 历史注释默认值没有兼容判断。'),
+    array('functions.php', 'sakura_dash_scheme_custom_css_rules_default', 'Custom 附加 CSS 默认提示没有集中定义。'),
+    array('functions.php', 'sakura_dash_scheme_prepare_custom_css', 'Custom 附加 CSS 没有历史默认兼容处理。'),
+    array('options.php', 'sakura_dash_scheme_custom_css_rules_default()', 'Custom 附加 CSS 默认提示没有复用集中定义。'),
+    array('functions.php', '--sakura-dash-options-surface', '主题设置页没有注册独立的语义表面色令牌。'),
+    array('functions.php', '--sakura-dash-options-control-border', '主题设置页控件边界没有接入配色方案令牌。'),
     array('functions.php', 'sakura_dash_scheme_preview_script', '个人资料页没有注册后台配色实时预览脚本。'),
     array('functions.php', "wp_enqueue_style(\n        'sakura-admin-color-scheme-preview'", '个人资料页预览没有加载静态后台配色样式。'),
     array('functions.php', "'styleSheetId' => 'sakura-admin-color-scheme-preview-css'", '个人资料页预览未标识静态后台配色样式表。'),
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
     array('functions.php', "check_ajax_referer('sakura-dismiss-scheme-tip')", '配色提示关闭动作缺少 nonce 校验。'),
     array('inc/css/optionsframework.css', '#optionsframework-wrap .nav-tab', '主题设置页标签样式未收紧作用域。'),
-    array('inc/css/optionsframework.css', '#optionsframework input[type="button"]', '主题设置页按钮样式未收紧作用域。'),
     array('inc/css/optionsframework.css', ':focus-visible', '主题设置页缺少键盘焦点反馈。'),
     array('inc/options-sanitize.php', 'sanitize_hex_color', 'Options Framework 颜色清理器未复用 WordPress 核心校验。'),
     array('js/admin-color-scheme-preview.js', 'styleSheetId', '个人资料页预览脚本未控制静态后台配色样式表。'),
     array('js/admin-color-scheme-preview.js', '#color-picker .color-option', '个人资料页预览脚本未覆盖 WordPress 配色卡片点击入口。'),
     array('js/admin-color-scheme-preview.js', 'input[name="admin_color"]', '个人资料页预览脚本未监听后台配色选择器。'),
+    array('inc/css/optionsframework.css', '#optionsframework .wp-picker-container', '主题设置页颜色选择器缺少统一的控件样式。'),
+    array('inc/css/optionsframework.css', '#optionsframework .section-editor', '主题设置页编辑器缺少统一的外框样式。'),
+    array('inc/css/optionsframework.css', '#optionsframework .controls input.upload-button', '主题设置页上传控件未匹配实际的 upload-button 类。'),
+    array('inc/options-interface.php', 'aria-label="', '主题设置页图片/颜色 radio 缺少可访问名称。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -113,6 +122,9 @@ foreach ($sourceChecks as $check) {
 if (file_exists(get_template_directory() . '/inc/dash-scheme.php')) {
     $errors[] = '旧后台配色端点 inc/dash-scheme.php 仍存在。';
 }
+if (!file_exists(get_template_directory() . '/images/Custom.jpg')) {
+    $errors[] = 'Custom 默认后台背景 images/Custom.jpg 未随主题发布。';
+}
 
 // 以下片段一旦重新出现即视为回归。
 $absentChecks = array(
@@ -122,9 +134,15 @@ $absentChecks = array(
     array('inc/css/optionsframework.css', "\ninput[type=", '主题设置页仍无作用域地覆盖表单控件。'),
     array('inc/css/optionsframework.css', "\n.nav-tab", '主题设置页仍无作用域地覆盖标签页样式。'),
     array('options.php', 'windows10-2019-4-21-i3.jpg', '后台配色默认值仍引用已失效的外部背景图。'),
+    array('options.php', 'example.com/your-background.jpg', 'Custom 默认 CSS 仍是外部图片注释示例。'),
     array('options.php', 'Other custom panel styles(CSS)', 'Custom 附加 CSS 设置仍使用旧名称。'),
     array('functions.php', 'window.onload', '后台通知脚本仍覆盖全局 window.onload。'),
     array('js/admin-color-scheme-preview.js', 'innerHTML', '后台配色预览脚本仍使用不安全的 innerHTML。'),
+    array('inc/css/optionsframework.css', '#FBFBFB', '主题设置页仍使用旧版面板背景色。'),
+    array('inc/css/optionsframework.css', '#3F607D', '主题设置页仍使用旧版标题颜色。'),
+    array('inc/css/optionsframework.css', '#455E8C', '主题设置页仍使用旧版分组标题颜色。'),
+    array('inc/css/optionsframework.css', '#E8E8E8', '主题设置页仍使用旧版分隔线颜色。'),
+    array('inc/css/optionsframework.css', '#BBBBBB', '主题设置页仍使用旧版上传控件边框颜色。'),
 );
 foreach ($absentChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -185,6 +203,16 @@ if ($optionsStyleSource === false || preg_match('/#optionsframework \.button-pri
 }
 if ($optionsStyleSource === false || strpos($optionsStyleSource, '--sakura-dash-button-bg') === false || strpos($optionsStyleSource, '#optionsframework .button-primary:hover') === false || strpos($optionsStyleSource, '#optionsframework .reset-button:hover') === false) {
     $errors[] = '主题设置页保存/重置按钮缺少后台配色令牌或状态规则。';
+}
+if ($optionsStyleSource === false || strpos($optionsStyleSource, 'color: var(--sakura-dash-highlight-text, var(--options-text));') === false) {
+    $errors[] = '主题设置页重置按钮按下态未使用高亮背景的可读文字颜色。';
+}
+if ($optionsStyleSource === false || preg_match('/#optionsframework input\.of-radio-img-radio\s*\{[^}]*display:\s*none/s', $optionsStyleSource)) {
+    $errors[] = '主题设置页图片/颜色 radio 仍通过 display:none 失去键盘焦点。';
+}
+$interfaceSource = file_get_contents(get_template_directory() . '/inc/options-interface.php');
+if ($interfaceSource === false || strpos($interfaceSource, 'class="of-color of-typography-color" type="text"') === false) {
+    $errors[] = 'Typography 颜色输入的 HTML 属性仍未正确闭合。';
 }
 $dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-scheme.css');
 if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {
@@ -261,16 +289,29 @@ if (function_exists('sakura_dash_contrast_ratio') && function_exists('sakura_das
     }
 }
 
-if (function_exists('sakura_dash_scheme_legacy_custom_css') && function_exists('sakura_dash_scheme_prepare_custom_css')) {
+if (function_exists('sakura_dash_scheme_legacy_custom_css') && function_exists('sakura_dash_scheme_default_custom_css') && function_exists('sakura_dash_scheme_commented_custom_css') && function_exists('sakura_dash_scheme_custom_css_rules_default') && function_exists('sakura_dash_scheme_prepare_custom_css')) {
     $legacyCss = sakura_dash_scheme_legacy_custom_css();
-    foreach (array($legacyCss, "\r\n" . str_replace("\n", "\r\n", $legacyCss) . " \t") as $legacyVariant) {
-        if (sakura_dash_scheme_prepare_custom_css($legacyVariant) !== '') {
-            $errors[] = '旧版 Custom 默认 CSS 没有按精确匹配降级为空。';
+    $defaultCss = sakura_dash_scheme_default_custom_css();
+    $commentedCss = sakura_dash_scheme_commented_custom_css();
+    $rulesDefault = sakura_dash_scheme_custom_css_rules_default();
+    if (strpos($defaultCss, '/images/Custom.jpg') === false || strpos($defaultCss, 'windows10-2019-4-21-i3.jpg') !== false || strpos($defaultCss, 'var(--sakura-dash-submenu-link)') === false || strpos($defaultCss, 'color:#f3f2f1') !== false) {
+        $errors[] = 'Custom 默认 CSS 没有使用本地背景或配色变量。';
+    }
+    $localizedLegacy = sakura_dash_scheme_localize_urls($legacyCss);
+    if (strpos($localizedLegacy, '/images/Custom.jpg') === false || strpos($localizedLegacy, 'windows10-2019-4-21-i3.jpg') !== false) {
+        $errors[] = '旧版 Custom CSS 的死链没有映射到本地 Custom.jpg。';
+    }
+    foreach (array($legacyCss, $commentedCss, $defaultCss, $rulesDefault, "\r\n" . str_replace("\n", "\r\n", $legacyCss) . " \t") as $defaultVariant) {
+        if (sakura_dash_scheme_prepare_custom_css($defaultVariant) !== '') {
+            $errors[] = 'Custom 历史默认值或附加 CSS 提示没有恢复为空附加规则。';
             break;
         }
     }
+    if (sakura_dash_scheme_prepare_custom_css('/* administrator note */') !== '') {
+        $errors[] = '仅包含 CSS 注释的 Custom 附加内容没有恢复为空。';
+    }
     if (sakura_dash_scheme_prepare_custom_css($legacyCss . '/* changed */') === '') {
-        $errors[] = '修改过的 Custom CSS 被错误当作旧默认值清空。';
+        $errors[] = '修改过的 Custom CSS 被错误当作默认值替换。';
     }
 }
 
@@ -302,8 +343,8 @@ if (function_exists('sakura_dash_scheme_css')) {
     if ($smokeColors['base'] !== '#abc' || $smokeColors['primary'] !== '#d88e4c' || $smokeColors['highlight'] !== '#695644' || $smokeColors['icon_focus'] !== '#ffffff') {
         $errors[] = 'Custom 非法或空颜色没有按集中预设安全回退。';
     }
-    if (strpos($customCss, '.smoke-test{color:red;}') === false || strpos($customCss, '--sakura-dash-primary:') === false) {
-        $errors[] = 'Custom CSS 生成没有同时包含变量和附加规则。';
+    if (strpos($customCss, '.smoke-test{color:red;}') === false || strpos($customCss, '--sakura-dash-primary:') === false || strpos($customCss, '/images/Custom.jpg') === false) {
+        $errors[] = 'Custom CSS 生成没有同时包含源码默认规则、变量和附加规则。';
     }
 }
 $scriptSource = file_get_contents(get_template_directory() . '/js/sakura-app.js');

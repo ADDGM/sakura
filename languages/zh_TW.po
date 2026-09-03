@@ -1472,8 +1472,8 @@ msgid "Custom admin additional styles (CSS)"
 msgstr "Custom 後台附加樣式（CSS）"
 
 #: options.php:960
-msgid "Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. The default value contains a commented-out example; uncomment it and fill in your own image URL to set an admin background."
-msgstr "選擇 Custom 時套用到整個 WordPress 後台的附加 CSS。這是 Sakura 全域設定，所有使用 Custom 的管理員共用。預設值包含已註解的範例，取消註解並填入圖片位址即可設定後台背景。"
+msgid "Additional CSS applied across the WordPress admin when Custom is selected. This is a global Sakura setting shared by every administrator who uses Custom. Classic Custom rules and the bundled Custom.jpg background are loaded automatically; add CSS here only to extend or override them. Leave it empty or commented to restore the source defaults."
+msgstr "選擇 Custom 時套用到整個 WordPress 後台的附加 CSS。這是 Sakura 全域設定，所有使用 Custom 的管理員共用。經典 Custom 規則和內建 Custom.jpg 背景會自動載入；這裡只需填寫要追加或覆蓋的 CSS。留空或只保留註解即可恢復原始碼預設效果。"
 
 #: options.php:966
 msgid "Login interface background image"
