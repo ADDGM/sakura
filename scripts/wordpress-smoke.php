@@ -210,9 +210,35 @@ if ($optionsStyleSource === false || strpos($optionsStyleSource, 'color: var(--s
 if ($optionsStyleSource === false || preg_match('/#optionsframework input\.of-radio-img-radio\s*\{[^}]*display:\s*none/s', $optionsStyleSource)) {
     $errors[] = '主题设置页图片/颜色 radio 仍通过 display:none 失去键盘焦点。';
 }
+$badgeImageRuleValid = false;
+if ($optionsStyleSource !== false && preg_match('/#optionsframework \.section-images \.controls \.of-radio-img-img,[\s\S]*?\{([^}]*)\}/s', $optionsStyleSource, $badgeImageRule)) {
+    $badgeImageRuleValid = strpos($badgeImageRule[1], 'box-shadow: none;') !== false
+        && strpos($badgeImageRule[1], 'border: 0;') !== false;
+}
+if ($optionsStyleSource === false || strpos($optionsStyleSource, '#optionsframework .section-images .of-radio-img-option') === false || !$badgeImageRuleValid) {
+    $errors[] = '主题设置页更新徽章未使用语义卡片包装或未清除旧选中阴影。';
+}
 $interfaceSource = file_get_contents(get_template_directory() . '/inc/options-interface.php');
 if ($interfaceSource === false || strpos($interfaceSource, 'class="of-color of-typography-color" type="text"') === false) {
     $errors[] = 'Typography 颜色输入的 HTML 属性仍未正确闭合。';
+}
+$imageRadioBlockValid = false;
+if ($interfaceSource !== false && preg_match('/case "images":([\s\S]*?)case "colorradio":/', $interfaceSource, $imageRadioBlock)) {
+    $imageRadioBlockValid = strpos($imageRadioBlock[1], 'class="of-radio-img-option') !== false
+        && strpos($imageRadioBlock[1], "\$value['labels'][ \$key ]") !== false
+        && strpos($imageRadioBlock[1], '$option_selected') !== false
+        && strpos($imageRadioBlock[1], 'aria-label="\' . esc_attr( $label )') !== false
+        && strpos($imageRadioBlock[1], 'aria-label="\' . esc_attr( $key )') === false;
+}
+if (!$imageRadioBlockValid) {
+    $errors[] = '主题设置页图片 radio 未输出语义包装或未支持独立标签。';
+}
+$optionsSource = file_get_contents(get_template_directory() . '/options.php');
+if ($optionsSource === false || strpos($optionsSource, "'id' => \"release_info\"") === false || strpos($optionsSource, "'tag' => 'https://img.shields.io/github/tag/ADDGM/sakura") === false || strpos($optionsSource, "'tag2' => 'https://img.shields.io/github/last-commit/ADDGM/sakura/develop") === false || strpos($optionsSource, "'tag' => __('Latest tag', 'sakura')") === false || strpos($optionsSource, "'tag2' => __('Latest develop commit', 'sakura')") === false) {
+    $errors[] = '检查更新徽章未使用 ADDGM/sakura 地址或缺少人类可读标签。';
+}
+if ($optionsSource !== false && (strpos($optionsSource, "'tag' => 'https://img.shields.io/github/release/mashirozx/Sakura") !== false || strpos($optionsSource, "'tag2' => 'https://img.shields.io/github/commits-since/mashirozx/Sakura") !== false)) {
+    $errors[] = '检查更新区域仍引用上游 mashirozx/Sakura 徽章。';
 }
 $dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-scheme.css');
 if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {

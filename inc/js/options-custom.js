@@ -83,8 +83,10 @@ jQuery(document).ready(function($) {
 		var $radio = $(radio);
 		var $controls = $radio.closest('.controls');
 		$controls.find('.of-radio-img-img').removeClass('of-radio-img-selected');
+		$controls.find('.of-radio-img-option').removeClass('of-radio-img-option-selected');
 		if ($radio.prop('checked')) {
 			$radio.next('.of-radio-img-label').next('.of-radio-img-img').addClass('of-radio-img-selected');
+			$radio.closest('.of-radio-img-option').addClass('of-radio-img-option-selected');
 		}
 	}
 
@@ -97,7 +99,8 @@ jQuery(document).ready(function($) {
 		$radio.prop('checked', true).trigger('change').trigger('focus');
 	});
 
-	$('.of-radio-img-label').hide();
+	$('.section-colorradio .of-radio-img-label').hide();
+	$('.section-images .of-radio-img-label').show();
 	$('.of-radio-img-img').show();
 	$('.of-radio-img-radio').each(function() {
 		syncImageRadio(this);

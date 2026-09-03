@@ -1051,20 +1051,24 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('About', 'sakura'), /*关于*/
-        'desc' => sprintf(__('Theme Sakura v %s  |  <a href="https://2heng.xin/theme-sakura/">Theme document</a>  |  <a href="https://github.com/mashirozx/Sakura/">Source code</a><a href="https://github.com/mashirozx/Sakura/releases/latest"><img src="https://img.shields.io/github/release/mashirozx/Sakura.svg?style=flat-square" alt="GitHub release"></a>', 'sakura'), SAKURA_VERSION), /*Theme Sakura v'.SAKURA_VERSION.'  |  <a href="https://2heng.xin/theme-sakura/">主题说明</a>  |  <a href="https://github.com/mashirozx/Sakura/">源码</a><a href="https://github.com/mashirozx/Sakura/releases/latest"><img src="https://img.shields.io/github/release/mashirozx/Sakura.svg?style=flat-square" alt="GitHub release"></a>*/
+        'desc' => sprintf(__('Theme Sakura v %s  |  <a href="https://2heng.xin/theme-sakura/">Theme document</a>  |  <a href="https://github.com/mashirozx/Sakura/">Source code</a><a href="https://github.com/mashirozx/Sakura/releases/latest"><img src="https://img.shields.io/github/release/mashirozx/Sakura.svg?style=flat-square" alt="GitHub release"></a>', 'sakura'), SAKURA_VERSION), /*Theme Sakura v'.SAKURA_VERSION.'  |  主题说明  |  源码*/
         'id' => 'theme_intro',
         'std' => '',
         'type' => 'typography ');
 
     $options[] = array(
         'name' => __('Check for Updates', 'sakura'), /*检查更新*/
-        'desc' => '<a href="https://github.com/mashirozx/Sakura/releases/latest">Download the latest version</a>',
+        'desc' => __('Choose a status badge below. The links use the ADDGM/sakura fork; the latest tag is the newest packaged version and the develop badge is the latest commit on the development branch.', 'sakura'),
         'id' => "release_info",
         'std' => "tag",
         'type' => "images",
         'options' => array(
-            'tag' => 'https://img.shields.io/github/release/mashirozx/Sakura.svg?style=flat-square',
-            'tag2' => 'https://img.shields.io/github/commits-since/mashirozx/Sakura/v' . SAKURA_VERSION . '/dev.svg?style=flat-square',
+            'tag' => 'https://img.shields.io/github/tag/ADDGM/sakura.svg?style=flat-square&label=latest%20tag',
+            'tag2' => 'https://img.shields.io/github/last-commit/ADDGM/sakura/develop.svg?style=flat-square&label=develop',
+        ),
+        'labels' => array(
+            'tag' => __('Latest tag', 'sakura'),
+            'tag2' => __('Latest develop commit', 'sakura'),
         ),
     );
 

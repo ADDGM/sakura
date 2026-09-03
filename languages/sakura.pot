@@ -1801,3 +1801,12 @@ msgstr ""
 #: functions.php:1565
 msgid "Why not try the new admin dashboard color scheme %1$shere%2$s?"
 msgstr ""
+
+msgid "Choose a status badge below. The links use the ADDGM/sakura fork; the latest tag is the newest packaged version and the develop badge is the latest commit on the development branch."
+msgstr ""
+
+msgid "Latest tag"
+msgstr ""
+
+msgid "Latest develop commit"
+msgstr ""

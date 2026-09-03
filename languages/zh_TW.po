@@ -2076,3 +2076,12 @@ msgstr "暫未開放註冊。"
 #: functions.php:1565
 msgid "Why not try the new admin dashboard color scheme %1$shere%2$s?"
 msgstr "試一試新後台界面%1$s色彩配置%2$s吧？"
+
+msgid "Choose a status badge below. The links use the ADDGM/sakura fork; the latest tag is the newest packaged version and the develop badge is the latest commit on the development branch."
+msgstr "請選擇下方的狀態徽章。連結使用 ADDGM/sakura fork；最新標籤代表最新打包版本，develop 徽章代表開發分支的最新提交。"
+
+msgid "Latest tag"
+msgstr "最新標籤"
+
+msgid "Latest develop commit"
+msgstr "develop 分支最新提交"

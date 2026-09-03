@@ -154,12 +154,17 @@ function optionsframework_fields() {
 			$name = $option_name .'['. $value['id'] .']';
 			foreach ( $value['options'] as $key => $option ) {
 				$selected = '';
+				$option_selected = '';
+				$label = isset( $value['labels'][ $key ] ) ? $value['labels'][ $key ] : $key;
 				if ( $val != '' && ($val == $key) ) {
 					$selected = ' of-radio-img-selected';
+					$option_selected = ' of-radio-img-option-selected';
 				}
-				$output .= '<input type="radio" id="' . esc_attr( $value['id'] .'_'. $key) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" aria-label="' . esc_attr( $key ) . '" '. checked( $val, $key, false ) .' />';
-				$output .= '<div class="of-radio-img-label">' . esc_html( $key ) . '</div>';
-				$output .= '<img src="' . esc_url( $option ) . '" alt="' . esc_attr( $key ) . '" class="of-radio-img-img' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;" />';
+				$output .= '<span class="of-radio-img-option' . esc_attr( $option_selected ) . '">';
+				$output .= '<input type="radio" id="' . esc_attr( $value['id'] .'_'. $key) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" aria-label="' . esc_attr( $label ) . '" '. checked( $val, $key, false ) .' />';
+				$output .= '<label class="of-radio-img-label" for="' . esc_attr( $value['id'] .'_'. $key) . '">' . esc_html( $label ) . '</label>';
+				$output .= '<img src="' . esc_url( $option ) . '" alt="' . esc_attr( $label ) . '" class="of-radio-img-img' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;" />';
+				$output .= '</span>';
 			}
 			break;
 			

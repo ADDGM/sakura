@@ -1926,8 +1926,29 @@ function sakura_dash_scheme_commented_custom_css()
  */
 function sakura_dash_scheme_custom_css_rules_default()
 {
-    return "/* Custom built-in rules are loaded automatically. Add CSS here only to extend or override them. */
-/* Example: body { background-image: none; } */";
+    return "/* Custom 内置规则会自动加载。以下内容仅为追加或覆盖示例，按需取消注释并修改。 */
+/* Custom built-in rules load automatically. Uncomment and edit only the rules you need. */
+/* */
+/* 1) 替换后台背景图：请先将 Custom1.jpg 放入主题 images/ 目录。 */
+/* body { */
+/*   background-image: url(\"/wp-content/themes/sakura/images/Custom1.jpg\"); */
+/*   background-size: cover; */
+/*   background-repeat: no-repeat; */
+/*   background-attachment: fixed; */
+/* } */
+/* */
+/* 2) 取消默认背景图（选择器应写 body，不是 #body）。 */
+/* body { background-image: none; } */
+/* */
+/* 3) 增加内容区不透明度。 */
+/* #wpcontent { background: rgba(255, 255, 255, .92); } */
+/* */
+/* 4) 修改菜单文字颜色。 */
+/* #adminmenu a, */
+/* #wpadminbar .ab-item { color: #fff; } */
+/* */
+/* 5) 修改后台内容区宽度。 */
+/* #wpcontent { max-width: 1600px; } */";
 }
 
 /**

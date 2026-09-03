@@ -458,6 +458,60 @@
 	box-shadow: 0 0 0 2px var(--options-surface), 0 0 0 4px var(--options-control-border);
 }
 
+/* 更新徽章使用语义标签和卡片边框，不在徽章本身叠加双层选中圆环。 */
+#optionsframework .section-images .of-radio-img-option {
+	display: flex;
+	flex: 0 1 auto;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	max-width: 100%;
+	padding: 8px;
+	border: 1px solid var(--options-border);
+	border-radius: 4px;
+	background: var(--options-surface);
+	transition: border-color .15s ease, background-color .15s ease;
+}
+
+#optionsframework .section-images .of-radio-img-option:hover {
+	border-color: var(--options-control-hover);
+	background: var(--options-surface-alt);
+}
+
+#optionsframework .section-images .of-radio-img-option.of-radio-img-option-selected {
+	border-color: var(--options-control-border);
+	background: var(--options-surface-alt);
+}
+
+#optionsframework .section-images .of-radio-img-label {
+	display: block;
+	max-width: 100%;
+	margin: 0;
+	color: var(--options-text);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 20px;
+	cursor: pointer;
+}
+
+#optionsframework .section-images .controls .of-radio-img-img,
+#optionsframework .section-images .controls .of-radio-img-img.of-radio-img-selected,
+#optionsframework .section-images input.of-radio-img-radio:checked + .of-radio-img-label + .of-radio-img-img {
+	max-width: min(100%, 340px);
+	padding: 0;
+	border: 0;
+	border-radius: 3px;
+	background: transparent;
+	box-shadow: none;
+	transform: none;
+}
+
+#optionsframework .section-images input.of-radio-img-radio:focus-visible + .of-radio-img-label {
+	outline: 2px solid var(--options-focus);
+	outline-offset: 2px;
+	border-radius: 3px;
+}
+
 #optionsframework .controls .of-radio-color {
 	width: 42px;
 	height: 42px;
