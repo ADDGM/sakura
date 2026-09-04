@@ -130,6 +130,15 @@ jobs:
             echo "无法确定提交检查基线"
             exit 1
           fi
+          BASE_REF="${RANGE%%..*}"
+          if ! git rev-parse --verify "${BASE_REF}^{commit}" >/dev/null 2>&1; then
+            if [[ -s .github/release-baseline.txt ]]; then
+              RANGE="$(tr -d '[:space:]' < .github/release-baseline.txt)..${GITHUB_SHA}"
+            else
+              echo "提交检查基线不可达，且没有可用的发布基线"
+              exit 1
+            fi
+          fi
           git rev-parse --verify "${RANGE##*..}^{commit}" >/dev/null
           echo "range=${RANGE}" >> "$GITHUB_OUTPUT"
 
