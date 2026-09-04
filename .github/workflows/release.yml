@@ -180,16 +180,31 @@ jobs:
           rm -f "$THEME_HEADER_FILE"
           sha256sum "dist/sakura-${VERSION}.zip" > "dist/sakura-${VERSION}.zip.sha256"
 
-      - name: Upload release artifact
+      - name: Upload release bundle artifact
         uses: actions/upload-artifact@v7
         with:
-          name: sakura-${{ steps.release.outputs.version }}
+          name: sakura-release-bundle-${{ steps.release.outputs.version }}
           path: |
             dist/sakura-${{ steps.release.outputs.version }}.zip
             dist/sakura-${{ steps.release.outputs.version }}.zip.sha256
             release-notes.zh-CN.md
           retention-days: 14
           if-no-files-found: error
+
+      - name: Explain downloadable artifacts
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          THEME_ZIP="sakura-${VERSION}.zip"
+          BUNDLE_NAME="sakura-release-bundle-${VERSION}"
+          {
+            echo "### 发布产物使用说明"
+            echo
+            printf '%s\n' "- GitHub Release 页面中的 \`${THEME_ZIP}\` 是可直接上传 WordPress 的主题包。"
+            printf '%s\n' "- Actions Artifact \`${BUNDLE_NAME}\` 是外层资料包，下载后请先解压，再上传其中的 \`${THEME_ZIP}\`。"
+            printf '%s\n' "- 主题 ZIP 内应包含 \`sakura/style.css\`。"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create or update GitHub Release
         env:

@@ -59,6 +59,17 @@ Actions Artifact（外层下载压缩包）
 
 CI Artifact 只用于快速验证最新 `develop` 提交，当前保留 7 天，不作为长期下载地址。
 
+Release 工作流也会上传一个 Actions Artifact，名称为 `sakura-release-bundle-X.Y.Z` 或 `sakura-release-bundle-X.Y.Z-beta.N`。它同样是外层资料包，不能直接上传 WordPress；下载后请先解压，再上传其中的 `sakura-X.Y.Z.zip` 或 `sakura-X.Y.Z-beta.N.zip`。Release 页面中的版本主题 ZIP（例如 `sakura-3.5.0-beta.5.zip`）则是可直接安装的包：
+
+```text
+Actions Artifact（外层发布资料包）
+└─ sakura-release-bundle-3.5.0-beta.5.zip  ← 下载后得到的外层 ZIP
+   ├─ sakura-3.5.0-beta.5.zip              ← 上传这个主题 ZIP
+   │  └─ sakura/style.css
+   ├─ sakura-3.5.0-beta.5.zip.sha256
+   └─ release-notes.zh-CN.md
+```
+
 推送版本标签后，Release 工作流只构建一个主题 ZIP，例如：
 
 ```text
@@ -74,6 +85,7 @@ release-notes.zh-CN.md
 | 文件或包 | 适用场景 | 是否建议上传 WordPress |
 | --- | --- | --- |
 | `sakura-ci-phpX.Y-N` | 验证某次 `develop` 提交，优先选择与测试服务器 PHP 相同的矩阵包 | 解压外层后，上传内部 `sakura-ci-N.zip` |
+| `sakura-release-bundle-X.Y.Z[-beta.N]` | 查看标签发布工作流生成的完整资料 | 解压外层后，上传内部版本主题 ZIP |
 | `sakura-X.Y.Z-beta.N.zip` | 测试服务器、预发布环境和候选版本验收 | 是 |
 | `sakura-X.Y.Z.zip` | 正式生产环境 | 是 |
 | GitHub `Download ZIP` 源码包 | 浏览源码或临时开发 | 不建议，优先使用 Release 主题 ZIP |
