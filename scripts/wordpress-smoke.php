@@ -103,6 +103,15 @@ $sourceChecks = array(
     array('inc/css/optionsframework.css', '#optionsframework .section-editor', '主题设置页编辑器缺少统一的外框样式。'),
     array('inc/css/optionsframework.css', '#optionsframework .controls input.upload-button', '主题设置页上传控件未匹配实际的 upload-button 类。'),
     array('inc/options-interface.php', 'aria-label="', '主题设置页图片/颜色 radio 缺少可访问名称。'),
+    array('inc/options-interface.php', 'class="screen-reader-text" for="', '主题设置页普通控件缺少正式关联标签。'),
+    array('inc/options-interface.php', 'role="group" aria-labelledby="', '主题设置页复合选项缺少组级可访问名称。'),
+    array('inc/options-interface.php', '$field_label . \' - size\'', 'Typography 子控件缺少独立标签。'),
+    array('inc/options-interface.php', '$field_label . \' - repeat\'', 'Background 子控件缺少独立标签。'),
+    array('inc/options-media-uploader.php', 'function optionsframework_uploader( $_id, $_value, $_desc = \'\', $_name = \'\', $_label = \'\' )', '上传控件未接收字段标签。'),
+    array('inc/options-media-uploader.php', 'aria-label="\' . esc_attr( $field_label )', '上传地址输入框缺少可访问名称。'),
+    array('inc/options-media-uploader.php', 'type="button" class="remove-image"', '图片预览删除操作未使用键盘可操作按钮。'),
+    array('inc/js/media-uploader.js', "var removeImage = $('<button>',", '媒体上传脚本未生成可访问的图片删除按钮。'),
+    array('inc/css/optionsframework.css', 'margin: 0 auto 8px !important;', '主题设置页导航底部间距未采用 8px。'),
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -143,6 +152,9 @@ $absentChecks = array(
     array('inc/css/optionsframework.css', '#455E8C', '主题设置页仍使用旧版分组标题颜色。'),
     array('inc/css/optionsframework.css', '#E8E8E8', '主题设置页仍使用旧版分隔线颜色。'),
     array('inc/css/optionsframework.css', '#BBBBBB', '主题设置页仍使用旧版上传控件边框颜色。'),
+    array('inc/options-interface.php', '<div class="of-radio-img-label">', '颜色 radio 仍使用无法关联控件的普通文本容器。'),
+    array('inc/options-media-uploader.php', '<a class="remove-image">', '图片预览删除操作仍使用不可聚焦的旧链接。'),
+    array('inc/js/media-uploader.js', '<a class="remove-image">', '媒体上传脚本仍生成不可聚焦的旧删除链接。'),
 );
 foreach ($absentChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);

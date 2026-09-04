@@ -59,6 +59,12 @@ function optionsframework_fields() {
 			$value['id'] = preg_replace('/[^a-zA-Z0-9._\-]/', '', strtolower( $value['id'] ) );
 
 			$id = 'section-' . $value['id'];
+			$heading_id = $id . '-heading';
+			$field_label = isset( $value['name'] ) ? $value['name'] : $value['id'];
+			$group_types = array( 'radio', 'multicheck', 'images', 'colorradio' );
+			$group_attributes = in_array( $value['type'], $group_types, true )
+				? ' role="group" aria-labelledby="' . esc_attr( $heading_id ) . '"'
+				: '';
 
 			$class = 'section';
 			if ( isset( $value['type'] ) ) {
@@ -70,10 +76,10 @@ function optionsframework_fields() {
 
 			$output .= '<div id="' . esc_attr( $id ) .'" class="' . esc_attr( $class ) . '">'."\n";
 			if ( isset( $value['name'] ) ) {
-				$output .= '<h4 class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
+				$output .= '<h4 id="' . esc_attr( $heading_id ) . '" class="heading">' . esc_html( $value['name'] ) . '</h4>' . "\n";
 			}
 			if ( $value['type'] != 'editor' ) {
-				$output .= '<div class="option">' . "\n" . '<div class="controls">' . "\n";
+				$output .= '<div class="option">' . "\n" . '<div class="controls"' . $group_attributes . '>' . "\n";
 			}
 			else {
 				$output .= '<div class="option">' . "\n" . '<div>' . "\n";
@@ -101,16 +107,22 @@ function optionsframework_fields() {
 		if ( isset( $value['desc'] ) ) {
 			$explain_value = $value['desc'];
 		}
+		$screen_reader_label = '';
+		if ( ( $value['type'] != 'heading' ) && ( $value['type'] != 'info' ) ) {
+			$screen_reader_label = '<label class="screen-reader-text" for="' . esc_attr( $value['id'] ) . '">' . esc_html( $field_label ) . '</label>';
+		}
 
 		switch ( $value['type'] ) {
 
 		// Basic text input
 		case 'text':
+			$output .= $screen_reader_label;
 			$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" type="text" value="' . esc_attr( $val ) . '" />';
 			break;
 
 		// Password input
 		case 'password':
+			$output .= $screen_reader_label;
 			$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" type="password" value="' . esc_attr( $val ) . '" />';
 			break;
 
@@ -126,11 +138,13 @@ function optionsframework_fields() {
 			}
 
 			$val = stripslashes( $val );
+			$output .= $screen_reader_label;
 			$output .= '<textarea id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" rows="' . $rows . '">' . esc_textarea( $val ) . '</textarea>';
 			break;
 
 		// Select Box
 		case 'select':
+			$output .= $screen_reader_label;
 			$output .= '<select class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" id="' . esc_attr( $value['id'] ) . '">';
 
 			foreach ($value['options'] as $key => $option ) {
@@ -180,15 +194,19 @@ function optionsframework_fields() {
 							$checked = ' checked="checked"';
 						}
 					}
-					$output .= '<input type="radio" id="' . esc_attr( $value['id'] .'_'. $key) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" aria-label="' . esc_attr( $key ) . '" '. $checked .' />';
-					$output .= '<div class="of-radio-img-label">' . esc_html( $key ) . '</div>';
-					$output .= '<a style="background-color:#'.$key.';" href="javascript:;" class="of-radio-img-img of-radio-color' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;"></a>';
+					$color_id = $value['id'] .'_'. $key;
+					$output .= '<input type="radio" id="' . esc_attr( $color_id ) . '" class="of-radio-img-radio" value="' . esc_attr( $key ) . '" name="' . esc_attr( $name ) . '" aria-label="' . esc_attr( $key ) . '" '. $checked .' />';
+					$output .= '<label class="of-radio-img-label" for="' . esc_attr( $color_id ) . '">' . esc_html( $key ) . '</label>';
+					$output .= '<label style="background-color:#' . esc_attr( $key ) . ';" for="' . esc_attr( $color_id ) . '" class="of-radio-img-img of-radio-color' . $selected .'" aria-hidden="true"></label>';
 					// $output .= '<img src="' . esc_url( $option ) . '" alt="' . $option .'" class="of-radio-img-img' . $selected .'" onclick="document.getElementById(\''. esc_attr($value['id'] .'_'. $key) .'\').checked=true;" />';
 				}
 				break;	
 
 		// Checkbox
 		case "checkbox":
+			if ( trim( wp_strip_all_tags( $explain_value ) ) === '' ) {
+				$output .= $screen_reader_label;
+			}
 			$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="checkbox of-input" type="checkbox" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" '. checked( $val, 1, false) .' />';
 			$output .= '<label class="explain" for="' . esc_attr( $value['id'] ) . '">' . wp_kses( $explain_value, $allowedtags) . '</label>';
 			break;
@@ -218,13 +236,14 @@ function optionsframework_fields() {
 				if ( $val !=  $value['std'] )
 					$default_color = ' data-default-color="' .$value['std'] . '" ';
 			}
+			$output .= $screen_reader_label;
 			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" id="' . esc_attr( $value['id'] ) . '" class="of-color"  type="text" value="' . esc_attr( $val ) . '"' . $default_color .' />';
 
 			break;
 
 		// Uploader
 		case "upload":
-			$output .= optionsframework_uploader( $value['id'], $val, null );
+			$output .= optionsframework_uploader( $value['id'], $val, null, '', $field_label );
 
 			break;
 
@@ -255,7 +274,8 @@ function optionsframework_fields() {
 
 			// Font Size
 			if ( $typography_options['sizes'] ) {
-				$font_size = '<select class="of-typography of-typography-size" name="' . esc_attr( $option_name . '[' . $value['id'] . '][size]' ) . '" id="' . esc_attr( $value['id'] . '_size' ) . '">';
+				$font_size = '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_size' ) . '">' . esc_html( $field_label . ' - size' ) . '</label>';
+				$font_size .= '<select class="of-typography of-typography-size" name="' . esc_attr( $option_name . '[' . $value['id'] . '][size]' ) . '" id="' . esc_attr( $value['id'] . '_size' ) . '">';
 				$sizes = $typography_options['sizes'];
 				foreach ( $sizes as $i ) {
 					$size = $i . 'px';
@@ -266,7 +286,8 @@ function optionsframework_fields() {
 
 			// Font Face
 			if ( $typography_options['faces'] ) {
-				$font_face = '<select class="of-typography of-typography-face" name="' . esc_attr( $option_name . '[' . $value['id'] . '][face]' ) . '" id="' . esc_attr( $value['id'] . '_face' ) . '">';
+				$font_face = '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_face' ) . '">' . esc_html( $field_label . ' - face' ) . '</label>';
+				$font_face .= '<select class="of-typography of-typography-face" name="' . esc_attr( $option_name . '[' . $value['id'] . '][face]' ) . '" id="' . esc_attr( $value['id'] . '_face' ) . '">';
 				$faces = $typography_options['faces'];
 				foreach ( $faces as $key => $face ) {
 					$font_face .= '<option value="' . esc_attr( $key ) . '" ' . selected( $typography_stored['face'], $key, false ) . '>' . esc_html( $face ) . '</option>';
@@ -276,7 +297,8 @@ function optionsframework_fields() {
 
 			// Font Styles
 			if ( $typography_options['styles'] ) {
-				$font_style = '<select class="of-typography of-typography-style" name="'.$option_name.'['.$value['id'].'][style]" id="'. $value['id'].'_style">';
+				$font_style = '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_style' ) . '">' . esc_html( $field_label . ' - style' ) . '</label>';
+				$font_style .= '<select class="of-typography of-typography-style" name="'.$option_name.'['.$value['id'].'][style]" id="'. esc_attr( $value['id'].'_style' ) .'">';
 				$styles = $typography_options['styles'];
 				foreach ( $styles as $key => $style ) {
 					$font_style .= '<option value="' . esc_attr( $key ) . '" ' . selected( $typography_stored['style'], $key, false ) . '>'. $style .'</option>';
@@ -291,7 +313,8 @@ function optionsframework_fields() {
 					if ( $val !=  $value['std']['color'] )
 						$default_color = ' data-default-color="' .$value['std']['color'] . '" ';
 				}
-				$font_color = '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-typography-color" type="text" value="' . esc_attr( $typography_stored['color'] ) . '"' . $default_color .' />';
+				$font_color = '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_color' ) . '">' . esc_html( $field_label . ' - color' ) . '</label>';
+				$font_color .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-typography-color" type="text" value="' . esc_attr( $typography_stored['color'] ) . '"' . $default_color .' />';
 			}
 
 			// Allow modification/injection of typography fields
@@ -312,6 +335,7 @@ function optionsframework_fields() {
 				if ( $val !=  $value['std']['color'] )
 					$default_color = ' data-default-color="' .$value['std']['color'] . '" ';
 			}
+			$output .= '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_color' ) . '">' . esc_html( $field_label . ' - color' ) . '</label>';
 			$output .= '<input name="' . esc_attr( $option_name . '[' . $value['id'] . '][color]' ) . '" id="' . esc_attr( $value['id'] . '_color' ) . '" class="of-color of-background-color"  type="text" value="' . esc_attr( $background['color'] ) . '"' . $default_color .' />';
 
 			// Background Image
@@ -319,7 +343,7 @@ function optionsframework_fields() {
 				$background['image'] = '';
 			}
 
-			$output .= optionsframework_uploader( $value['id'], $background['image'], null, esc_attr( $option_name . '[' . $value['id'] . '][image]' ) );
+			$output .= optionsframework_uploader( $value['id'], $background['image'], null, esc_attr( $option_name . '[' . $value['id'] . '][image]' ), $field_label . ' - image' );
 
 			$class = 'of-background-properties';
 			if ( '' == $background['image'] ) {
@@ -328,6 +352,7 @@ function optionsframework_fields() {
 			$output .= '<div class="' . esc_attr( $class ) . '">';
 
 			// Background Repeat
+			$output .= '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_repeat' ) . '">' . esc_html( $field_label . ' - repeat' ) . '</label>';
 			$output .= '<select class="of-background of-background-repeat" name="' . esc_attr( $option_name . '[' . $value['id'] . '][repeat]'  ) . '" id="' . esc_attr( $value['id'] . '_repeat' ) . '">';
 			$repeats = of_recognized_background_repeat();
 
@@ -337,6 +362,7 @@ function optionsframework_fields() {
 			$output .= '</select>';
 
 			// Background Position
+			$output .= '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_position' ) . '">' . esc_html( $field_label . ' - position' ) . '</label>';
 			$output .= '<select class="of-background of-background-position" name="' . esc_attr( $option_name . '[' . $value['id'] . '][position]' ) . '" id="' . esc_attr( $value['id'] . '_position' ) . '">';
 			$positions = of_recognized_background_position();
 
@@ -346,6 +372,7 @@ function optionsframework_fields() {
 			$output .= '</select>';
 
 			// Background Attachment
+			$output .= '<label class="screen-reader-text" for="' . esc_attr( $value['id'] . '_attachment' ) . '">' . esc_html( $field_label . ' - attachment' ) . '</label>';
 			$output .= '<select class="of-background of-background-attachment" name="' . esc_attr( $option_name . '[' . $value['id'] . '][attachment]' ) . '" id="' . esc_attr( $value['id'] . '_attachment' ) . '">';
 			$attachments = of_recognized_background_attachment();
 
@@ -360,6 +387,7 @@ function optionsframework_fields() {
 		// Editor
 		case 'editor':
 			$output .= '<div class="explain">' . wp_kses( $explain_value, $allowedtags ) . '</div>'."\n";
+			$output .= '<label class="screen-reader-text" for="' . esc_attr( $value['id'] ) . '">' . esc_html( $field_label ) . '</label>' . "\n";
 			echo $output;
 			$textarea_name = esc_attr( $option_name . '[' . $value['id'] . ']' );
 			$default_editor_settings = array(

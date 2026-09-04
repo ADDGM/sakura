@@ -7,12 +7,14 @@
  * - string $_id - A token to identify this field (the name).
  * - string $_value - The value of the field, if present.
  * - string $_desc - An optional description of the field.
+ * - string $_name - An optional custom field name.
+ * - string $_label - A human-readable label for the field and its actions.
  *
  */
 
 if ( ! function_exists( 'optionsframework_uploader' ) ) :
 
-function optionsframework_uploader( $_id, $_value, $_desc = '', $_name = '' ) {
+function optionsframework_uploader( $_id, $_value, $_desc = '', $_name = '', $_label = '' ) {
 
 	$optionsframework_settings = get_option( 'optionsframework' );
 
@@ -32,6 +34,9 @@ function optionsframework_uploader( $_id, $_value, $_desc = '', $_name = '' ) {
 	$name = '';
 
 	$id = strip_tags( strtolower( $_id ) );
+	$field_label = $_label != '' ? wp_strip_all_tags( $_label ) : __( 'Choose file', 'sakura' );
+	$upload_label = __( 'Upload', 'sakura' ) . ': ' . $field_label;
+	$remove_label = __( 'Remove', 'sakura' ) . ': ' . $field_label;
 
 	// If a value is passed and we don't have a stored value, use the value that's passed through.
 	if ( $_value != '' && $value == '' ) {
@@ -48,12 +53,13 @@ function optionsframework_uploader( $_id, $_value, $_desc = '', $_name = '' ) {
 	if ( $value ) {
 		$class = ' has-file';
 	}
-	$output .= '<input id="' . $id . '" class="upload' . $class . '" type="text" name="'.$name.'" value="' . $value . '" placeholder="' . __('Choose file', 'sakura') .'" />' . "\n";
+	$output .= '<label class="screen-reader-text" for="' . esc_attr( $id ) . '">' . esc_html( $field_label ) . '</label>' . "\n";
+	$output .= '<input id="' . esc_attr( $id ) . '" class="upload' . $class . '" type="text" name="'.$name.'" value="' . $value . '" placeholder="' . __('Choose file', 'sakura') .'" aria-label="' . esc_attr( $field_label ) . '" />' . "\n";
 	if ( function_exists( 'wp_enqueue_media' ) ) {
 		if ( ( $value == '' ) ) {
-			$output .= '<input id="upload-' . $id . '" class="upload-button button" type="button" value="' . __( 'Upload', 'sakura' ) . '" />' . "\n";
+			$output .= '<input id="upload-' . esc_attr( $id ) . '" class="upload-button button" type="button" value="' . __( 'Upload', 'sakura' ) . '" aria-label="' . esc_attr( $upload_label ) . '" />' . "\n";
 		} else {
-			$output .= '<input id="remove-' . $id . '" class="remove-file button" type="button" value="' . __( 'Remove', 'sakura' ) . '" />' . "\n";
+			$output .= '<input id="remove-' . esc_attr( $id ) . '" class="remove-file button" type="button" value="' . __( 'Remove', 'sakura' ) . '" aria-label="' . esc_attr( $remove_label ) . '" />' . "\n";
 		}
 	} else {
 		$output .= '<p><i>' . __( 'Upgrade your version of WordPress for full media support.', 'sakura' ) . '</i></p>';
@@ -66,7 +72,7 @@ function optionsframework_uploader( $_id, $_value, $_desc = '', $_name = '' ) {
 	$output .= '<div class="screenshot" id="' . $id . '-image">' . "\n";
 
 	if ( $value != '' ) {
-		$remove = '<a class="remove-image">Remove</a>';
+		$remove = '<button type="button" class="remove-image" aria-label="' . esc_attr( $remove_label ) . '">' . esc_html( __( 'Remove', 'sakura' ) ) . '</button>';
 		$image = preg_match( '/(^.*\.jpg|jpeg|png|gif|ico*)/i', $value );
 		if ( $image ) {
 			$output .= '<img src="' . $value . '" alt="" />'.$remove.'';

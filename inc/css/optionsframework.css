@@ -6,75 +6,83 @@
  */
 
 #optionsframework-wrap {
-	--options-surface: var(--sakura-dash-options-surface, #ffffff);
-	--options-surface-alt: var(--sakura-dash-options-surface-alt, #f6f7f7);
-	--options-surface-emphasis: var(--sakura-dash-options-surface-emphasis, #f0f0f1);
-	--options-text: var(--sakura-dash-options-text, #1d2327);
-	--options-muted-text: var(--sakura-dash-options-muted-text, #50575e);
-	--options-border: var(--sakura-dash-options-border, #dcdcde);
-	--options-control-border: var(--sakura-dash-options-control-border, #8c8f94);
-	--options-control-hover: var(--sakura-dash-options-control-hover, #2271b1);
-	--options-focus: var(--sakura-dash-focus-ring, #2271b1);
-	--options-danger: var(--sakura-dash-options-danger, #b32d2e);
-	--options-danger-text: var(--sakura-dash-options-danger-text, #ffffff);
-	font-family: miranafont, "Hiragino Sans GB", STXihei, "Microsoft YaHei", SimSun, sans-serif;
-	height: auto;
-	color: var(--options-text);
+  --options-surface: var(--sakura-dash-options-surface, #ffffff);
+  --options-surface-alt: var(--sakura-dash-options-surface-alt, #f6f7f7);
+  --options-surface-emphasis: var(
+    --sakura-dash-options-surface-emphasis,
+    #f0f0f1
+  );
+  --options-text: var(--sakura-dash-options-text, #1d2327);
+  --options-muted-text: var(--sakura-dash-options-muted-text, #50575e);
+  --options-border: var(--sakura-dash-options-border, #dcdcde);
+  --options-control-border: var(--sakura-dash-options-control-border, #8c8f94);
+  --options-control-hover: var(--sakura-dash-options-control-hover, #2271b1);
+  --options-focus: var(--sakura-dash-focus-ring, #2271b1);
+  --options-danger: var(--sakura-dash-options-danger, #b32d2e);
+  --options-danger-text: var(--sakura-dash-options-danger-text, #ffffff);
+  font-family:
+    miranafont, "Hiragino Sans GB", STXihei, "Microsoft YaHei", SimSun,
+    sans-serif;
+  height: auto;
+  color: var(--options-text);
 }
 
 #optionsframework-wrap,
 #optionsframework-wrap *,
 #optionsframework-wrap *::before,
 #optionsframework-wrap *::after {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /* 导航标签 */
 
 #optionsframework-wrap .nav-tab-wrapper {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 6px;
-	max-width: 900px;
-	margin: 0 auto 18px !important;
-	padding: 0 0 1px;
-	border-bottom: 1px solid var(--options-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 900px;
+  margin: 0 auto 8px !important;
+  padding: 0 0 1px;
+  border-bottom: 1px solid var(--options-border);
 }
 
 #optionsframework-wrap h2.nav-tab-wrapper {
-	border-bottom-color: var(--options-border);
+  border-bottom-color: var(--options-border);
 }
 
 #optionsframework-wrap .nav-tab {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	min-height: 38px;
-	margin: 0;
-	padding: 8px 13px;
-	border: 1px solid transparent;
-	border-radius: 5px 5px 0 0;
-	background: transparent;
-	color: var(--options-muted-text);
-	font-size: 14px;
-	font-weight: 500;
-	line-height: 20px;
-	text-decoration: none;
-	transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin: 0;
+  padding: 8px 13px;
+  border: 1px solid transparent;
+  border-radius: 5px 5px 0 0;
+  background: transparent;
+  color: var(--options-muted-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 #optionsframework-wrap .nav-tab:hover {
-	background: var(--options-surface-alt);
-	color: var(--options-text);
+  background: var(--options-surface-alt);
+  color: var(--options-text);
 }
 
 #optionsframework-wrap .nav-tab-active,
 #optionsframework-wrap .nav-tab-active:hover {
-	margin-bottom: -1px;
-	border-color: var(--options-border);
-	border-bottom-color: var(--options-surface);
-	background: var(--options-surface);
-	color: var(--options-text);
+  margin-bottom: -1px;
+  border-color: var(--options-border);
+  border-bottom-color: var(--options-surface);
+  background: var(--options-surface);
+  color: var(--options-text);
 }
 
 #optionsframework-wrap a#options-group-1-tab::before,
@@ -85,863 +93,933 @@
 #optionsframework-wrap a#options-group-6-tab::before,
 #optionsframework-wrap a#options-group-7-tab::before,
 #optionsframework-wrap a#options-group-8-tab::before {
-	display: inline-block;
-	margin-right: 6px;
-	font-family: "dashicons";
-	font-size: 16px;
-	font-weight: 400;
-	line-height: 1;
+  display: inline-block;
+  margin-right: 6px;
+  font-family: "dashicons";
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
 }
 
-#optionsframework-wrap a#options-group-1-tab::before { content: "\f111"; }
-#optionsframework-wrap a#options-group-2-tab::before { content: "\f102"; }
-#optionsframework-wrap a#options-group-3-tab::before { content: "\f123"; }
-#optionsframework-wrap a#options-group-4-tab::before { content: "\f487"; }
-#optionsframework-wrap a#options-group-5-tab::before { content: "\f101"; }
-#optionsframework-wrap a#options-group-6-tab::before { content: "\f110"; }
-#optionsframework-wrap a#options-group-7-tab::before { content: "\f325"; }
-#optionsframework-wrap a#options-group-8-tab::before { content: "\f487"; }
+#optionsframework-wrap a#options-group-1-tab::before {
+  content: "\f111";
+}
+#optionsframework-wrap a#options-group-2-tab::before {
+  content: "\f102";
+}
+#optionsframework-wrap a#options-group-3-tab::before {
+  content: "\f123";
+}
+#optionsframework-wrap a#options-group-4-tab::before {
+  content: "\f487";
+}
+#optionsframework-wrap a#options-group-5-tab::before {
+  content: "\f101";
+}
+#optionsframework-wrap a#options-group-6-tab::before {
+  content: "\f110";
+}
+#optionsframework-wrap a#options-group-7-tab::before {
+  content: "\f325";
+}
+#optionsframework-wrap a#options-group-8-tab::before {
+  content: "\f487";
+}
 
 /* 面板与分组 */
 
 #optionsframework-metabox {
-	padding-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 #optionsframework {
-	position: relative;
-	z-index: 0;
-	max-width: 900px;
-	margin: 0 auto;
-	padding: 30px;
-	border: 1px solid var(--options-border);
-	border-radius: 6px;
-	background: var(--options-surface);
-	box-shadow: 0 1px 2px rgba(29, 35, 39, .06);
-	color: var(--options-text);
+  position: relative;
+  z-index: 0;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid var(--options-border);
+  border-radius: 6px;
+  background: var(--options-surface);
+  box-shadow: 0 1px 2px rgba(29, 35, 39, 0.06);
+  color: var(--options-text);
 }
 
 #optionsframework h3 {
-	display: none;
+  display: none;
 }
 
 #optionsframework h4,
 #optionsframework .heading {
-	margin: 0 0 14px;
-	padding: 0;
-	color: var(--options-text);
-	font-size: 15px;
-	font-weight: 600;
-	line-height: 1.45;
+  margin: 0 0 14px;
+  padding: 0;
+  color: var(--options-text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 #optionsframework p {
-	margin: 0 0 10px;
-	padding: 0;
-	color: var(--options-text);
-	line-height: 1.55;
+  margin: 0 0 10px;
+  padding: 0;
+  color: var(--options-text);
+  line-height: 1.55;
 }
 
 #optionsframework .section {
-	clear: both;
-	margin: 0 0 24px;
-	padding: 0 0 24px;
-	border-bottom: 1px solid var(--options-border);
+  clear: both;
+  margin: 0 0 24px;
+  padding: 0 0 24px;
+  border-bottom: 1px solid var(--options-border);
 }
 
 #optionsframework .section:last-child {
-	margin-bottom: 0;
-	border-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
 }
 
 #optionsframework .section::after {
-	content: "";
-	display: table;
-	clear: both;
+  content: "";
+  display: table;
+  clear: both;
 }
 
 #optionsframework .group {
-	padding-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 #optionsframework .option {
-	clear: both;
+  clear: both;
 }
 
 #optionsframework .section .controls {
-	float: left;
-	min-width: 350px;
-	width: 54%;
-	padding-right: 2%;
+  float: left;
+  min-width: 350px;
+  width: 54%;
+  padding-right: 2%;
 }
 
 #optionsframework .section .explain {
-	float: left;
-	max-width: 38%;
-	margin: 0;
-	color: var(--options-muted-text);
-	font-size: 12px;
-	line-height: 1.65;
+  float: left;
+  max-width: 38%;
+  margin: 0;
+  color: var(--options-muted-text);
+  font-size: 12px;
+  line-height: 1.65;
 }
 
 #optionsframework .section .explain a,
 #optionsframework .section-info a {
-	color: var(--sakura-dash-link, #2271b1);
+  color: var(--sakura-dash-link, #2271b1);
 }
 
 #optionsframework .section .explain a:hover,
 #optionsframework .section-info a:hover {
-	color: var(--sakura-dash-link-hover, #135e96);
+  color: var(--sakura-dash-link-hover, #135e96);
 }
 
 #optionsframework .section-checkbox .controls {
-	display: flex;
-	align-items: flex-start;
-	gap: 8px;
-	width: 98%;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 98%;
 }
 
 #optionsframework .section-checkbox .explain {
-	float: none;
-	flex: 1 1 auto;
-	max-width: 94%;
+  float: none;
+  flex: 1 1 auto;
+  max-width: 94%;
 }
 
 /* 基础表单控件 */
 
-#optionsframework input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+#optionsframework
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(
+    [type="button"]
+  ):not([type="submit"]):not([type="reset"]),
 #optionsframework select,
 #optionsframework textarea {
-	max-width: 100%;
-	min-height: 36px;
-	padding: 7px 10px;
-	border: 1px solid var(--options-control-border);
-	border-radius: 4px;
-	background: var(--options-surface);
-	box-shadow: inset 0 1px 1px rgba(29, 35, 39, .05);
-	color: var(--options-text);
-	font-size: 13px;
-	line-height: 20px;
-	transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  max-width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--options-control-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+  box-shadow: inset 0 1px 1px rgba(29, 35, 39, 0.05);
+  color: var(--options-text);
+  font-size: 13px;
+  line-height: 20px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
-#optionsframework input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):hover,
+#optionsframework
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(
+    [type="button"]
+  ):not([type="submit"]):not([type="reset"]):hover,
 #optionsframework select:hover,
 #optionsframework textarea:hover {
-	border-color: var(--options-control-hover);
+  border-color: var(--options-control-hover);
 }
 
-#optionsframework input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):focus,
+#optionsframework
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(
+    [type="button"]
+  ):not([type="submit"]):not([type="reset"]):focus,
 #optionsframework select:focus,
 #optionsframework textarea:focus {
-	border-color: var(--options-focus);
-	outline: none;
-	box-shadow: 0 0 0 1px var(--options-focus), inset 0 1px 1px rgba(29, 35, 39, .05);
+  border-color: var(--options-focus);
+  outline: none;
+  box-shadow:
+    0 0 0 1px var(--options-focus),
+    inset 0 1px 1px rgba(29, 35, 39, 0.05);
 }
 
 #optionsframework input::placeholder,
 #optionsframework textarea::placeholder {
-	color: var(--options-muted-text);
-	opacity: 1;
+  color: var(--options-muted-text);
+  opacity: 1;
 }
 
 #optionsframework .of-input {
-	width: 100%;
+  width: 100%;
 }
 
 #optionsframework .controls select,
 #optionsframework .controls textarea {
-	width: 100%;
-	margin-bottom: 10px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 #optionsframework textarea.of-input {
-	min-height: 150px;
-	resize: vertical;
+  min-height: 150px;
+  resize: vertical;
 }
 
 /* 保留 Options Framework 的 mini 字段契约（例如 feature_title）。 */
 
 #optionsframework .mini .controls select,
 #optionsframework .section .mini .controls {
-	width: 140px;
+  width: 140px;
 }
 
 #optionsframework .mini .controls input,
 #optionsframework .mini .controls {
-	min-width: 140px;
-	width: 140px;
+  min-width: 140px;
+  width: 140px;
 }
 
 #optionsframework .mini .explain {
-	max-width: 74%;
+  max-width: 74%;
 }
 
 #optionsframework input:disabled,
 #optionsframework select:disabled,
 #optionsframework textarea:disabled {
-	background: var(--options-surface-alt);
-	color: var(--options-muted-text);
-	opacity: .7;
-	cursor: not-allowed;
+  background: var(--options-surface-alt);
+  color: var(--options-muted-text);
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 /* 普通 checkbox 与 radio */
 
 #optionsframework input.checkbox,
 #optionsframework input.of-radio {
-	position: relative;
-	display: inline-block;
-	flex: 0 0 auto;
-	width: 18px;
-	min-width: 18px;
-	height: 18px;
-	min-height: 18px;
-	margin: 0 8px 0 0;
-	padding: 0;
-	border: 2px solid var(--options-control-border);
-	background: var(--options-surface);
-	box-shadow: none;
-	vertical-align: middle;
-	-webkit-appearance: none;
-	appearance: none;
-	cursor: pointer;
-	transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0 8px 0 0;
+  padding: 0;
+  border: 2px solid var(--options-control-border);
+  background: var(--options-surface);
+  box-shadow: none;
+  vertical-align: middle;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 #optionsframework input.checkbox {
-	border-radius: 4px;
+  border-radius: 4px;
 }
 
 #optionsframework input.of-radio {
-	border-radius: 50%;
+  border-radius: 50%;
 }
 
 #optionsframework input.checkbox:hover,
 #optionsframework input.of-radio:hover {
-	border-color: var(--options-control-hover);
+  border-color: var(--options-control-hover);
 }
 
 #optionsframework input.checkbox:checked,
 #optionsframework input.of-radio:checked {
-	border-color: var(--options-control-border);
-	background: var(--options-control-border);
+  border-color: var(--options-control-border);
+  background: var(--options-control-border);
 }
 
 #optionsframework input.checkbox:checked::before {
-	content: "";
-	position: absolute;
-	top: 2px;
-	left: 5px;
-	display: block;
-	width: 5px;
-	height: 9px;
-	margin: 0;
-	border: solid var(--options-surface);
-	border-width: 0 2px 2px 0;
-	background: transparent;
-	transform: rotate(45deg);
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  display: block;
+  width: 5px;
+  height: 9px;
+  margin: 0;
+  border: solid var(--options-surface);
+  border-width: 0 2px 2px 0;
+  background: transparent;
+  transform: rotate(45deg);
 }
 
 #optionsframework input.of-radio:checked::before {
-	content: "";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	display: block;
-	float: none;
-	width: 8px;
-	height: 8px;
-	margin: 0;
-	border: 0;
-	border-radius: 50%;
-	background: var(--options-surface);
-	transform: translate(-50%, -50%);
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  float: none;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--options-surface);
+  transform: translate(-50%, -50%);
 }
 
 #optionsframework input.checkbox:focus-visible,
 #optionsframework input.of-radio:focus-visible {
-	outline: 2px solid var(--options-focus);
-	outline-offset: 2px;
-	box-shadow: 0 0 0 1px var(--options-surface);
+  outline: 2px solid var(--options-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px var(--options-surface);
 }
 
 #optionsframework input.checkbox:disabled,
 #optionsframework input.of-radio:disabled {
-	opacity: .65;
-	cursor: not-allowed;
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 #optionsframework .of-radio-option,
 #optionsframework .of-multicheck-option {
-	display: flex;
-	align-items: center;
-	max-width: 100%;
-	min-height: 32px;
-	margin: 0 0 5px;
-	padding: 4px 8px;
-	border-radius: 4px;
-	line-height: 20px;
-	transition: background-color .15s ease;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 32px;
+  margin: 0 0 5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 20px;
+  transition: background-color 0.15s ease;
 }
 
 #optionsframework .of-radio-option:hover,
 #optionsframework .of-multicheck-option:hover {
-	background: var(--options-surface-alt);
+  background: var(--options-surface-alt);
 }
 
 #optionsframework .of-radio-option label,
 #optionsframework .of-multicheck-option label {
-	display: inline-block;
-	max-width: calc(100% - 26px);
-	margin: 0;
-	color: var(--options-text);
-	line-height: 20px;
-	vertical-align: middle;
-	cursor: pointer;
+  display: inline-block;
+  max-width: calc(100% - 26px);
+  margin: 0;
+  color: var(--options-text);
+  line-height: 20px;
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 /* 图片 radio 与颜色 radio */
 
 #optionsframework input.of-radio-img-radio {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	margin: -1px;
-	padding: 0;
-	border: 0;
-	opacity: 0;
-	overflow: hidden;
-	clip: rect(0 0 0 0);
-	white-space: nowrap;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 #optionsframework .section-images .controls,
 #optionsframework .section-colorradio .controls {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	gap: 8px;
-	float: none;
-	width: 100%;
-	max-width: 100%;
-	padding-right: 0;
-	overflow: visible;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  float: none;
+  width: 100%;
+  max-width: 100%;
+  padding-right: 0;
+  overflow: visible;
 }
 
 #optionsframework .of-radio-img-label {
-	display: none;
+  display: none;
 }
 
 #optionsframework .controls .of-radio-img-img {
-	display: block;
-	float: none;
-	max-width: min(100%, 340px);
-	height: auto;
-	margin: 0;
-	padding: 4px;
-	border: 2px solid transparent;
-	border-radius: 6px;
-	background: var(--options-surface-alt);
-	cursor: pointer;
-	transition: border-color .15s ease, box-shadow .15s ease, opacity .15s ease, transform .15s ease;
+  display: block;
+  float: none;
+  max-width: min(100%, 340px);
+  height: auto;
+  margin: 0;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: var(--options-surface-alt);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 #optionsframework .controls .of-radio-img-img:hover {
-	opacity: .9;
-	transform: translateY(-1px);
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 #optionsframework .controls .of-radio-img-img.of-radio-img-selected,
-#optionsframework input.of-radio-img-radio:checked + .of-radio-img-label + .of-radio-img-img {
-	border-color: var(--options-control-border);
-	box-shadow: 0 0 0 2px var(--options-surface), 0 0 0 4px var(--options-control-border);
+#optionsframework
+  input.of-radio-img-radio:checked
+  + .of-radio-img-label
+  + .of-radio-img-img {
+  border-color: var(--options-control-border);
+  box-shadow:
+    0 0 0 2px var(--options-surface),
+    0 0 0 4px var(--options-control-border);
 }
 
 /* 更新徽章使用语义标签和卡片边框，不在徽章本身叠加双层选中圆环。 */
 #optionsframework .section-images .of-radio-img-option {
-	display: flex;
-	flex: 0 1 auto;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 6px;
-	max-width: 100%;
-	padding: 8px;
-	border: 1px solid var(--options-border);
-	border-radius: 4px;
-	background: var(--options-surface);
-	transition: border-color .15s ease, background-color .15s ease;
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 100%;
+  padding: 8px;
+  border: 1px solid var(--options-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 #optionsframework .section-images .of-radio-img-option:hover {
-	border-color: var(--options-control-hover);
-	background: var(--options-surface-alt);
+  border-color: var(--options-control-hover);
+  background: var(--options-surface-alt);
 }
 
-#optionsframework .section-images .of-radio-img-option.of-radio-img-option-selected {
-	border-color: var(--options-control-border);
-	background: var(--options-surface-alt);
+#optionsframework
+  .section-images
+  .of-radio-img-option.of-radio-img-option-selected {
+  border-color: var(--options-control-border);
+  background: var(--options-surface-alt);
 }
 
 #optionsframework .section-images .of-radio-img-label {
-	display: block;
-	max-width: 100%;
-	margin: 0;
-	color: var(--options-text);
-	font-size: 13px;
-	font-weight: 600;
-	line-height: 20px;
-	cursor: pointer;
+  display: block;
+  max-width: 100%;
+  margin: 0;
+  color: var(--options-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  cursor: pointer;
 }
 
 #optionsframework .section-images .controls .of-radio-img-img,
-#optionsframework .section-images .controls .of-radio-img-img.of-radio-img-selected,
-#optionsframework .section-images input.of-radio-img-radio:checked + .of-radio-img-label + .of-radio-img-img {
-	max-width: min(100%, 340px);
-	padding: 0;
-	border: 0;
-	border-radius: 3px;
-	background: transparent;
-	box-shadow: none;
-	transform: none;
+#optionsframework
+  .section-images
+  .controls
+  .of-radio-img-img.of-radio-img-selected,
+#optionsframework
+  .section-images
+  input.of-radio-img-radio:checked
+  + .of-radio-img-label
+  + .of-radio-img-img {
+  max-width: min(100%, 340px);
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
 }
 
-#optionsframework .section-images input.of-radio-img-radio:focus-visible + .of-radio-img-label {
-	outline: 2px solid var(--options-focus);
-	outline-offset: 2px;
-	border-radius: 3px;
+#optionsframework
+  .section-images
+  input.of-radio-img-radio:focus-visible
+  + .of-radio-img-label {
+  outline: 2px solid var(--options-focus);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 #optionsframework .controls .of-radio-color {
-	width: 42px;
-	height: 42px;
-	padding: 0;
-	border: 2px solid transparent;
-	border-radius: 6px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
 }
 
 #optionsframework .controls .of-radio-color:focus-visible,
-#optionsframework input.of-radio-img-radio:focus-visible + .of-radio-img-label + .of-radio-img-img {
-	outline: 2px solid var(--options-focus);
-	outline-offset: 2px;
+#optionsframework
+  input.of-radio-img-radio:focus-visible
+  + .of-radio-img-label
+  + .of-radio-img-img {
+  outline: 2px solid var(--options-focus);
+  outline-offset: 2px;
 }
 
 #optionsframework .section-color .controls,
 #optionsframework .section-colorradio .explain,
 #optionsframework .section-radio .controls,
 #optionsframework .section-radio .explain {
-	float: none;
-	width: 100%;
-	max-width: 100%;
+  float: none;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* WordPress Color Picker */
 
 #optionsframework .wp-picker-container {
-	display: inline-flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	max-width: 100%;
-	gap: 6px;
-	outline: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  max-width: 100%;
+  gap: 6px;
+  outline: 0;
 }
 
 #optionsframework .wp-color-result {
-	display: inline-block;
-	height: 34px;
-	min-width: 112px;
-	margin: 0;
-	padding-left: 34px;
-	border: 1px solid var(--options-control-border);
-	border-radius: 4px;
-	background-color: var(--options-surface-alt);
-	box-shadow: none;
-	position: relative;
-	top: 0;
-	vertical-align: top;
+  display: inline-block;
+  height: 34px;
+  min-width: 112px;
+  margin: 0;
+  padding-left: 34px;
+  border: 1px solid var(--options-control-border);
+  border-radius: 4px;
+  background-color: var(--options-surface-alt);
+  box-shadow: none;
+  position: relative;
+  top: 0;
+  vertical-align: top;
 }
 
 #optionsframework .wp-color-result::after {
-	height: 32px;
-	padding: 0 9px;
-	border-left: 1px solid var(--options-border);
-	border-radius: 0 3px 3px 0;
-	background: var(--options-surface);
-	color: var(--options-text);
-	font-size: 12px;
-	line-height: 32px;
-	text-shadow: none;
+  height: 32px;
+  padding: 0 9px;
+  border-left: 1px solid var(--options-border);
+  border-radius: 0 3px 3px 0;
+  background: var(--options-surface);
+  color: var(--options-text);
+  font-size: 12px;
+  line-height: 32px;
+  text-shadow: none;
 }
 
 #optionsframework .wp-color-result:hover,
 #optionsframework .wp-color-result:focus,
 #optionsframework .wp-color-result.wp-picker-open {
-	border-color: var(--options-control-hover);
-	box-shadow: 0 0 0 1px var(--options-control-hover);
+  border-color: var(--options-control-hover);
+  box-shadow: 0 0 0 1px var(--options-control-hover);
 }
 
 #optionsframework .wp-color-result:focus {
-	outline: 0;
+  outline: 0;
 }
 
 #optionsframework .wp-picker-input-wrap {
-	display: inline-flex;
-	align-items: flex-start;
-	gap: 6px;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 #optionsframework .wp-picker-input-wrap .wp-color-picker {
-	display: inline-block;
-	width: 96px;
-	min-height: 34px;
-	margin: 0;
+  display: inline-block;
+  width: 96px;
+  min-height: 34px;
+  margin: 0;
 }
 
 #optionsframework .wp-picker-container .button,
 #optionsframework .wp-picker-container .wp-picker-default,
 #optionsframework .wp-picker-container .wp-picker-clear {
-	min-height: 34px;
-	margin: 0;
-	padding: 0 11px;
-	border: 1px solid var(--options-control-border);
-	border-radius: 4px;
-	background: var(--options-surface);
-	box-shadow: none;
-	color: var(--options-text);
-	line-height: 32px;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 11px;
+  border: 1px solid var(--options-control-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+  box-shadow: none;
+  color: var(--options-text);
+  line-height: 32px;
 }
 
 #optionsframework .wp-picker-container .button:hover,
 #optionsframework .wp-picker-container .button:focus {
-	border-color: var(--options-control-hover);
-	background: var(--options-surface-alt);
-	color: var(--options-text);
+  border-color: var(--options-control-hover);
+  background: var(--options-surface-alt);
+  color: var(--options-text);
 }
 
 #optionsframework .wp-picker-container .iris-picker,
 #optionsframework .wp-picker-holder .iris-picker {
-	border-color: var(--options-border);
-	background: var(--options-surface);
+  border-color: var(--options-border);
+  background: var(--options-surface);
 }
 
 #optionsframework input[type="text"].iris-error {
-	border-color: var(--options-danger);
-	background: var(--options-surface-alt);
-	color: var(--options-text);
+  border-color: var(--options-danger);
+  background: var(--options-surface-alt);
+  color: var(--options-text);
 }
 
 /* Typography 与 Background 复合控件 */
 
 #optionsframework .section-typography .controls,
 #optionsframework .section-typography .explain {
-	float: none;
-	width: 100%;
-	max-width: 100%;
+  float: none;
+  width: 100%;
+  max-width: 100%;
 }
 
 #optionsframework .section-typography .controls {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	gap: 8px;
-	padding-right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  padding-right: 0;
 }
 
 #optionsframework .controls .of-typography {
-	float: none;
-	width: auto;
-	min-width: 110px;
-	margin: 0;
+  float: none;
+  width: auto;
+  min-width: 110px;
+  margin: 0;
 }
 
 #optionsframework .controls .of-typography-size {
-	min-width: 80px;
+  min-width: 80px;
 }
 
 #optionsframework .controls .of-typography-face {
-	min-width: 180px;
+  min-width: 180px;
 }
 
 #optionsframework .controls .of-typography-style {
-	min-width: 120px;
+  min-width: 120px;
 }
 
 #optionsframework .controls .of-typography-color {
-	min-width: 120px;
+  min-width: 120px;
 }
 
 #optionsframework .of-background-properties {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	gap: 8px;
-	clear: both;
-	margin-top: 14px;
-	padding: 12px;
-	border: 1px solid var(--options-border);
-	border-radius: 4px;
-	background: var(--options-surface-alt);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  clear: both;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--options-border);
+  border-radius: 4px;
+  background: var(--options-surface-alt);
 }
 
 #optionsframework .controls .of-background {
-	float: none;
-	width: auto;
-	min-width: 140px;
-	margin: 0;
+  float: none;
+  width: auto;
+  min-width: 140px;
+  margin: 0;
 }
 
 #optionsframework .section-background .wp-picker-container {
-	margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 /* Editor */
 
 #optionsframework .section-editor .explain {
-	float: none;
-	max-width: 98%;
-	margin-bottom: 8px;
+  float: none;
+  max-width: 98%;
+  margin-bottom: 8px;
 }
 
 #optionsframework .section-editor .wp-editor-wrap {
-	clear: both;
-	border: 1px solid var(--options-border);
-	border-radius: 4px;
-	background: var(--options-surface);
-	overflow: hidden;
+  clear: both;
+  border: 1px solid var(--options-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+  overflow: hidden;
 }
 
 #optionsframework .section-editor .wp-editor-tools {
-	min-height: 36px;
-	padding: 6px 8px;
-	border-bottom: 1px solid var(--options-border);
-	background: var(--options-surface-alt);
+  min-height: 36px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--options-border);
+  background: var(--options-surface-alt);
 }
 
 #optionsframework .section-editor .wp-editor-container {
-	border: 0;
-	background: var(--options-surface);
+  border: 0;
+  background: var(--options-surface);
 }
 
 #optionsframework .section-editor .wp-editor-area {
-	width: 100%;
-	min-height: 240px;
-	padding: 10px;
-	border: 0;
-	background: var(--options-surface);
-	color: var(--options-text);
+  width: 100%;
+  min-height: 240px;
+  padding: 10px;
+  border: 0;
+  background: var(--options-surface);
+  color: var(--options-text);
 }
 
 #optionsframework .section-editor .mce-tinymce,
 #optionsframework .section-editor .quicktags-toolbar {
-	border-color: var(--options-border);
-	background: var(--options-surface-alt);
+  border-color: var(--options-border);
+  background: var(--options-surface-alt);
 }
 
 /* 上传控件与预览 */
 
 #optionsframework .section-upload .controls,
 #optionsframework .section-background .controls {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 #optionsframework .controls input.upload {
-	flex: 1 1 280px;
-	width: auto;
-	min-width: 0;
-	box-shadow: none;
+  flex: 1 1 280px;
+  width: auto;
+  min-width: 0;
+  box-shadow: none;
 }
 
 #optionsframework .controls input.upload-button,
 #optionsframework .controls input.upload_button,
 #optionsframework .controls input.remove-file {
-	min-height: 36px;
-	margin: 0;
-	padding: 0 13px;
-	border: 1px solid var(--options-control-border);
-	border-radius: 4px;
-	background: var(--options-surface);
-	box-shadow: none;
-	color: var(--options-text);
-	line-height: 34px;
-	cursor: pointer;
-	transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  min-height: 36px;
+  margin: 0;
+  padding: 0 13px;
+  border: 1px solid var(--options-control-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+  box-shadow: none;
+  color: var(--options-text);
+  line-height: 34px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 #optionsframework .controls input.upload-button:hover,
 #optionsframework .controls input.upload_button:hover {
-	border-color: var(--options-control-hover);
-	background: var(--options-surface-alt);
+  border-color: var(--options-control-hover);
+  background: var(--options-surface-alt);
 }
 
 #optionsframework .controls input.remove-file {
-	border-color: var(--options-danger);
-	background: var(--options-danger);
-	color: var(--options-danger-text);
+  border-color: var(--options-danger);
+  background: var(--options-danger);
+  color: var(--options-danger-text);
 }
 
 #optionsframework .controls input.remove-file:hover {
-	filter: brightness(.92);
+  filter: brightness(0.92);
 }
 
 #optionsframework .screenshot {
-	position: relative;
-	clear: both;
-	float: none;
-	width: min(100%, 360px);
-	min-height: 20px;
-	margin: 14px 0 0;
-	padding: 8px;
-	border: 1px solid var(--options-border);
-	border-radius: 4px;
-	background: var(--options-surface-alt);
+  position: relative;
+  clear: both;
+  float: none;
+  width: min(100%, 360px);
+  min-height: 20px;
+  margin: 14px 0 0;
+  padding: 8px;
+  border: 1px solid var(--options-border);
+  border-radius: 4px;
+  background: var(--options-surface-alt);
 }
 
 #optionsframework .screenshot img {
-	display: block;
-	float: none;
-	max-width: 100%;
-	max-height: 180px;
-	margin: 0 0 8px;
-	padding: 4px;
-	border: 1px solid var(--options-border);
-	background: var(--options-surface);
+  display: block;
+  float: none;
+  max-width: 100%;
+  max-height: 180px;
+  margin: 0 0 8px;
+  padding: 4px;
+  border: 1px solid var(--options-border);
+  background: var(--options-surface);
 }
 
 #optionsframework .screenshot .remove-image {
-	position: absolute;
-	bottom: 8px;
-	left: 8px;
-	display: block;
-	width: 18px;
-	height: 18px;
-	border: 0;
-	background: url("../images/ico-delete.png") no-repeat center;
-	color: transparent;
-	cursor: pointer;
-	text-indent: -9999px;
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  padding: 0;
+  background: url("../images/ico-delete.png") no-repeat center;
+  color: transparent;
+  font: inherit;
+  cursor: pointer;
+  text-indent: -9999px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 #optionsframework .screenshot .no-image .file_link {
-	display: inline-block;
-	margin-left: 20px;
+  display: inline-block;
+  margin-left: 20px;
 }
 
 #optionsframework .screenshot .no-image a {
-	color: var(--sakura-dash-link, #2271b1);
+  color: var(--sakura-dash-link, #2271b1);
 }
 
 #optionsframework .reset-button {
-	float: none;
+  float: none;
 }
 
 /* 信息块与错误提示 */
 
 #optionsframework .section-info {
-	padding: 14px 16px;
-	border: 1px solid var(--options-border);
-	border-left: 3px solid var(--options-control-border);
-	border-radius: 4px;
-	background: var(--options-surface-alt);
+  padding: 14px 16px;
+  border: 1px solid var(--options-border);
+  border-left: 3px solid var(--options-control-border);
+  border-radius: 4px;
+  background: var(--options-surface-alt);
 }
 
 #optionsframework-wrap .settings-error {
-	border-left-color: var(--options-danger);
-	background: var(--options-surface);
-	color: var(--options-text);
+  border-left-color: var(--options-danger);
+  background: var(--options-surface);
+  color: var(--options-text);
 }
 
 /* 底部操作区 */
 
 #optionsframework-submit {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	flex-wrap: wrap;
-	gap: 10px;
-	padding: 20px 0 0;
-	border-top: 1px solid var(--options-border);
-	background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--options-border);
+  background: transparent;
 }
 
 #optionsframework-submit .clear {
-	display: none;
+  display: none;
 }
 
 #optionsframework .reset-button,
 #optionsframework .button-primary {
-	box-sizing: border-box;
-	min-height: 40px;
-	height: 40px;
-	width: auto;
-	margin: 0;
-	padding: 0 18px;
-	border-radius: 4px;
-	box-shadow: none;
-	font-size: 13px;
-	font-weight: 500;
-	line-height: 38px;
-	text-shadow: none;
-	cursor: pointer;
-	transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+  box-sizing: border-box;
+  min-height: 40px;
+  height: 40px;
+  width: auto;
+  margin: 0;
+  padding: 0 18px;
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 38px;
+  text-shadow: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 #optionsframework .reset-button {
-	border: 1px solid var(--options-control-border);
-	background: transparent;
-	color: var(--options-text);
+  border: 1px solid var(--options-control-border);
+  background: transparent;
+  color: var(--options-text);
 }
 
 #optionsframework .reset-button:hover {
-	border-color: var(--options-control-hover);
-	background: var(--options-surface-alt);
-	color: var(--options-text);
+  border-color: var(--options-control-hover);
+  background: var(--options-surface-alt);
+  color: var(--options-text);
 }
 
 #optionsframework .reset-button:active {
-	background: var(--options-surface-emphasis);
-	color: var(--sakura-dash-highlight-text, var(--options-text));
+  background: var(--options-surface-emphasis);
+  color: var(--sakura-dash-highlight-text, var(--options-text));
 }
 
 #optionsframework .button-primary {
-	border: 1px solid var(--sakura-dash-button-border, #2271b1);
-	background: var(--sakura-dash-button-bg, #2271b1);
-	color: var(--sakura-dash-button-text, #ffffff);
+  border: 1px solid var(--sakura-dash-button-border, #2271b1);
+  background: var(--sakura-dash-button-bg, #2271b1);
+  color: var(--sakura-dash-button-text, #ffffff);
 }
 
 #optionsframework .button-primary:hover {
-	border-color: var(--sakura-dash-button-border, #135e96);
-	background: var(--sakura-dash-highlight, #135e96);
-	color: var(--sakura-dash-button-hover-text, #ffffff);
+  border-color: var(--sakura-dash-button-border, #135e96);
+  background: var(--sakura-dash-highlight, #135e96);
+  color: var(--sakura-dash-button-hover-text, #ffffff);
 }
 
 #optionsframework .button-primary:active {
-	border-color: var(--sakura-dash-button-border, #3858e9);
-	background: var(--sakura-dash-primary, #3858e9);
-	color: var(--sakura-dash-button-active-text, #ffffff);
-	box-shadow: inset 0 2px 0 rgba(0, 0, 0, .12);
+  border-color: var(--sakura-dash-button-border, #3858e9);
+  background: var(--sakura-dash-primary, #3858e9);
+  color: var(--sakura-dash-button-active-text, #ffffff);
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.12);
 }
 
 #optionsframework .button-primary:focus,
 #optionsframework .reset-button:focus {
-	outline: none;
+  outline: none;
 }
 
 #optionsframework .button-primary:focus-visible,
 #optionsframework .reset-button:focus-visible {
-	outline: 2px solid var(--options-focus);
-	outline-offset: 2px;
-	box-shadow: 0 0 0 1px var(--options-surface);
+  outline: 2px solid var(--options-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px var(--options-surface);
 }
 
 #optionsframework .button-primary:disabled,
 #optionsframework .button-primary[disabled],
 #optionsframework .reset-button:disabled,
 #optionsframework .reset-button[disabled] {
-	opacity: .65;
-	cursor: not-allowed;
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 /* 通用键盘焦点 */
@@ -952,102 +1030,102 @@
 #optionsframework select:focus-visible,
 #optionsframework textarea:focus-visible,
 #optionsframework button:focus-visible {
-	outline: 2px solid var(--options-focus);
-	outline-offset: 2px;
-	box-shadow: 0 0 0 1px var(--options-surface);
+  outline: 2px solid var(--options-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px var(--options-surface);
 }
 
 /* 小屏布局 */
 
 @media (max-width: 782px) {
-	#optionsframework-wrap .nav-tab-wrapper {
-		margin-right: 10px !important;
-		margin-left: 10px !important;
-	}
+  #optionsframework-wrap .nav-tab-wrapper {
+    margin-right: 10px !important;
+    margin-left: 10px !important;
+  }
 
-	#optionsframework {
-		width: calc(100% - 20px);
-		max-width: none;
-		padding: 20px 15px;
-	}
+  #optionsframework {
+    width: calc(100% - 20px);
+    max-width: none;
+    padding: 20px 15px;
+  }
 
-	#optionsframework .section .controls,
-	#optionsframework .section .explain {
-		float: none;
-		width: 100%;
-		min-width: 0;
-		max-width: none;
-		padding-right: 0;
-	}
+  #optionsframework .section .controls,
+  #optionsframework .section .explain {
+    float: none;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding-right: 0;
+  }
 
-	#optionsframework .section .explain {
-		margin-top: 10px;
-	}
+  #optionsframework .section .explain {
+    margin-top: 10px;
+  }
 
-	#optionsframework .mini .controls,
-	#optionsframework .mini .controls input,
-	#optionsframework .mini .controls select {
-		min-width: 0;
-		width: 100%;
-	}
+  #optionsframework .mini .controls,
+  #optionsframework .mini .controls input,
+  #optionsframework .mini .controls select {
+    min-width: 0;
+    width: 100%;
+  }
 
-	#optionsframework .controls input.upload {
-		flex-basis: 100%;
-		width: 100%;
-	}
+  #optionsframework .controls input.upload {
+    flex-basis: 100%;
+    width: 100%;
+  }
 
-	#optionsframework .controls input.upload-button,
-	#optionsframework .controls input.upload_button,
-	#optionsframework .controls input.remove-file {
-		margin: 0;
-	}
+  #optionsframework .controls input.upload-button,
+  #optionsframework .controls input.upload_button,
+  #optionsframework .controls input.remove-file {
+    margin: 0;
+  }
 
-	#optionsframework .section-typography .controls,
-	#optionsframework .of-background-properties {
-		align-items: stretch;
-	}
+  #optionsframework .section-typography .controls,
+  #optionsframework .of-background-properties {
+    align-items: stretch;
+  }
 
-	#optionsframework .controls .of-typography,
-	#optionsframework .controls .of-background {
-		width: 100%;
-		min-width: 0;
-	}
+  #optionsframework .controls .of-typography,
+  #optionsframework .controls .of-background {
+    width: 100%;
+    min-width: 0;
+  }
 
-	#optionsframework .wp-picker-container {
-		width: 100%;
-	}
+  #optionsframework .wp-picker-container {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-	#optionsframework-wrap .nav-tab-wrapper {
-		gap: 4px;
-	}
+  #optionsframework-wrap .nav-tab-wrapper {
+    gap: 4px;
+  }
 
-	#optionsframework-wrap .nav-tab {
-		flex: 1 1 calc(50% - 4px);
-		justify-content: center;
-		padding-right: 8px;
-		padding-left: 8px;
-		font-size: 13px;
-	}
+  #optionsframework-wrap .nav-tab {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 13px;
+  }
 
-	#optionsframework .wp-picker-input-wrap {
-		width: 100%;
-	}
+  #optionsframework .wp-picker-input-wrap {
+    width: 100%;
+  }
 
-	#optionsframework .wp-picker-input-wrap .wp-color-picker {
-		flex: 1 1 auto;
-		width: auto;
-	}
+  #optionsframework .wp-picker-input-wrap .wp-color-picker {
+    flex: 1 1 auto;
+    width: auto;
+  }
 
-	#optionsframework-submit {
-		align-items: stretch;
-		justify-content: stretch;
-	}
+  #optionsframework-submit {
+    align-items: stretch;
+    justify-content: stretch;
+  }
 
-	#optionsframework .reset-button,
-	#optionsframework .button-primary {
-		flex: 1 1 100%;
-		width: 100%;
-	}
+  #optionsframework .reset-button,
+  #optionsframework .button-primary {
+    flex: 1 1 100%;
+    width: 100%;
+  }
 }
