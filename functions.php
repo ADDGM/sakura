@@ -237,6 +237,56 @@ function sakura_set_frontend_cache_headers() {
 add_action('send_headers', 'sakura_set_frontend_cache_headers');
 
 /**
+ * Parse the configured site launch date in the WordPress site timezone.
+ *
+ * @param mixed $value Date in YYYY-MM-DD format.
+ * @return DateTimeImmutable|false
+ */
+function sakura_parse_site_start_date($value)
+{
+    $value = is_scalar($value) ? trim((string) $value) : '';
+    if ($value === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+        return false;
+    }
+
+    $timezone = function_exists('wp_timezone') ? wp_timezone() : new DateTimeZone('UTC');
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value, $timezone);
+    $parse_errors = DateTimeImmutable::getLastErrors();
+    if (false === $date || ($parse_errors !== false && ($parse_errors['warning_count'] > 0 || $parse_errors['error_count'] > 0)) || $date->format('Y-m-d') !== $value) {
+        return false;
+    }
+
+    $today = function_exists('current_datetime') ? current_datetime()->setTime(0, 0, 0) : new DateTimeImmutable('today', $timezone);
+    if ($date > $today) {
+        return false;
+    }
+
+    return $date;
+}
+
+/**
+ * Get the number of natural days since the configured site launch date.
+ *
+ * @param mixed|null $site_start_date Optional date override for tests.
+ * @return int|null
+ */
+function sakura_get_site_runtime_days($site_start_date = null)
+{
+    if ($site_start_date === null) {
+        $site_start_date = function_exists('akina_option') ? akina_option('site_start_date', '') : '';
+    }
+
+    $date = sakura_parse_site_start_date($site_start_date);
+    if (false === $date) {
+        return null;
+    }
+
+    $timezone = function_exists('wp_timezone') ? wp_timezone() : new DateTimeZone('UTC');
+    $today = function_exists('current_datetime') ? current_datetime()->setTime(0, 0, 0) : new DateTimeImmutable('today', $timezone);
+    return (int) $date->diff($today)->days;
+}
+
+/**
  * load .php.
  */
 require get_template_directory() . '/inc/decorate.php';

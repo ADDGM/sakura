@@ -1,5 +1,33 @@
 <?php
 add_filter( 'of_sanitize_text', 'sanitize_text_field' );
+
+/**
+ * Validate the optional site launch date without overwriting a valid stored value.
+ */
+function of_sanitize_site_start_date( $input, $option = array() ) {
+	$value = is_scalar( $input ) ? trim( (string) $input ) : '';
+	if ( '' === $value ) {
+		return '';
+	}
+
+	if ( function_exists( 'sakura_parse_site_start_date' ) && false !== sakura_parse_site_start_date( $value ) ) {
+		return $value;
+	}
+
+	add_settings_error(
+		'options-framework',
+		'site_start_date',
+		__( 'Enter a valid site launch date in YYYY-MM-DD format that is not in the future.', 'sakura' ),
+		'error'
+	);
+
+	$framework_settings = get_option( 'optionsframework' );
+	$option_name = is_array( $framework_settings ) && isset( $framework_settings['id'] ) ? $framework_settings['id'] : '';
+	$saved = $option_name ? get_option( $option_name, array() ) : array();
+	return is_array( $saved ) && isset( $saved['site_start_date'] ) && is_scalar( $saved['site_start_date'] ) ? $saved['site_start_date'] : '';
+}
+add_filter( 'of_sanitize_site_start_date', 'of_sanitize_site_start_date', 10, 2 );
+
 function of_sanitize_textarea($input) {
 	global $allowedposttags;
 	$output = wp_kses( $input, $allowedposttags);

@@ -107,6 +107,13 @@ $sourceChecks = array(
     array('inc/options-interface.php', 'role="group" aria-labelledby="', '主题设置页复合选项缺少组级可访问名称。'),
     array('inc/options-interface.php', '$field_label . \' - size\'', 'Typography 子控件缺少独立标签。'),
     array('inc/options-interface.php', '$field_label . \' - repeat\'', 'Background 子控件缺少独立标签。'),
+    array('options.php', "'id' => 'site_start_date'", '主题设置缺少建站时间字段。'),
+    array('options.php', "'placeholder' => '2020-01-01'", '建站时间字段缺少日期格式示例。'),
+    array('inc/options-sanitize.php', 'of_sanitize_site_start_date', '建站时间字段未接入服务端日期清理器。'),
+    array('functions.php', 'function sakura_parse_site_start_date', '主题缺少建站时间解析函数。'),
+    array('functions.php', 'function sakura_get_site_runtime_days', '主题缺少页脚运行天数计算函数。'),
+    array('footer.php', 'sakura_get_site_runtime_days()', '页脚未输出建站运行天数。'),
+    array('inc/options-framework.php', "get_settings_errors( 'options-framework' )", '日期校验失败后仍会显示误导性的设置保存成功提示。'),
     array('inc/options-media-uploader.php', 'function optionsframework_uploader( $_id, $_value, $_desc = \'\', $_name = \'\', $_label = \'\' )', '上传控件未接收字段标签。'),
     array('inc/options-media-uploader.php', 'aria-label="\' . esc_attr( $field_label )', '上传地址输入框缺少可访问名称。'),
     array('inc/options-media-uploader.php', 'type="button" class="remove-image"', '图片预览删除操作未使用键盘可操作按钮。'),
@@ -385,6 +392,44 @@ if (function_exists('sakura_dash_scheme_css')) {
         $errors[] = 'Custom CSS 生成没有同时包含源码默认规则、变量和附加规则。';
     }
 }
+
+if (function_exists('sakura_parse_site_start_date') && function_exists('sakura_get_site_runtime_days')) {
+    if (!(sakura_parse_site_start_date('2020-02-29') instanceof DateTimeImmutable)) {
+        $errors[] = '合法的建站日期未通过解析。';
+    }
+    if (sakura_parse_site_start_date('2020-02-30') !== false) {
+        $errors[] = '不存在的建站日期未被拒绝。';
+    }
+    $futureDate = current_datetime()->modify('+1 day')->format('Y-m-d');
+    if (sakura_parse_site_start_date($futureDate) !== false) {
+        $errors[] = '未来建站日期未被拒绝。';
+    }
+    if (sakura_get_site_runtime_days('') !== null) {
+        $errors[] = '空建站日期没有隐藏运行天数。';
+    }
+    $runtimeDays = sakura_get_site_runtime_days('2020-01-01');
+    if (!is_int($runtimeDays) || $runtimeDays < 0) {
+        $errors[] = '建站运行天数没有返回非负整数。';
+    }
+}
+
+if (function_exists('of_sanitize_site_start_date')) {
+    $frameworkFilter = static function ($value) {
+        return array('id' => 'sakura');
+    };
+    $optionFilter = static function ($value) {
+        return array('site_start_date' => '2020-01-01');
+    };
+    add_filter('pre_option_optionsframework', $frameworkFilter);
+    add_filter('pre_option_sakura', $optionFilter);
+    $invalidDateFallback = of_sanitize_site_start_date('2020-02-30');
+    remove_filter('pre_option_optionsframework', $frameworkFilter);
+    remove_filter('pre_option_sakura', $optionFilter);
+    if ($invalidDateFallback !== '2020-01-01') {
+        $errors[] = '非法建站日期没有保留原有合法值。';
+    }
+}
+
 $scriptSource = file_get_contents(get_template_directory() . '/js/sakura-app.js');
 if ($scriptSource === false || preg_match('/\baddComment\.I\s*\(/', $scriptSource)) {
     $errors[] = '主题脚本仍在自定义评论对象外部依赖 addComment.I。';

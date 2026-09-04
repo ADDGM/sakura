@@ -338,6 +338,14 @@ function optionsframework_options()
         'type' => 'textarea');
 
     $options[] = array(
+        'name' => __('Site launch date', 'sakura'), /*建站时间*/
+        'desc' => __('Enter the site launch date in YYYY-MM-DD format. The running days will be shown in the footer.', 'sakura'), /*请输入建站日期，格式为 YYYY-MM-DD，运行天数将显示在页脚。*/
+        'id' => 'site_start_date',
+        'std' => '',
+        'placeholder' => '2020-01-01',
+        'type' => 'text');
+
+    $options[] = array(
         'name' => __('Google analytics', 'sakura'), /*Google 统计代码*/
         'desc' => __('UA-xxxxx-x', 'sakura'),
         'id' => 'google_analytics_id',

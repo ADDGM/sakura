@@ -117,7 +117,8 @@ function optionsframework_fields() {
 		// Basic text input
 		case 'text':
 			$output .= $screen_reader_label;
-			$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" type="text" value="' . esc_attr( $val ) . '" />';
+			$placeholder = isset( $value['placeholder'] ) ? ' placeholder="' . esc_attr( $value['placeholder'] ) . '"' : '';
+			$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" type="text" value="' . esc_attr( $val ) . '"' . $placeholder . ' />';
 			break;
 
 		// Password input

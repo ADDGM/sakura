@@ -27,6 +27,10 @@
 					<img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/disqus-preloader.svg">
 				</div>
 				<p style="color: #666666;"><?php echo akina_option('footer_info', ''); ?></p>
+				<?php $site_runtime_days = sakura_get_site_runtime_days(); ?>
+				<?php if ($site_runtime_days !== null) : ?>
+					<p class="site-runtime" style="color: #666666;"><?php printf(esc_html__('Website has been running through all kinds of disasters for %d days~', 'sakura'), $site_runtime_days); ?></p>
+				<?php endif; ?>
 			</div>
 			<div class="footer-device">
 			<p style="font-family: 'Ubuntu', sans-serif;">

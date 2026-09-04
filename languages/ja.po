@@ -83,3 +83,20 @@ msgstr "最新タグ"
 
 msgid "Latest develop commit"
 msgstr "developブランチの最新コミット"
+
+#: options.php
+msgid "Site launch date"
+msgstr "サイト開設日"
+
+#: options.php
+msgid "Enter the site launch date in YYYY-MM-DD format. The running days will be shown in the footer."
+msgstr "サイト開設日を YYYY-MM-DD 形式で入力してください。稼働日数はフッターに表示されます。"
+
+#: functions.php
+#, php-format
+msgid "Website has been running through all kinds of disasters for %d days~"
+msgstr "サイトはあらゆる災害の中で %d 日間稼働しています~"
+
+#: inc/options-sanitize.php
+msgid "Enter a valid site launch date in YYYY-MM-DD format that is not in the future."
+msgstr "有効なサイト開設日を YYYY-MM-DD 形式で入力してください。未来の日付は指定できません。"

@@ -2085,3 +2085,20 @@ msgstr "最新标签"
 
 msgid "Latest develop commit"
 msgstr "develop 分支最新提交"
+
+#: options.php
+msgid "Site launch date"
+msgstr "建站时间"
+
+#: options.php
+msgid "Enter the site launch date in YYYY-MM-DD format. The running days will be shown in the footer."
+msgstr "请输入建站日期，格式为 YYYY-MM-DD，运行天数将显示在页脚。"
+
+#: functions.php
+#, php-format
+msgid "Website has been running through all kinds of disasters for %d days~"
+msgstr "网站在各种灾难中运行了 %d 天~"
+
+#: inc/options-sanitize.php
+msgid "Enter a valid site launch date in YYYY-MM-DD format that is not in the future."
+msgstr "请输入有效的建站日期，格式为 YYYY-MM-DD，且日期不能晚于今天。"

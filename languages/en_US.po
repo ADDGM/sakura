@@ -1995,3 +1995,20 @@ msgstr ""
 
 msgid "Latest develop commit"
 msgstr ""
+
+#: options.php
+msgid "Site launch date"
+msgstr ""
+
+#: options.php
+msgid "Enter the site launch date in YYYY-MM-DD format. The running days will be shown in the footer."
+msgstr ""
+
+#: functions.php
+#, php-format
+msgid "Website has been running through all kinds of disasters for %d days~"
+msgstr ""
+
+#: inc/options-sanitize.php
+msgid "Enter a valid site launch date in YYYY-MM-DD format that is not in the future."
+msgstr ""

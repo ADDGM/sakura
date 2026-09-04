@@ -361,6 +361,12 @@ function optionsframework_validate( $input ) {
  */
 
 function optionsframework_save_options_notice() {
+	$settings_errors = get_settings_errors( 'options-framework' );
+	foreach ( $settings_errors as $settings_error ) {
+		if ( isset( $settings_error['type'] ) && 'error' === $settings_error['type'] ) {
+			return;
+		}
+	}
 	add_settings_error( 'options-framework', 'save_options', __( 'Options saved.', 'options_framework_theme' ), 'updated fade' );
 }
 
