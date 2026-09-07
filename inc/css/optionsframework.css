@@ -287,6 +287,49 @@
   width: 100%;
 }
 
+#optionsframework .of-field-action {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#optionsframework .sakura-action-button {
+  min-height: 36px;
+  margin: 0;
+  padding: 0 13px;
+  border: 1px solid var(--options-control-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+  box-shadow: none;
+  color: var(--options-text);
+  line-height: 34px;
+  text-shadow: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+#optionsframework .sakura-action-button:hover {
+  border-color: var(--options-control-hover);
+  background: var(--options-surface-alt);
+  color: var(--options-text);
+}
+
+#optionsframework .sakura-action-button:active {
+  background: var(--options-surface-emphasis);
+}
+
+#optionsframework .of-field-action-desc {
+  flex: 1 1 280px;
+  color: var(--options-muted-text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 #optionsframework .controls select,
 #optionsframework .controls textarea {
   width: 100%;
@@ -1078,6 +1121,14 @@
   #optionsframework .controls input.upload_button,
   #optionsframework .controls input.remove-file {
     margin: 0;
+  }
+
+  #optionsframework .of-field-action {
+    align-items: stretch;
+  }
+
+  #optionsframework .sakura-action-button {
+    width: 100%;
   }
 
   #optionsframework .section-typography .controls,

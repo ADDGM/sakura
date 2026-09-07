@@ -1243,9 +1243,13 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Email address prefix', 'sakura'), /*发件地址前缀*/
-        'desc' => __('For sending system mail, the sender address displayed in the user\'s mailbox, do not use Chinese, the default system email address is bibi@your_domain_name', 'sakura'), /*用于发送系统邮件，在用户的邮箱中显示的发件人地址，不要使用中文，默认系统邮件地址为 bibi@你的域名*/
+        'desc' => __('For sending system mail, the sender address displayed in the user\'s mailbox, do not use Chinese, the default system email address is bibi@your_domain_name. Easy WP SMTP provides the SMTP connection; the test message is sent to the site administrator email.', 'sakura'), /*用于发送系统邮件，在用户的邮箱中显示的发件人地址，不要使用中文，默认系统邮件地址为 bibi@你的域名。Easy WP SMTP 负责 SMTP 连接，测试邮件将发送到站点管理员邮箱。*/
         'id' => 'mail_user_name',
         'std' => 'bibi',
+        'action' => 'sakura_send_test_email',
+        'action_label' => __('Send test email', 'sakura'), /*发送测试邮件*/
+        'action_desc' => __('Send a test message to the site administrator email using the saved settings.', 'sakura'), /*使用已保存的设置向站点管理员邮箱发送测试邮件。*/
+        'action_nonce' => 'sakura-send-test-email',
         'type' => 'text');
 
     return $options;

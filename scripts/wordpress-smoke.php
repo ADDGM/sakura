@@ -114,6 +114,21 @@ $sourceChecks = array(
     array('functions.php', 'function sakura_get_site_runtime_days', '主题缺少页脚运行天数计算函数。'),
     array('footer.php', 'sakura_get_site_runtime_days()', '页脚未输出建站运行天数。'),
     array('inc/options-framework.php', "get_settings_errors( 'options-framework' )", '日期校验失败后仍会显示误导性的设置保存成功提示。'),
+    array('inc/mail.php', 'function sakura_get_mail_from_address', '邮件模块缺少统一的发件地址解析函数。'),
+    array('inc/mail.php', 'function sakura_get_mail_blog_name', '邮件模块未统一清理站点名称。'),
+    array('inc/mail.php', 'function sakura_render_mail_template', '邮件模块缺少公共 HTML 外框模板。'),
+    array('inc/mail.php', 'function sakura_render_test_mail', '邮件模块缺少测试邮件模板。'),
+    array('inc/mail.php', 'function sakura_prepare_comment_mail_content', '评论邮件未提供兼容旧版内容标记的清理函数。'),
+    array('inc/mail.php', "add_action('wp_mail_failed'", '邮件发送未记录 wp_mail_failed 错误。'),
+    array('inc/mail.php', 'wp_kses_post($content)', '邮件模板内容未经过 HTML 白名单清理。'),
+    array('inc/mail.php', "add_action('admin_post_sakura_send_test_email'", '测试邮件未注册 admin-post 入口。'),
+    array('inc/mail.php', "check_admin_referer('sakura-send-test-email', '_sakura_test_nonce')", '测试邮件入口缺少独立 Nonce 校验。'),
+    array('inc/mail.php', "current_user_can('edit_theme_options')", '测试邮件入口缺少主题设置权限检查。'),
+    array('inc/mail.php', "wp_safe_redirect($url)", '测试邮件结果未通过安全重定向返回设置页。'),
+    array('inc/options-interface.php', 'formaction="', '主题设置页测试动作未使用独立的普通 POST 目标。'),
+    array('inc/options-interface.php', "'_sakura_test_nonce'", '主题设置页测试邮件按钮缺少独立 Nonce 字段。'),
+    array('options.php', "'action' => 'sakura_send_test_email'", '发件地址前缀字段未声明测试邮件动作。'),
+    array('functions.php', "require get_template_directory() . '/inc/mail.php';", '主题未加载公共邮件模块。'),
     array('inc/options-media-uploader.php', 'function optionsframework_uploader( $_id, $_value, $_desc = \'\', $_name = \'\', $_label = \'\' )', '上传控件未接收字段标签。'),
     array('inc/options-media-uploader.php', 'aria-label="\' . esc_attr( $field_label )', '上传地址输入框缺少可访问名称。'),
     array('inc/options-media-uploader.php', 'type="button" class="remove-image"', '图片预览删除操作未使用键盘可操作按钮。'),
@@ -162,6 +177,8 @@ $absentChecks = array(
     array('inc/options-interface.php', '<div class="of-radio-img-label">', '颜色 radio 仍使用无法关联控件的普通文本容器。'),
     array('inc/options-media-uploader.php', '<a class="remove-image">', '图片预览删除操作仍使用不可聚焦的旧链接。'),
     array('inc/js/media-uploader.js', '<a class="remove-image">', '媒体上传脚本仍生成不可聚焦的旧删除链接。'),
+    array('inc/mail.php', 'prefix@192.168', '邮件模块不应把内网 IP 拼入发件地址。'),
+    array('inc/mail.php', 'date(Y)', '邮件模板仍使用 PHP 8 不兼容的未定义年份常量。'),
 );
 foreach ($absentChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
@@ -427,6 +444,34 @@ if (function_exists('of_sanitize_site_start_date')) {
     remove_filter('pre_option_sakura', $optionFilter);
     if ($invalidDateFallback !== '2020-01-01') {
         $errors[] = '非法建站日期没有保留原有合法值。';
+    }
+}
+
+if (function_exists('sakura_get_mail_from_address') && function_exists('sakura_get_mail_headers') && function_exists('sakura_render_test_mail')) {
+    $mailOptionFilter = static function ($value) {
+        return array('mail_user_name' => 'bibi');
+    };
+    $adminEmailFilter = static function ($value) {
+        return 'admin@example.com';
+    };
+    add_filter('pre_option_sakura', $mailOptionFilter);
+    add_filter('pre_option_admin_email', $adminEmailFilter);
+    $mailFrom = sakura_get_mail_from_address();
+    $mailHeaders = sakura_get_mail_headers($mailFrom);
+    $testMail = sakura_render_test_mail('admin@example.com', $mailFrom);
+    remove_filter('pre_option_sakura', $mailOptionFilter);
+    remove_filter('pre_option_admin_email', $adminEmailFilter);
+    if ('bibi@example.com' !== $mailFrom) {
+        $errors[] = '内网/localhost 站点没有回退到管理员邮箱域名生成发件地址。';
+    }
+    if (count($mailHeaders) !== 2 || strpos($mailHeaders[0], 'bibi@example.com') === false || strpos($mailHeaders[1], 'text/html') === false) {
+        $errors[] = '邮件 headers 未正确声明发件人或 HTML 内容类型。';
+    }
+    if (strpos($testMail, 'wp_mail()') === false || strpos($testMail, 'admin@example.com') === false || strpos($testMail, '<!doctype html>') === false) {
+        $errors[] = '测试邮件模板缺少站点信息或最终送达提示。';
+    }
+    if (sakura_get_mail_from_address() === 'bibi@192.168.2.9') {
+        $errors[] = '内网 IP 被错误用作发件地址域名。';
     }
 }
 

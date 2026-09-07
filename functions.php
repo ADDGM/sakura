@@ -308,6 +308,7 @@ require get_template_directory() . '/inc/customizer.php';
  */
 require get_template_directory() . '/inc/theme_plus.php';
 require get_template_directory() . '/inc/categories-images.php';
+require get_template_directory() . '/inc/mail.php';
 
 //Comment Location Start
 function convertip($ip)
@@ -1029,84 +1030,37 @@ add_filter('wp_new_user_notification_email', 'new_user_message_fix');
 
 /*
  * 评论邮件回复
+ *
+ * The message layout and sender validation live in inc/mail.php. Keeping the
+ * notification condition here preserves the existing comment hook behavior.
  */
 function comment_mail_notify($comment_id)
 {
-    $mail_user_name = akina_option('mail_user_name') ? akina_option('mail_user_name') : 'poi';
     $comment = get_comment($comment_id);
-    $parent_id = $comment->comment_parent ? $comment->comment_parent : '';
-    $spam_confirmed = $comment->comment_approved;
-    $mail_notify = akina_option('mail_notify') ? get_comment_meta($parent_id, 'mail_notify', false) : false;
-    $admin_notify = akina_option('admin_notify') ? '1' : (get_comment($parent_id)->comment_author_email != get_bloginfo('admin_email') ? '1' : '0');
-    if (($parent_id != '') && ($spam_confirmed != 'spam') && ($admin_notify != '0') && (!$mail_notify)) {
-        $wp_email = $mail_user_name . '@' . preg_replace('#^www\.#', '', strtolower($_SERVER['SERVER_NAME']));
-        $to = trim(get_comment($parent_id)->comment_author_email);
-        $subject = '你在 [' . get_option("blogname") . '] 的留言有了回应';
-        $message = '
-      <div style="background: white;
-      width: 95%;
-      max-width: 800px;
-      margin: auto auto;
-      border-radius: 5px;
-      border:orange 1px solid;
-      overflow: hidden;
-      -webkit-box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.12);
-      box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.18);">
-        <header style="overflow: hidden;">
-            <img style="width:100%;z-index: 666;" src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.4/img/other/head.jpg">
-        </header>
-        <div style="padding: 5px 20px;">
-        <p style="position: relative;
-        color: white;
-        float: left;
-        z-index: 999;
-        background: orange;
-        padding: 5px 30px;
-        margin: -25px auto 0 ;
-        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.30)">Dear&nbsp;' . trim(get_comment($parent_id)->comment_author) . '</p>
-        <br>
-        <h3>您有一条来自<a style="text-decoration: none;color: orange " target="_blank" href="' . home_url() . '/">' . get_option("blogname") . '</a>的回复</h3>
-        <br>
-        <p style="font-size: 14px;">您在文章《' . get_the_title($comment->comment_post_ID) . '》上发表的评论：</p>
-        <div style="border-bottom:#ddd 1px solid;border-left:#ddd 1px solid;padding-bottom:20px;background-color:#eee;margin:15px 0px;padding-left:20px;padding-right:20px;border-top:#ddd 1px solid;border-right:#ddd 1px solid;padding-top:20px">'
-        . trim(get_comment($parent_id)->comment_content) . '</div>
-        <p style="font-size: 14px;">' . trim($comment->comment_author) . ' 给您的回复如下：</p>
-        <div style="border-bottom:#ddd 1px solid;border-left:#ddd 1px solid;padding-bottom:20px;background-color:#eee;margin:15px 0px;padding-left:20px;padding-right:20px;border-top:#ddd 1px solid;border-right:#ddd 1px solid;padding-top:20px">'
-        . trim($comment->comment_content) . '</div>
-
-      <div style="text-align: center;">
-          <img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.4/img/other/hr.png" alt="hr" style="width:100%;
-                                                                                                  margin:5px auto 5px auto;
-                                                                                                  display: block;">
-          <a style="text-transform: uppercase;
-                      text-decoration: none;
-                      font-size: 14px;
-                      border: 2px solid #6c7575;
-                      color: #2f3333;
-                      padding: 10px;
-                      display: inline-block;
-                      margin: 10px auto 0; " target="_blank" href="' . htmlspecialchars(get_comment_link($parent_id)) . '">点击查看回复的完整內容</a>
-      </div>
-        <p style="font-size: 12px;text-align: center;color: #999;">本邮件为系统自动发出，请勿直接回复<br>
-        &copy; ' . date(Y) . ' ' . get_option("blogname") . '</p>
-      </div>
-    </div>
-';
-        $message = convert_smilies($message);
-        $message = str_replace("{{", '<img src="https://cdn.jsdelivr.net/gh/moezx/cdn@2.9.4/img/bili/hd/ic_emoji_', $message);
-        $message = str_replace("}}", '.png" alt="emoji" style="height: 2em; max-height: 2em;">', $message);
-
-        $message = str_replace('{UPLOAD}', 'https://i.loli.net/', $message);
-        $message = str_replace('[/img][img]', '[/img^img]', $message);
-
-        $message = str_replace('[img]', '<img src="', $message);
-        $message = str_replace('[/img]', '" style="width:80%;display: block;margin-left: auto;margin-right: auto;">', $message);
-
-        $message = str_replace('[/img^img]', '" style="width:80%;display: block;margin-left: auto;margin-right: auto;"><img src="', $message);
-        $from = "From: \"" . get_option('blogname') . "\" <$wp_email>";
-        $headers = "$from\nContent-Type: text/html; charset=" . get_option('blog_charset') . "\n";
-        wp_mail($to, $subject, $message, $headers);
+    if (!$comment || empty($comment->comment_parent) || 'spam' === $comment->comment_approved) {
+        return;
     }
+
+    $parent = get_comment($comment->comment_parent);
+    if (!$parent) {
+        return;
+    }
+
+    $mail_notify = akina_option('mail_notify') ? get_comment_meta($parent->comment_ID, 'mail_notify', false) : false;
+    $admin_notify = akina_option('admin_notify') ? '1' : ($parent->comment_author_email !== get_bloginfo('admin_email') ? '1' : '0');
+    if ('0' === $admin_notify || $mail_notify) {
+        return;
+    }
+
+    $to = sanitize_email($parent->comment_author_email);
+    $from = sakura_get_mail_from_address();
+    $headers = sakura_get_mail_headers($from);
+    if (!is_email($to) || !$headers) {
+        return;
+    }
+
+    $subject = sprintf('你在 [%s] 的留言有了回应', sakura_get_mail_blog_name());
+    sakura_send_html_mail($to, $subject, sakura_render_comment_mail($comment, $parent), $headers);
 }
 add_action('comment_post', 'comment_mail_notify');
 

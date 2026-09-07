@@ -1849,13 +1849,45 @@ msgstr "複製超過30個位元組時自動向剪貼板添加版權標識，預�
 msgid "Email address prefix"
 msgstr "發件位址首碼"
 
-#: options.php:1233
+#: options.php:1246
 msgid ""
 "For sending system mail, the sender address displayed in the user's mailbox, "
-"do not use Chinese, the default system email address is bibi@your_domain_name"
+"do not use Chinese, the default system email address is bibi@your_domain_name. "
+"Easy WP SMTP provides the SMTP connection; the test message is sent to the "
+"site administrator email."
 msgstr ""
 "用於發送系統郵件，在使用者的郵箱中顯示的寄件者位址，不要使用中文，預設系統郵"
-"件地址為 bibi@你的功能變數名稱"
+"件地址為 bibi@你的功能變數名稱。Easy WP SMTP 負責 SMTP 連線，測試郵件將發送到網站管理員郵箱。"
+
+msgid "Send test email"
+msgstr "發送測試郵件"
+
+msgid "Send a test message to the site administrator email using the saved settings."
+msgstr "使用已儲存的設定向網站管理員郵箱發送測試郵件。"
+
+msgid "Run action"
+msgstr "執行操作"
+
+msgid "You are not allowed to send a test email."
+msgstr "您沒有發送測試郵件的權限。"
+
+msgid "站点管理员邮箱无效，无法发送测试邮件。"
+msgstr "網站管理員郵箱無效，無法發送測試郵件。"
+
+msgid "无法生成合法发件地址，请检查“发件地址前缀”和站点管理员邮箱设置。"
+msgstr "無法產生合法寄件地址，請檢查「寄件地址前綴」和網站管理員郵箱設定。"
+
+msgid "发件地址无效，测试邮件未发送。"
+msgstr "寄件地址無效，測試郵件未發送。"
+
+msgid "【%s】Sakura 测试邮件"
+msgstr "【%s】Sakura 測試郵件"
+
+msgid "测试邮件已交给 WordPress/邮件插件处理，目标地址：%s。最终送达仍取决于邮件服务商。"
+msgstr "測試郵件已交由 WordPress/郵件外掛處理，目標地址：%s。最終送達仍取決於郵件服務商。"
+
+msgid "测试邮件发送失败。"
+msgstr "測試郵件發送失敗。"
 
 #: search.php:19
 #, php-format

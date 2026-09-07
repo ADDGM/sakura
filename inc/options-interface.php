@@ -119,6 +119,19 @@ function optionsframework_fields() {
 			$output .= $screen_reader_label;
 			$placeholder = isset( $value['placeholder'] ) ? ' placeholder="' . esc_attr( $value['placeholder'] ) . '"' : '';
 			$output .= '<input id="' . esc_attr( $value['id'] ) . '" class="of-input" name="' . esc_attr( $option_name . '[' . $value['id'] . ']' ) . '" type="text" value="' . esc_attr( $val ) . '"' . $placeholder . ' />';
+			if ( ! empty( $value['action'] ) && is_string( $value['action'] ) && ! empty( $value['action_nonce'] ) ) {
+				$action = sanitize_key( $value['action'] );
+				$nonce_action = sanitize_key( $value['action_nonce'] );
+				$action_label = isset( $value['action_label'] ) ? $value['action_label'] : __( 'Run action', 'sakura' );
+				$action_desc = isset( $value['action_desc'] ) ? $value['action_desc'] : '';
+				$output .= '<div class="of-field-action">';
+				$output .= '<button type="submit" class="button-secondary sakura-action-button" name="action" value="' . esc_attr( $action ) . '" formaction="' . esc_url( admin_url( 'admin-post.php' ) ) . '" formmethod="post">' . esc_html( $action_label ) . '</button>';
+				$output .= wp_nonce_field( $nonce_action, '_sakura_test_nonce', false, false );
+				if ( $action_desc !== '' ) {
+					$output .= '<span class="of-field-action-desc">' . wp_kses_post( $action_desc ) . '</span>';
+				}
+				$output .= '</div>';
+			}
 			break;
 
 		// Password input

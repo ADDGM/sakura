@@ -1667,8 +1667,38 @@ msgstr ""
 msgid "Email address prefix"
 msgstr ""
 
-#: options.php:1233
-msgid "For sending system mail, the sender address displayed in the user's mailbox, do not use Chinese, the default system email address is bibi@your_domain_name"
+#: options.php:1246
+msgid "For sending system mail, the sender address displayed in the user's mailbox, do not use Chinese, the default system email address is bibi@your_domain_name. Easy WP SMTP provides the SMTP connection; the test message is sent to the site administrator email."
+msgstr ""
+
+msgid "Send test email"
+msgstr ""
+
+msgid "Send a test message to the site administrator email using the saved settings."
+msgstr ""
+
+msgid "Run action"
+msgstr ""
+
+msgid "You are not allowed to send a test email."
+msgstr ""
+
+msgid "站点管理员邮箱无效，无法发送测试邮件。"
+msgstr ""
+
+msgid "无法生成合法发件地址，请检查“发件地址前缀”和站点管理员邮箱设置。"
+msgstr ""
+
+msgid "发件地址无效，测试邮件未发送。"
+msgstr ""
+
+msgid "【%s】Sakura 测试邮件"
+msgstr ""
+
+msgid "测试邮件已交给 WordPress/邮件插件处理，目标地址：%s。最终送达仍取决于邮件服务商。"
+msgstr ""
+
+msgid "测试邮件发送失败。"
 msgstr ""
 
 #: search.php:19
