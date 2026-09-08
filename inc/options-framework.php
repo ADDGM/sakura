@@ -344,9 +344,10 @@ function optionsframework_validate( $input ) {
 			}
 		}
 
-		// For a value to be submitted to database it must pass through a sanitization filter
-		if ( has_filter( 'of_sanitize_' . $option['type'] ) ) {
-			$clean[$id] = apply_filters( 'of_sanitize_' . $option['type'], $input[$id], $option );
+		// Prefer an option-specific sanitizer, then fall back to the field type sanitizer.
+		$sanitizer = has_filter( 'of_sanitize_' . $id ) ? 'of_sanitize_' . $id : 'of_sanitize_' . $option['type'];
+		if ( has_filter( $sanitizer ) ) {
+			$clean[$id] = apply_filters( $sanitizer, $input[$id], $option );
 		}
 	}
 
@@ -399,8 +400,10 @@ function of_get_default_values() {
 		if ( ! isset( $option['type'] ) ) {
 			continue;
 		}
-		if ( has_filter( 'of_sanitize_' . $option['type'] ) ) {
-			$output[$option['id']] = apply_filters( 'of_sanitize_' . $option['type'], $option['std'], $option );
+		$id = preg_replace( '/[^a-zA-Z0-9._\-]/', '', strtolower( $option['id'] ) );
+		$sanitizer = has_filter( 'of_sanitize_' . $id ) ? 'of_sanitize_' . $id : 'of_sanitize_' . $option['type'];
+		if ( has_filter( $sanitizer ) ) {
+			$output[$option['id']] = apply_filters( $sanitizer, $option['std'], $option );
 		}
 	}
 	return $output;

@@ -122,6 +122,34 @@ function sakura_release_metadata(array $release, string $key, string $default = 
     return $value !== '' ? $value : $default;
 }
 
+/**
+ * 为需要额外操作说明的版本补充稳定的用户可见信息。
+ */
+function sakura_release_version_notes(string $version): array
+{
+    if ($version !== '3.5.0-beta.6') {
+        return array();
+    }
+
+    return array(
+        '本版本重点' => array(
+            '新增主题设置页“发送测试邮件”，使用已保存的设置调用 `wp_mail()`，默认发送到站点管理员邮箱。',
+            '兼容 Easy WP SMTP：主题不接管 SMTP 主机、端口或认证，由 Easy WP SMTP 负责实际 SMTP 连接和投递。',
+            '修复 Options Framework 国际化，保存、恢复默认、颜色选择器和清除提示统一使用 `sakura` 文本域。',
+            '修复 WordPress smoke 检查中的 `$url` 字符串插值故障，PHP 8.0/8.1/8.2 与 WordPress 7.0/7.1 矩阵均通过。',
+        ),
+        '已知限制' => array(
+            '测试邮件显示“发送成功”只代表 `wp_mail()` 或邮件插件接受请求，不代表邮件已经最终送达；请结合 Easy WP SMTP 日志和收件箱确认。',
+            '本版本尚未完成本地资源优先治理，默认核心资源仍可能访问旧远程地址；该治理列入 `v3.5.0-beta.7` 的 P0 任务。',
+            '这是测试版，不建议直接用于生产站点；升级前请先在测试环境完成主题设置、邮件和前台页面回归。',
+        ),
+        '升级提示' => array(
+            '请从 GitHub Release 页面下载 `sakura-3.5.0-beta.6.zip` 并直接上传 WordPress；Actions Artifact 是外层资料包，需要先解压后再上传其中的主题 ZIP。',
+            '使用测试邮件前先在 Easy WP SMTP 中完成 SMTP 配置；主题设置中的发件地址前缀只影响显示的发件地址。',
+        ),
+    );
+}
+
 function sakura_render_release_notes(string $tag, string $previous, array $commits, array $files, string $repository, array $release, bool $prerelease): string
 {
     $sections = array();
@@ -209,6 +237,18 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
         $lines[] = '';
     }
 
+    $versionNotes = sakura_release_version_notes($version);
+    $versionUpgradeNotes = $versionNotes['升级提示'] ?? array();
+    unset($versionNotes['升级提示']);
+    foreach ($versionNotes as $title => $items) {
+        $lines[] = '## ' . $title;
+        $lines[] = '';
+        foreach ($items as $item) {
+            $lines[] = '- ' . $item;
+        }
+        $lines[] = '';
+    }
+
     $compareRange = $previous . '...' . $tag;
     $lines[] = '## 完整更新日志';
     $lines[] = '';
@@ -230,6 +270,9 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
     $lines[] = '';
     $lines[] = '- 升级前请备份数据库、主题设置和 `wp-content/uploads`。';
     $lines[] = $prerelease ? '- 此版本为测试版，不建议直接用于生产环境。' : '- 此版本为正式版，请先在测试服务器验证主题设置和外部服务。';
+    foreach ($versionUpgradeNotes as $item) {
+        $lines[] = '- ' . $item;
+    }
     $lines[] = '';
     return implode("\n", $lines);
 }
@@ -270,6 +313,15 @@ function sakura_release_self_test(): int
         || strpos($emptyNotes, 'https://github.com//compare/') !== false
         || strpos($emptyNotes, '此版本为测试版') === false) {
         fwrite(STDERR, "Release 空变更区间自测失败。\n");
+        return 1;
+    }
+    $betaSixNotes = sakura_render_release_notes('v3.5.0-beta.6', 'v3.5.0-beta.5', array(), array(), '', array('version' => '3.5.0-beta.6'), true);
+    if (strpos($betaSixNotes, '## 本版本重点') === false
+        || strpos($betaSixNotes, 'Easy WP SMTP') === false
+        || strpos($betaSixNotes, '## 已知限制') === false
+        || strpos($betaSixNotes, '## 升级提示') === false
+        || strpos($betaSixNotes, 'Actions Artifact') === false) {
+        fwrite(STDERR, "Beta.6 Release 说明自测失败。\n");
         return 1;
     }
     echo "Release 说明自测通过。\n";

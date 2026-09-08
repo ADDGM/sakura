@@ -115,6 +115,7 @@ $sourceChecks = array(
     array('options.php', "'id' => 'site_start_date'", '主题设置缺少建站时间字段。'),
     array('options.php', "'placeholder' => '2020-01-01'", '建站时间字段缺少日期格式示例。'),
     array('inc/options-sanitize.php', 'of_sanitize_site_start_date', '建站时间字段未接入服务端日期清理器。'),
+    array('inc/options-framework.php', 'has_filter( \'of_sanitize_\' . $id )', 'Options Framework 未优先调用字段专用清理器。'),
     array('functions.php', 'function sakura_parse_site_start_date', '主题缺少建站时间解析函数。'),
     array('functions.php', 'function sakura_get_site_runtime_days', '主题缺少页脚运行天数计算函数。'),
     array('footer.php', 'sakura_get_site_runtime_days()', '页脚未输出建站运行天数。'),
