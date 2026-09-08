@@ -226,9 +226,9 @@ function optionsframework_load_scripts( $hook ) {
 		wp_register_script( 'iris', OPTIONS_FRAMEWORK_DIRECTORY . 'js/iris.min.js', array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1 );
 		wp_register_script( 'wp-color-picker', OPTIONS_FRAMEWORK_DIRECTORY . 'js/color-picker.min.js', array( 'jquery', 'iris' ) );
 		$colorpicker_l10n = array(
-			'clear' => __( 'Clear','options_framework_theme' ),
-			'defaultString' => __( 'Default', 'options_framework_theme' ),
-			'pick' => __( 'Select Color', 'options_framework_theme' )
+			'clear' => __( 'Clear', 'sakura' ),
+			'defaultString' => __( 'Default', 'sakura' ),
+			'pick' => __( 'Select Color', 'sakura' )
 		);
 		wp_localize_script( 'wp-color-picker', 'wpColorPickerL10n', $colorpicker_l10n );
 	}
@@ -307,7 +307,7 @@ function optionsframework_validate( $input ) {
 	 */
 
 	if ( isset( $_POST['reset'] ) ) {
-		add_settings_error( 'options-framework', 'restore_defaults', __( 'Default options restored.', 'options_framework_theme' ), 'updated fade' );
+		add_settings_error( 'options-framework', 'restore_defaults', __( 'Default options restored.', 'sakura' ), 'updated fade' );
 		return of_get_default_values();
 	}
 
@@ -367,7 +367,7 @@ function optionsframework_save_options_notice() {
 			return;
 		}
 	}
-	add_settings_error( 'options-framework', 'save_options', __( 'Options saved.', 'options_framework_theme' ), 'updated fade' );
+	add_settings_error( 'options-framework', 'save_options', __( 'Options saved.', 'sakura' ), 'updated fade' );
 }
 
 add_action( 'optionsframework_after_validate', 'optionsframework_save_options_notice' );
