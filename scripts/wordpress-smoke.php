@@ -124,7 +124,7 @@ $sourceChecks = array(
     array('inc/mail.php', "add_action('admin_post_sakura_send_test_email'", '测试邮件未注册 admin-post 入口。'),
     array('inc/mail.php', "check_admin_referer('sakura-send-test-email', '_sakura_test_nonce')", '测试邮件入口缺少独立 Nonce 校验。'),
     array('inc/mail.php', "current_user_can('edit_theme_options')", '测试邮件入口缺少主题设置权限检查。'),
-    array('inc/mail.php', "wp_safe_redirect($url)", '测试邮件结果未通过安全重定向返回设置页。'),
+    array('inc/mail.php', 'wp_safe_redirect($url)', '测试邮件结果未通过安全重定向返回设置页。'),
     array('inc/options-interface.php', 'formaction="', '主题设置页测试动作未使用独立的普通 POST 目标。'),
     array('inc/options-interface.php', "'_sakura_test_nonce'", '主题设置页测试邮件按钮缺少独立 Nonce 字段。'),
     array('options.php', "'action' => 'sakura_send_test_email'", '发件地址前缀字段未声明测试邮件动作。'),
