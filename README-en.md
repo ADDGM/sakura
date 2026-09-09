@@ -7,9 +7,9 @@ Sakura🌸: A Wonderful WordPress Theme
 
 ![PHP version](https://img.shields.io/badge/PHP-8.0--8.2-4F5B93.svg?style=flat-square&logo=php)
 ![WP version](https://img.shields.io/badge/WordPress-7.0--7.1-0073aa.svg?style=flat-square&logo=wordpress)
-[![GitHub release](https://img.shields.io/github/release/mashirozx/Sakura.svg?style=flat-square)](https://github.com/mashirozx/Sakura/releases/latest)
-[![Github commits (since latest release)](https://img.shields.io/github/commits-since/mashirozx/Sakura/latest/dev.svg?style=flat-square)](https://github.com/mashirozx/Sakura/commits/dev)
-[![](https://data.jsdelivr.com/v1/package/gh/moezx/cdn/badge)](https://www.jsdelivr.com/package/gh/moezx/cdn)
+[![GitHub release](https://img.shields.io/github/release/ADDGM/sakura.svg?style=flat-square)](https://github.com/ADDGM/sakura/releases/latest)
+[![Github commits (since latest release)](https://img.shields.io/github/commits-since/ADDGM/sakura/latest/develop.svg?style=flat-square)](https://github.com/ADDGM/sakura/commits/develop)
+[![](https://data.jsdelivr.com/v1/package/gh/ADDGM/sakura/badge)](https://www.jsdelivr.com/package/gh/ADDGM/sakura)
 
 Modified based on theme [Akina (by Fuzzz)](http://www.akina.pw/themeakina) and [Siren (by Louie)](https://github.com/louie-senpai/Siren).
 
@@ -20,7 +20,7 @@ The rebuild version is on the way :)
 #### By GIT
 ```bash
 cd /wp-content/themes/
-git clone https://github.com/mashirozx/Sakura.git
+git clone https://github.com/ADDGM/sakura.git
 ```
 
 #### By FTP
@@ -36,7 +36,7 @@ git fetch
 git pull
 ```
 
-[Learn more info about the theme (Chinese)](https://2heng.xin/theme-sakura/)
+[Learn more info about the theme (Chinese)](https://github.com/ADDGM/sakura/blob/develop/README.md)
 
 Enjoy it!
 

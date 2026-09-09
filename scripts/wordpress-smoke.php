@@ -339,6 +339,16 @@ if ($optionsSource === false || strpos($optionsSource, "'id' => \"release_info\"
 if ($optionsSource !== false && (strpos($optionsSource, "'tag' => 'https://img.shields.io/github/release/mashirozx/Sakura") !== false || strpos($optionsSource, "'tag2' => 'https://img.shields.io/github/commits-since/mashirozx/Sakura") !== false)) {
     $errors[] = '检查更新区域仍引用上游 mashirozx/Sakura 徽章。';
 }
+$aboutBlock = '';
+if ($optionsSource !== false && preg_match("/'name'\s*=>\s*__\('About'.*?'id'\s*=>\s*'theme_intro'/s", $optionsSource, $aboutMatch)) {
+    $aboutBlock = $aboutMatch[0];
+}
+if ($aboutBlock === '' || strpos($aboutBlock, 'https://github.com/ADDGM/sakura#readme') === false || strpos($aboutBlock, 'https://github.com/ADDGM/sakura/') === false || strpos($aboutBlock, 'https://github.com/ADDGM/sakura/releases/latest') === false || strpos($aboutBlock, 'img.shields.io/github/release/ADDGM/sakura.svg') === false) {
+    $errors[] = '关于区域的文档、源码或 Release 链接未统一到 ADDGM/sakura。';
+}
+if ($aboutBlock !== '' && strpos($aboutBlock, 'mashirozx/Sakura') !== false) {
+    $errors[] = '关于区域仍引用上游 mashirozx/Sakura 链接。';
+}
 $dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-scheme.css');
 if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {
     $errors[] = '后台配色主按钮按下态未使用主色背景。';

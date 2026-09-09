@@ -1464,7 +1464,7 @@ msgstr ""
 
 #: options.php:1053
 #, php-format
-msgid "Theme Sakura v %s  |  <a href=\"https://2heng.xin/theme-sakura/\">Theme document</a>  |  <a href=\"https://github.com/mashirozx/Sakura/\">Source code</a><a href=\"https://github.com/mashirozx/Sakura/releases/latest\"><img src=\"https://img.shields.io/github/release/mashirozx/Sakura.svg?style=flat-square\" alt=\"GitHub release\"></a>"
+msgid "Theme Sakura v %s  |  <a href=\"https://github.com/ADDGM/sakura#readme\">Theme document</a>  |  <a href=\"https://github.com/ADDGM/sakura/\">Source code</a><a href=\"https://github.com/ADDGM/sakura/releases/latest\"><img src=\"https://img.shields.io/github/release/ADDGM/sakura.svg?style=flat-square\" alt=\"GitHub release\"></a>"
 msgstr ""
 
 #: options.php:1059
