@@ -237,8 +237,8 @@ function upload_image(WP_REST_Request $request) {
         $output = array('status' => 403,
             'success' => false,
             'message' => 'Unauthorized client.',
-            'link' => "https://view.moezx.cc/images/2019/11/14/step04.md.png",
-            'proxy' => akina_option('cmt_image_proxy') . "https://view.moezx.cc/images/2019/11/14/step04.md.png",
+            'link' => get_template_directory_uri() . '/images/avatar.jpeg',
+            'proxy' => get_template_directory_uri() . '/images/avatar.jpeg',
         );
         $result = new WP_REST_Response($output, 403);
         $result->set_headers(array('Content-Type' => 'application/json'));

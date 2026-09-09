@@ -64,11 +64,7 @@ mashiro_option.entry_content_theme_src = "<?php echo get_template_directory_uri(
 <?php } ?>
 mashiro_option.entry_content_theme = "<?php echo akina_option('entry_content_theme'); ?>";
 
-<?php if(akina_option('jsdelivr_cdn_test')){ ?>
-mashiro_option.jsdelivr_css_src = "<?php echo get_template_directory_uri() ?>/cdn/css/lib.css?<?php echo SAKURA_VERSION.akina_option('cookie_version', ''); ?>";
-<?php } else { ?>
-mashiro_option.jsdelivr_css_src = "https://cdn.jsdelivr.net/gh/mashirozx/Sakura@<?php echo SAKURA_VERSION; ?>/cdn/css/lib.min.css";
-<?php } ?>
+mashiro_option.jsdelivr_css_src = "<?php echo esc_js(sakura_core_resource_url('cdn/css/lib.css', 'jsdelivr_cdn_test', true)); ?>";
 <?php if (akina_option('aplayer_server') != 'off'): ?>
 mashiro_option.float_player_on = true;
 mashiro_option.meting_api_url = "<?php echo rest_url('sakura/v1/meting/aplayer'); ?>";

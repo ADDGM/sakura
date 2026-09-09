@@ -10,6 +10,11 @@
 define('SAKURA_VERSION', wp_get_theme()->get('Version'));
 define('BUILD_VERSION', '3');
 
+// 远程模式只作为显式兼容选项；固定到已发布标签，避免跟随不存在的维护版版本号。
+if (!defined('SAKURA_REMOTE_RESOURCE_TAG')) {
+    define('SAKURA_REMOTE_RESOURCE_TAG', 'v3.5.0-beta.6');
+}
+
 if (!function_exists('akina_setup')):
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -172,25 +177,69 @@ add_action('after_setup_theme', 'akina_content_width', 0);
 /**
  * Enqueue scripts and styles.
  */
+function sakura_core_resource_is_local($option_key)
+{
+    $value = akina_option($option_key, '1');
+
+    // 仅把旧复选框的明确关闭值视为远程；缺失值继续采用本地默认。
+    return !($value === false || $value === 0 || '0' === (string) $value);
+}
+
+/**
+ * Resolve a core resource URL while preserving the legacy local/remote switches.
+ */
+function sakura_core_resource_url($path, $option_key, $versioned = false)
+{
+    $path = ltrim((string) $path, '/');
+    if (sakura_core_resource_is_local($option_key)) {
+        $url = get_template_directory_uri() . '/' . $path;
+    } else {
+        $tag = apply_filters('sakura_remote_resource_tag', SAKURA_REMOTE_RESOURCE_TAG);
+        $tag = preg_replace('/[^A-Za-z0-9._-]/', '', (string) $tag);
+        if ('' === $tag) {
+            $tag = SAKURA_REMOTE_RESOURCE_TAG;
+        }
+        $url = 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@' . $tag . '/' . $path;
+    }
+
+    if ($versioned) {
+        $url = add_query_arg(
+            'ver',
+            SAKURA_VERSION . (string) akina_option('cookie_version', ''),
+            $url
+        );
+    }
+
+    return esc_url_raw($url);
+}
+
 function sakura_scripts()
 {
-    if (akina_option('jsdelivr_cdn_test')) {
-        wp_enqueue_script('js_lib', get_template_directory_uri() . '/cdn/js/lib.js', array(), SAKURA_VERSION . akina_option('cookie_version', ''), true);
-    } else {
-        wp_enqueue_script('js_lib', 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@' . SAKURA_VERSION . '/cdn/js/lib.min.js', array(), SAKURA_VERSION, true);
-    }
+    wp_enqueue_script(
+        'js_lib',
+        sakura_core_resource_url('cdn/js/lib.js', 'jsdelivr_cdn_test'),
+        array(),
+        SAKURA_VERSION . akina_option('cookie_version', ''),
+        true
+    );
     $app_dependencies = array();
     if (akina_option('aplayer_server') != 'off') {
         wp_enqueue_script('aplayer_localization', get_template_directory_uri() . '/js/aplayer-localization.js', array('js_lib'), SAKURA_VERSION, true);
         $app_dependencies[] = 'aplayer_localization';
     }
-    if (akina_option('app_no_jsdelivr_cdn')) {
-        wp_enqueue_style('saukra_css', get_stylesheet_uri(), array(), SAKURA_VERSION);
-        wp_enqueue_script('app', get_template_directory_uri() . '/js/sakura-app.js', $app_dependencies, SAKURA_VERSION, true);
-    } else {
-        wp_enqueue_style('saukra_css', 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@' . SAKURA_VERSION . '/style.min.css', array(), SAKURA_VERSION);
-        wp_enqueue_script('app', 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@' . SAKURA_VERSION . '/js/sakura-app.min.js', $app_dependencies, SAKURA_VERSION, true);
-    }
+    wp_enqueue_style(
+        'saukra_css',
+        sakura_core_resource_url('style.css', 'app_no_jsdelivr_cdn'),
+        array(),
+        SAKURA_VERSION
+    );
+    wp_enqueue_script(
+        'app',
+        sakura_core_resource_url('js/sakura-app.js', 'app_no_jsdelivr_cdn'),
+        $app_dependencies,
+        SAKURA_VERSION,
+        true
+    );
     //wp_enqueue_script('github_card', 'https://cdn.jsdelivr.net/github-cards/latest/widget.js', array(), SAKURA_VERSION, true);
 
     if (is_singular() && comments_open() && get_option('thread_comments')) {
@@ -678,7 +727,7 @@ function get_the_link_items($id = null)
             }
 
             if (empty($bookmark->link_image)) {
-                $bookmark->link_image = 'https://view.moezx.cc/images/2017/12/30/Transparent_Akkarin.th.jpg';
+                $bookmark->link_image = get_template_directory_uri() . '/images/Custom1.jpg';
             }
 
             $output .= '<li class="link-item"><a class="link-item-inner effect-apollo" href="' . $bookmark->link_url . '" title="' . $bookmark->link_description . '" target="_blank" rel="friend"><img class="lazyload" onerror="imgError(this,1)" data-src="' . $bookmark->link_image . '" src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg"><span class="sitename">' . $bookmark->link_name . '</span><div class="linkdes">' . $bookmark->link_description . '</div></a></li>';
@@ -926,11 +975,11 @@ function custom_html()
     if (akina_option('login_bg')) {
         $loginbg = akina_option('login_bg');
     } else {
-        $loginbg = 'https://cdn.jsdelivr.net/gh/mashirozx/Sakura@3.2.7/images/hd.png';
+        $loginbg = get_template_directory_uri() . '/images/hd.png';
     }
     echo '<script type="text/javascript" src="' . get_template_directory_uri() . '/js/login.js"></script>' . "\n";
     echo '<script type="text/javascript">' . "\n";
-    echo 'jQuery("body").prepend("<div class=\"loading\"><img src=\"https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/login_loading.gif\" width=\"58\" height=\"10\"></div><div id=\"bg\"><img /></div>");' . "\n";
+    echo 'jQuery("body").prepend("<div class=\"loading\"><img src=\"' . esc_url(get_template_directory_uri() . '/images/login_loading.gif') . '\" width=\"58\" height=\"10\"></div><div id=\"bg\"><img /></div>");' . "\n";
     echo 'jQuery(\'#bg\').children(\'img\').attr(\'src\', \'' . $loginbg . '\').load(function(){' . "\n";
     echo '	resizeImage(\'bg\');' . "\n";
     echo '	jQuery(window).bind("resize", function() { resizeImage(\'bg\'); });' . "\n";
@@ -1123,7 +1172,7 @@ add_filter('comment_text', 'comment_picture_support');
 add_filter('smilies_src', 'custom_smilies_src', 1, 10);
 function custom_smilies_src($img_src, $img, $siteurl)
 {
-    return 'https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/smilies/' . $img;
+    return get_template_directory_uri() . '/images/smilies/' . $img;
 }
 // 简单遍历系统表情库，今后应考虑标识表情包名——使用增加的扩展名，同时保留原有拓展名
 // 还有一个思路是根据表情调用路径来判定<-- 此法最好！
@@ -1135,7 +1184,7 @@ function push_smilies()
     foreach ((array) ($wpsmiliestrans ?? array()) as $k => $v) {
         $Sname = str_replace(":", "", $k);
         $Svalue = $v;
-        $return_smiles = $return_smiles . '<span title="' . $Sname . '" onclick="grin(' . "'" . $Sname . "'" . ')"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/smilies/' . $Svalue . '" /></span>';
+        $return_smiles = $return_smiles . '<span title="' . $Sname . '" onclick="grin(' . "'" . $Sname . "'" . ')"><img src="' . esc_url(get_template_directory_uri() . '/images/smilies/' . $Svalue) . '" /></span>';
     }
     return $return_smiles;
 }
@@ -1525,7 +1574,7 @@ function admin_ini()
 {
     wp_enqueue_style('admin-styles-fix-icon', get_site_url() . '/wp-includes/css/dashicons.css');
     wp_enqueue_style('cus-styles-fit', get_template_directory_uri() . '/inc/css/dashboard-fix.css');
-    wp_enqueue_script('lazyload', 'https://cdn.jsdelivr.net/npm/lazyload@2.0.0-beta.2/lazyload.min.js');
+    wp_enqueue_script('lazyload', get_template_directory_uri() . '/cdn/js/src/08.lazyload.min.js', array(), SAKURA_VERSION, true);
 }
 add_action('admin_enqueue_scripts', 'admin_ini');
 

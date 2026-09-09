@@ -58,7 +58,7 @@ function optionsframework_options()
     // 背景默认值
     $background_defaults = array(
         'color' => '',
-        'image' => 'https://view.moezx.cc/images/2018/12/23/knights-of-the-frozen-throne-8k-qa.jpg',
+        'image' => get_template_directory_uri() . '/images/Custom.jpg',
         'repeat' => 'repeat',
         'position' => 'top center',
         'attachment' => 'scroll');
@@ -1040,16 +1040,16 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Use the front-end library locally (lib.js、lib.css)', 'sakura'), /*本地调用前端库（lib.js、lib.css）*/
-        'desc' => __('The front-end library don\'t load from jsDelivr, not recommand', 'sakura'), /*前端库不走 jsDelivr，不建议启用*/
+        'desc' => __('Use the bundled local library by default. Disable this only to explicitly load the remote copy from jsDelivr.', 'sakura'), /*默认使用主题内置前端库。只有明确需要远程 jsDelivr 副本时才关闭。*/
         'id' => 'jsdelivr_cdn_test',
-        'std' => '0',
+        'std' => '1',
         'type' => 'checkbox');
 
     $options[] = array(
         'name' => __('Use js and css file of the theme (sakura-app.js、style.css) locally', 'sakura'), /*本地调用主题 js、css 文件（sakura-app.js、style.css）*/
-        'desc' => __('The js and css files of the theme do not load from jsDelivr, please open when DIY', 'sakura'), /*主题的 js、css 文件不走 jsDelivr，DIY 时请开启*/
+        'desc' => __('Use the bundled theme CSS and JavaScript by default. Disable this only to explicitly load the remote copy from jsDelivr.', 'sakura'), /*默认使用主题内置 CSS 和 JavaScript。只有明确需要远程 jsDelivr 副本时才关闭。*/
         'id' => 'app_no_jsdelivr_cdn',
-        'std' => '0',
+        'std' => '1',
         'type' => 'checkbox');
 
     //其他
@@ -1231,7 +1231,7 @@ function optionsframework_options()
         'name' => __('lazyload spinner', 'sakura'),
         'desc' => __('The placeholder to display when the image loads, fill in the image url', 'sakura'), /*图片加载时要显示的占位图，填写图片 url*/
         'id' => 'lazyload_spinner',
-        'std' => 'https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg',
+        'std' => get_template_directory_uri() . '/images/login_loading.gif',
         'type' => 'text');
 
     $options[] = array(

@@ -13,7 +13,6 @@
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="shortcut icon" href="<?php echo akina_option('favicon_link', ''); ?>"/>
-<link type="text/css" media="all" href="https://cdn.jsdelivr.net/gh/moezx/cdn@3.2.2/css/lib.css" rel="stylesheet" />
 <?php wp_head(); ?>
 <script>
 var the_url=window.location.href;
