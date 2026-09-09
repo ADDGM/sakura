@@ -8,7 +8,7 @@
 ![WP version](https://img.shields.io/badge/WordPress-7.0--7.1-0073aa.svg?style=flat-square&logo=wordpress)
 [![GitHub release](https://img.shields.io/github/v/release/ADDGM/sakura.svg?style=flat-square&logo=github)](https://github.com/ADDGM/sakura/releases/latest)
 [![Github commits (since latest release)](https://img.shields.io/github/commits-since/ADDGM/sakura/latest/develop.svg?style=flat-square&logo=git&color=important)](https://github.com/ADDGM/sakura/commits/develop)
-[![](https://data.jsdelivr.com/v1/package/gh/moezx/cdn/badge)](https://www.jsdelivr.com/package/gh/moezx/cdn)
+[![](https://data.jsdelivr.com/v1/package/gh/ADDGM/sakura/badge)](https://www.jsdelivr.com/package/gh/ADDGM/sakura)
 
 在 Louie 基于 Fuzzz 的 [Akina](http://www.akina.pw/themeakina) 主题修改的主题 [Siren](https://github.com/louie-senpai/Siren) 基础上三次修改 =.=
 
@@ -16,7 +16,11 @@
 
 特别感谢 [@Spirit](https://github.com/spirit1431007) 对本项目的贡献！
 
-注意：建议 `git clone` 下载（[简易 Git 使用指南](https://github.com/mashirozx/Sakura/wiki/Git-%E4%B8%8B%E8%BD%BD%E3%80%81%E6%9B%B4%E6%96%B0%E6%8C%87%E5%8D%97)）；如果选择下载压缩包，**解压后记得把文件夹名改回 `Sakura`，也即保证主题路径为 `/wp-content/themes/Sakura/`**；主题设置在 `菜单-外观-Sakura 主题设置` 中；DIY 的时候建议采用[子主题](https://github.com/mashirozx/Sakura/tree/child) 并勾选 `Sakura 主题设置-CDN-本地调用主题 js、css 文件`；请留意主题说明里的其他注意事项。
+注意：建议 `git clone` 下载（[简易 Git 使用指南](https://github.com/mashirozx/Sakura/wiki/Git-%E4%B8%8B%E8%BD%BD%E3%80%81%E6%9B%B4%E6%96%B0%E6%8C%87%E5%8D%97)）；如果选择下载压缩包，**解压后记得把文件夹名改回 `Sakura`，也即保证主题路径为 `/wp-content/themes/Sakura/`**；主题设置在 `菜单-外观-Sakura 主题设置` 中；主题核心 CSS、JavaScript 和前端库默认从主题本地文件加载，只有明确需要时才在 `CDN` 设置中取消本地选项以使用 ADDGM 固定版本的 jsDelivr 副本；DIY 时建议采用[子主题](https://github.com/mashirozx/Sakura/tree/child)。请留意主题说明里的其他注意事项。
+
+### 核心资源来源
+
+新安装或缺少旧设置值时，主题核心资源默认使用 Release 包内的本地文件。升级时仍兼容旧版 `jsdelivr_cdn_test` 和 `app_no_jsdelivr_cdn` 设置：勾选（`1`）使用本地文件，明确取消勾选（`0`）才会使用 ADDGM 仓库的固定远程标签。远程副本只用于兼容或特定网络场景，核心功能不依赖它；在受限网络环境中请保持本地选项开启。
 
 主题使用说明见：<https://2heng.xin/theme-sakura/>
 

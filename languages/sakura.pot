@@ -1443,7 +1443,7 @@ msgid "Use the front-end library locally (lib.js、lib.css)"
 msgstr ""
 
 #: options.php:1034
-msgid "The front-end library don't load from jsDelivr, not recommand"
+msgid "Use the bundled local library by default. Disable this only to explicitly load the remote copy from jsDelivr."
 msgstr ""
 
 #: options.php:1040
@@ -1451,7 +1451,7 @@ msgid "Use js and css file of the theme (sakura-app.js、style.css) locally"
 msgstr ""
 
 #: options.php:1041
-msgid "The js and css files of the theme do not load from jsDelivr, please open when DIY"
+msgid "Use the bundled theme CSS and JavaScript by default. Disable this only to explicitly load the remote copy from jsDelivr."
 msgstr ""
 
 #: options.php:1048

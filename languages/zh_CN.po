@@ -1567,18 +1567,16 @@ msgid "Use the front-end library locally (lib.js、lib.css)"
 msgstr "本地调用前端库（lib.js、lib.css）"
 
 #: options.php:1034
-msgid "The front-end library don't load from jsDelivr, not recommand"
-msgstr "前端库不走 jsDelivr，不建议启用"
+msgid "Use the bundled local library by default. Disable this only to explicitly load the remote copy from jsDelivr."
+msgstr "默认使用主题内置前端库。只有明确需要远程 jsDelivr 副本时才关闭。"
 
 #: options.php:1040
 msgid "Use js and css file of the theme (sakura-app.js、style.css) locally"
 msgstr "本地调用主题 js、css 文件（sakura-app.js、style.css）"
 
 #: options.php:1041
-msgid ""
-"The js and css files of the theme do not load from jsDelivr, please open "
-"when DIY"
-msgstr "主题的 js、css 文件不走 jsDelivr，DIY 时请开启"
+msgid "Use the bundled theme CSS and JavaScript by default. Disable this only to explicitly load the remote copy from jsDelivr."
+msgstr "默认使用主题内置 CSS 和 JavaScript。只有明确需要远程 jsDelivr 副本时才关闭。"
 
 #: options.php:1048
 msgid "Others"

@@ -27,7 +27,7 @@ git clone https://github.com/mashirozx/Sakura.git
 **Rename the theme folder name as `Sakura`** if you download form the green [Clone or download] button on this page. Make sure the path to the theme root is /wp-content/themes/Sakura/`.
 
 ### Configuration
-Config your theme at `Mune-Appearance-Sakura Options`. Please turn on `Use js and css file of the theme locally` under CDN tag if you want to modify local SCC an Javascript files.
+Config your theme at `Mune-Appearance-Sakura Options`. Core CSS, JavaScript, and frontend libraries use the bundled local files by default. The legacy CDN checkboxes remain compatible: keep them enabled for local resources, and disable them only when you explicitly need the fixed ADDGM jsDelivr copies. Please use a child theme for custom changes.
 
 ### Update
 ```bash
