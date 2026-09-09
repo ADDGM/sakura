@@ -97,6 +97,21 @@ $sourceChecks = array(
     array('functions.php', "wp_enqueue_style(\n        'sakura-admin-color-scheme-preview'", '个人资料页预览没有加载静态后台配色样式。'),
     array('functions.php', "'styleSheetId' => 'sakura-admin-color-scheme-preview-css'", '个人资料页预览未标识静态后台配色样式表。'),
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
+    array('functions.php', 'function sakura_core_resource_url', '核心资源没有统一的本地/远程 URL 解析函数。'),
+    array('functions.php', 'SAKURA_REMOTE_RESOURCE_TAG', '远程核心资源没有固定的已发布标签。'),
+    array('functions.php', 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@', '远程核心资源没有指向 ADDGM/sakura。'),
+    array('functions.php', "akina_option('jsdelivr_cdn_test', '1')", '前端库本地加载开关缺少本地优先的缺省值。'),
+    array('functions.php', "akina_option('app_no_jsdelivr_cdn', '1')", '主题 CSS/JavaScript 本地加载开关缺少本地优先的缺省值。'),
+    array('functions.php', "'/cdn/js/src/08.lazyload.min.js'", '后台 lazyload 仍未使用主题内置脚本。'),
+    array('inc/swicher.php', "sakura_core_resource_url('cdn/css/lib.css', 'jsdelivr_cdn_test', true)", '前端动态 lib.css 地址没有复用本地优先资源解析器。'),
+    array('options.php', "'id' => 'jsdelivr_cdn_test',\n        'std' => '1'", '前端库设置的新安装默认值不是本地优先。'),
+    array('options.php', "'id' => 'app_no_jsdelivr_cdn',\n        'std' => '1'", '主题 CSS/JavaScript 设置的新安装默认值不是本地优先。'),
+    array('options.php', "'image' => get_template_directory_uri() . '/images/Custom.jpg'", '前台背景默认值仍未使用主题本地资源。'),
+    array('options.php', "'std' => get_template_directory_uri() . '/images/login_loading.gif'", 'lazyload 默认占位图仍未使用主题本地资源。'),
+    array('inc/classes/Images.php', "get_template_directory_uri() . '/images/avatar.jpeg'", '图片上传失败占位图仍未使用主题本地资源。'),
+    array('inc/classes/Images.php', '$proxy = $link;', '图片上传失败回退仍把本地占位图错误拼接到外部代理。'),
+    array('inc/api.php', "get_template_directory_uri() . '/images/avatar.jpeg'", '图片上传鉴权失败回退图仍未使用主题本地资源。'),
+    array('js/sakura-app.js', "mashiro_option.template_url + '/images/avatar.jpeg'", '前端图片错误回退仍未使用主题本地资源。'),
     array('functions.php', "check_ajax_referer('sakura-dismiss-scheme-tip')", '配色提示关闭动作缺少 nonce 校验。'),
     array('inc/css/optionsframework.css', '#optionsframework-wrap .nav-tab', '主题设置页标签样式未收紧作用域。'),
     array('inc/css/optionsframework.css', ':focus-visible', '主题设置页缺少键盘焦点反馈。'),
@@ -155,6 +170,43 @@ foreach ($sourceChecks as $check) {
     }
 }
 
+if (function_exists('sakura_core_resource_url')) {
+    $frameworkFilter = static function ($value) {
+        return array('id' => 'sakura');
+    };
+    $localDefaultsFilter = static function ($value) {
+        return array();
+    };
+    $remoteOptionsFilter = static function ($value) {
+        return array(
+            'jsdelivr_cdn_test' => '0',
+            'app_no_jsdelivr_cdn' => '0',
+        );
+    };
+
+    add_filter('pre_option_optionsframework', $frameworkFilter);
+    add_filter('pre_option_sakura', $localDefaultsFilter);
+    $localDefaultUrl = sakura_core_resource_url('cdn/js/lib.js', 'jsdelivr_cdn_test');
+    remove_filter('pre_option_sakura', $localDefaultsFilter);
+    add_filter('pre_option_sakura', $remoteOptionsFilter);
+    $remoteLibraryUrl = sakura_core_resource_url('cdn/js/lib.js', 'jsdelivr_cdn_test');
+    $remoteThemeUrl = sakura_core_resource_url('style.css', 'app_no_jsdelivr_cdn');
+    remove_filter('pre_option_sakura', $remoteOptionsFilter);
+    remove_filter('pre_option_optionsframework', $frameworkFilter);
+
+    $remotePrefix = 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@' . (defined('SAKURA_REMOTE_RESOURCE_TAG') ? SAKURA_REMOTE_RESOURCE_TAG : '') . '/';
+
+    if (strpos($localDefaultUrl, '/wp-content/themes/sakura/cdn/js/lib.js') === false) {
+        $errors[] = '缺失旧设置值时核心资源没有回退到主题本地文件。';
+    }
+    if (strpos($remoteLibraryUrl, $remotePrefix . 'cdn/js/lib.js') !== 0) {
+        $errors[] = '旧设置值 0 没有解析到固定版本的 ADDGM 远程前端库。';
+    }
+    if (strpos($remoteThemeUrl, $remotePrefix . 'style.css') !== 0) {
+        $errors[] = '旧设置值 0 没有解析到固定版本的 ADDGM 主题 CSS。';
+    }
+}
+
 // 旧的动态配色端点必须彻底移除：它无鉴权且直接回显查询参数，构成反射型 CSS 注入。
 if (file_exists(get_template_directory() . '/inc/dash-scheme.php')) {
     $errors[] = '旧后台配色端点 inc/dash-scheme.php 仍存在。';
@@ -165,6 +217,11 @@ if (!file_exists(get_template_directory() . '/images/Custom.jpg')) {
 
 // 以下片段一旦重新出现即视为回归。
 $absentChecks = array(
+    array('functions.php', 'cdn.jsdelivr.net/gh/mashirozx/Sakura@', '核心资源仍指向旧上游维护版 URL。'),
+    array('inc/swicher.php', 'cdn.jsdelivr.net/gh/mashirozx/Sakura@', '动态 lib.css 仍指向旧上游维护版 URL。'),
+    array('functions.php', "'/cdn/js/lib.min.js'", '核心前端库仍请求不存在的 lib.min.js。'),
+    array('functions.php', 'style.min.css', '核心主题样式仍请求不存在的 style.min.css。'),
+    array('functions.php', 'js/sakura-app.min.js', '核心主题脚本仍请求不存在的 sakura-app.min.js。'),
     array('functions.php', 'dash-scheme.php?', '后台配色仍通过查询字符串传入动态样式端点。'),
     array('functions.php', 'urlencode($rules)', '后台配色仍把自定义 CSS 拼入资源 URL。'),
     array('inc/css/optionsframework.css', "\nbody {", '主题设置页仍覆盖全局 body 样式。'),
