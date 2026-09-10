@@ -98,12 +98,19 @@ $sourceChecks = array(
     array('functions.php', "'styleSheetId' => 'sakura-admin-color-scheme-preview-css'", '个人资料页预览未标识静态后台配色样式表。'),
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
     array('functions.php', 'function sakura_core_resource_url', '核心资源没有统一的本地/远程 URL 解析函数。'),
+    array('functions.php', 'function sakura_theme_asset_url', '主题内置资源没有统一的本地 URL 解析函数。'),
     array('functions.php', 'SAKURA_REMOTE_RESOURCE_TAG', '远程核心资源没有固定的已发布标签。'),
     array('functions.php', 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@', '远程核心资源没有指向 ADDGM/sakura。'),
     array('functions.php', '$value = akina_option($option_key, \'1\');', '前端资源统一解析器缺少本地优先的缺省值。'),
     array('functions.php', 'return !($value === false || $value === 0 || \'0\' === (string) $value);', '前端资源统一解析器未兼容旧设置值 0。'),
     array('functions.php', "'/cdn/js/src/08.lazyload.min.js'", '后台 lazyload 仍未使用主题内置脚本。'),
+    array('functions.php', "images/loaders/trans.ajax-spinner-preloader.svg", '评论和头像加载占位图未使用主题内置资源。'),
+    array('functions.php', "images/level/level_0.svg", '评论等级图标未使用主题内置资源。'),
     array('inc/swicher.php', "sakura_core_resource_url('cdn/css/lib.css', 'jsdelivr_cdn_test', true)", '前端动态 lib.css 地址没有复用本地优先资源解析器。'),
+    array('inc/theme_plus.php', "images/loaders/orange.progress-bar-stripe-loader.svg", '页面头图加载占位图未使用主题内置资源。'),
+    array('js/sakura-app.js', 'mashiro_option.template_url + "/cdn/js/src/16.hls.js"', 'HLS 脚本仍未使用主题内置副本。'),
+    array('style.css', 'background-image: url(images/comment-bg.png)', '评论框背景图未使用主题内置资源。'),
+    array('footer.php', "images/wordpress-rotating-ball-o.svg", '页脚预加载图未使用主题内置资源。'),
     array('options.php', "'id' => 'jsdelivr_cdn_test',\n        'std' => '1'", '前端库设置的新安装默认值不是本地优先。'),
     array('options.php', "'id' => 'app_no_jsdelivr_cdn',\n        'std' => '1'", '主题 CSS/JavaScript 设置的新安装默认值不是本地优先。'),
     array('options.php', "'image' => get_template_directory_uri() . '/images/Custom.jpg'", '前台背景默认值仍未使用主题本地资源。'),
@@ -215,6 +222,36 @@ if (!file_exists(get_template_directory() . '/images/Custom.jpg')) {
     $errors[] = 'Custom 默认后台背景 images/Custom.jpg 未随主题发布。';
 }
 
+$bundledAssets = array(
+    'images/comment-bg.png',
+    'images/disqus-preloader.svg',
+    'images/wordpress-rotating-ball-o.svg',
+    'images/none.png',
+    'images/loaders/trans.ajax-spinner-preloader.svg',
+    'images/loaders/orange.progress-bar-stripe-loader.svg',
+    'cdn/js/src/16.hls.js',
+);
+for ($level = 0; $level <= 6; $level++) {
+    $bundledAssets[] = 'images/level/level_' . $level . '.svg';
+}
+foreach ($bundledAssets as $asset) {
+    if (!file_exists(get_template_directory() . '/' . $asset)) {
+        $errors[] = "主题内置资源缺失：{$asset}";
+    }
+}
+
+if (function_exists('sakura_dash_scheme_legacy_custom_css') && function_exists('sakura_dash_scheme_localize_urls')) {
+    $legacyHost = 'view.' . 'moezx.' . 'cc';
+    $legacyCss = sakura_dash_scheme_legacy_custom_css();
+    $localizedLegacyCss = sakura_dash_scheme_localize_urls($legacyCss);
+    if (strpos($legacyCss, 'https://' . $legacyHost . '/') === false) {
+        $errors[] = '旧版 Custom CSS 兼容样本未保留历史地址识别能力。';
+    }
+    if (strpos($localizedLegacyCss, '/images/Custom.jpg') === false || strpos($localizedLegacyCss, 'https://' . $legacyHost . '/') !== false) {
+        $errors[] = '旧版 Custom CSS 未正确改写为本地 Custom.jpg。';
+    }
+}
+
 // 以下片段一旦重新出现即视为回归。
 $absentChecks = array(
     array('functions.php', 'cdn.jsdelivr.net/gh/mashirozx/Sakura@', '核心资源仍指向旧上游维护版 URL。'),
@@ -230,6 +267,16 @@ $absentChecks = array(
     array('options.php', 'windows10-2019-4-21-i3.jpg', '后台配色默认值仍引用已失效的外部背景图。'),
     array('options.php', 'example.com/your-background.jpg', 'Custom 默认 CSS 仍是外部图片注释示例。'),
     array('options.php', 'Other custom panel styles(CSS)', 'Custom 附加 CSS 设置仍使用旧名称。'),
+    array('functions.php', 'cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/', '评论等级图标仍指向外部图床。'),
+    array('functions.php', 'cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg', '评论头像加载占位图仍指向外部图床。'),
+    array('inc/theme_plus.php', 'cdn.jsdelivr.net/gh/moezx/cdn@3.0.1/img/svg/loader/orange.progress-bar-stripe-loader.svg', '页面头图加载占位图仍指向外部图床。'),
+    array('inc/theme_plus.php', 'cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/none.png', '未登录头像仍指向外部图床。'),
+    array('js/sakura-app.js', 'cdn.jsdelivr.net/gh/mashirozx/Sakura@3.3.3/cdn/js/src/16.hls.js', 'HLS 脚本仍指向旧上游仓库。'),
+    array('style.css', 'https://view.moezx.cc/images/2018/03/24/comment-bg.png', '评论框背景图仍指向失效图床。'),
+    array('style.css', 'cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/disqus-preloader.svg', '评论预加载图仍指向外部图床。'),
+    array('style.css', 'cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/wordpress-rotating-ball-o.svg', '分页加载图仍指向外部图床。'),
+    array('footer.php', 'cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/wordpress-rotating-ball-o.svg', '页脚预加载图仍指向外部图床。'),
+    array('footer.php', 'cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/disqus-preloader.svg', '页脚评论预加载图仍指向外部图床。'),
     array('functions.php', 'window.onload', '后台通知脚本仍覆盖全局 window.onload。'),
     array('js/admin-color-scheme-preview.js', 'innerHTML', '后台配色预览脚本仍使用不安全的 innerHTML。'),
     array('inc/css/optionsframework.css', '#FBFBFB', '主题设置页仍使用旧版面板背景色。'),

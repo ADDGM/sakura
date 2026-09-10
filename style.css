@@ -2638,7 +2638,7 @@ h1.page-title.mb- {
   height: 40px;
   text-align: center;
   line-height: 45px;
-  background-image: url(https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/disqus-preloader.svg);
+  background-image: url(images/disqus-preloader.svg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: auto 100%;
@@ -3562,7 +3562,7 @@ a.page-numbers {
 }
 
 .comment-respond textarea {
-  background-image: url(https://view.moezx.cc/images/2018/03/24/comment-bg.png);
+  background-image: url(images/comment-bg.png);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: right;
@@ -5212,7 +5212,7 @@ i.iconfont.down {
 
 #pagination .loading,
 #bangumi-pagination .loading {
-  background: url(https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/wordpress-rotating-ball-o.svg);
+  background: url(images/wordpress-rotating-ball-o.svg);
   background-position: center;
   background-repeat: no-repeat;
   color: #555;

@@ -29,6 +29,9 @@ git clone https://github.com/ADDGM/sakura.git
 ### Configuration
 Config your theme at `Mune-Appearance-Sakura Options`. Core CSS, JavaScript, and frontend libraries use the bundled local files by default. The legacy CDN checkboxes remain compatible: keep them enabled for local resources, and disable them only when you explicitly need the fixed ADDGM jsDelivr copies. Please use a child theme for custom changes.
 
+### Beta.7 resource policy
+Core styles, scripts, comment backgrounds, loading placeholders, level icons, footer preload images, and the HLS script are bundled with the theme. Google Fonts, Ali icon CSS, cursors, and social icons remain optional enhancements with system-style fallbacks. User-configured avatars, cover images, background URLs, upload services, and music APIs are not mirrored by the theme. The auditable inventory and hashes are tracked in the Beta.7 development resource inventory.
+
 ### Update
 ```bash
 cd /wp-content/themes/Sakura

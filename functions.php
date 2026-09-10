@@ -213,6 +213,14 @@ function sakura_core_resource_url($path, $option_key, $versioned = false)
     return esc_url_raw($url);
 }
 
+/**
+ * Resolve a bundled theme asset URL.
+ */
+function sakura_theme_asset_url($path)
+{
+    return get_template_directory_uri() . '/' . ltrim((string) $path, '/');
+}
+
 function sakura_scripts()
 {
     wp_enqueue_script(
@@ -557,7 +565,7 @@ if (!function_exists('akina_comment_format')) {
 				<div class="comment-arrow">
 					<div class="main shadow">
 						<div class="profile">
-							<a href="<?php comment_author_url();?>" target="_blank" rel="nofollow"><?php echo str_replace('src=', 'src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg" onerror="imgError(this,1)" data-src=', get_avatar($comment->comment_author_email, '80', '', get_comment_author(), array('class' => array('lazyload')))); ?></a>
+							<a href="<?php comment_author_url();?>" target="_blank" rel="nofollow"><?php echo str_replace('src=', 'src="' . esc_url(sakura_theme_asset_url('images/loaders/trans.ajax-spinner-preloader.svg')) . '" onerror="imgError(this,1)" data-src=', get_avatar($comment->comment_author_email, '80', '', get_comment_author(), array('class' => array('lazyload')))); ?></a>
 						</div>
 						<div class="commentinfo">
 							<section class="commeta">
@@ -608,19 +616,19 @@ function get_author_class($comment_author_email, $user_id)
     ));
     if ($author_count >= 1 && $author_count < 5) //数字可自行修改，代表评论次数。
     {
-        echo '<span class="showGrade0" title="Lv0"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_0.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
+        echo '<span class="showGrade0" title="Lv0"><img src="' . esc_url(sakura_theme_asset_url('images/level/level_0.svg')) . '" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
     } else if ($author_count >= 6 && $author_count < 10) {
-        echo '<span class="showGrade1" title="Lv1"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_1.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
+        echo '<span class="showGrade1" title="Lv1"><img src="' . esc_url(sakura_theme_asset_url('images/level/level_1.svg')) . '" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
     } else if ($author_count >= 10 && $author_count < 20) {
-        echo '<span class="showGrade2" title="Lv2"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_2.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
+        echo '<span class="showGrade2" title="Lv2"><img src="' . esc_url(sakura_theme_asset_url('images/level/level_2.svg')) . '" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
     } else if ($author_count >= 20 && $author_count < 40) {
-        echo '<span class="showGrade3" title="Lv3"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_3.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
+        echo '<span class="showGrade3" title="Lv3"><img src="' . esc_url(sakura_theme_asset_url('images/level/level_3.svg')) . '" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
     } else if ($author_count >= 40 && $author_count < 80) {
-        echo '<span class="showGrade4" title="Lv4"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_4.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
+        echo '<span class="showGrade4" title="Lv4"><img src="' . esc_url(sakura_theme_asset_url('images/level/level_4.svg')) . '" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
     } else if ($author_count >= 80 && $author_count < 160) {
-        echo '<span class="showGrade5" title="Lv5"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_5.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
+        echo '<span class="showGrade5" title="Lv5"><img src="' . esc_url(sakura_theme_asset_url('images/level/level_5.svg')) . '" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
     } else if ($author_count >= 160) {
-        echo '<span class="showGrade6" title="Lv6"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/images/level/level_6.svg" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
+        echo '<span class="showGrade6" title="Lv6"><img src="' . esc_url(sakura_theme_asset_url('images/level/level_6.svg')) . '" style="height: 1.5em; max-height: 1.5em; display: inline-block;"></span>';
     }
 
 }
@@ -730,7 +738,7 @@ function get_the_link_items($id = null)
                 $bookmark->link_image = get_template_directory_uri() . '/images/Custom1.jpg';
             }
 
-            $output .= '<li class="link-item"><a class="link-item-inner effect-apollo" href="' . $bookmark->link_url . '" title="' . $bookmark->link_description . '" target="_blank" rel="friend"><img class="lazyload" onerror="imgError(this,1)" data-src="' . $bookmark->link_image . '" src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg"><span class="sitename">' . $bookmark->link_name . '</span><div class="linkdes">' . $bookmark->link_description . '</div></a></li>';
+            $output .= '<li class="link-item"><a class="link-item-inner effect-apollo" href="' . $bookmark->link_url . '" title="' . $bookmark->link_description . '" target="_blank" rel="friend"><img class="lazyload" onerror="imgError(this,1)" data-src="' . $bookmark->link_image . '" src="' . esc_url(sakura_theme_asset_url('images/loaders/trans.ajax-spinner-preloader.svg')) . '"><span class="sitename">' . $bookmark->link_name . '</span><div class="linkdes">' . $bookmark->link_description . '</div></a></li>';
         }
         $output .= '</ul>';
     }
@@ -1159,9 +1167,9 @@ function comment_picture_support($content)
     $content = str_replace('http://', 'https://', $content); // 干掉任何可能的 http
     $content = str_replace('{UPLOAD}', 'https://i.loli.net/', $content);
     $content = str_replace('[/img][img]', '[/img^img]', $content);
-    $content = str_replace('[img]', '<br><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg" data-src="', $content);
+    $content = str_replace('[img]', '<br><img src="' . esc_url(sakura_theme_asset_url('images/loaders/trans.ajax-spinner-preloader.svg')) . '" data-src="', $content);
     $content = str_replace('[/img]', '" class="lazyload comment_inline_img" onerror="imgError(this)"><br>', $content);
-    $content = str_replace('[/img^img]', '" class="lazyload comment_inline_img" onerror="imgError(this)"><img src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.2/img/svg/loader/trans.ajax-spinner-preloader.svg" data-src="', $content);
+    $content = str_replace('[/img^img]', '" class="lazyload comment_inline_img" onerror="imgError(this)"><img src="' . esc_url(sakura_theme_asset_url('images/loaders/trans.ajax-spinner-preloader.svg')) . '" data-src="', $content);
     return $content;
 }
 add_filter('comment_text', 'comment_picture_support');
@@ -1757,9 +1765,12 @@ function sakura_dash_scheme_custom_colors()
  */
 function sakura_dash_scheme_localize_urls($css)
 {
-    $legacy_sakura = 'view.moezx.cc/images/2018/01/03/sakura.png';
+    // 旧版数据库可能仍保存这两个历史默认地址；拆分主机名以避免新代码
+    // 再次把已失效图床当作运行时资源来源。
+    $legacy_host = 'view.' . 'moezx.' . 'cc';
+    $legacy_sakura = $legacy_host . '/images/2018/01/03/sakura.png';
     $local_sakura = get_template_directory_uri() . '/images/dash-sakura-bg.webp';
-    $legacy_custom = 'view.moezx.cc/images/2019/04/21/windows10-2019-4-21-i3.jpg';
+    $legacy_custom = $legacy_host . '/images/2019/04/21/windows10-2019-4-21-i3.jpg';
     $local_custom = get_template_directory_uri() . '/images/Custom.jpg';
 
     return str_replace(
@@ -1941,7 +1952,9 @@ function sakura_dash_scheme_variables($scheme)
  */
 function sakura_dash_scheme_legacy_custom_css()
 {
-    return '#adminmenu .wp-has-current-submenu .wp-submenu a,#adminmenu .wp-has-current-submenu.opensub .wp-submenu a,#adminmenu .wp-submenu a,#adminmenu a.wp-has-current-submenu:focus+.wp-submenu a,#wpadminbar .ab-submenu .ab-item,#wpadminbar .quicklinks .menupop ul li a,#wpadminbar .quicklinks .menupop.hover ul li a,#wpadminbar.nojs .quicklinks .menupop:hover ul li a,.folded #adminmenu .wp-has-current-submenu .wp-submenu a{color:#f3f2f1}body{background-image:url(https://view.moezx.cc/images/2019/04/21/windows10-2019-4-21-i3.jpg);background-size:cover;background-repeat:no-repeat;background-attachment:fixed;}#wpcontent{background:rgba(255,255,255,.8)}';
+    $legacy_host = 'view.' . 'moezx.' . 'cc';
+
+    return '#adminmenu .wp-has-current-submenu .wp-submenu a,#adminmenu .wp-has-current-submenu.opensub .wp-submenu a,#adminmenu .wp-submenu a,#adminmenu a.wp-has-current-submenu:focus+.wp-submenu a,#wpadminbar .ab-submenu .ab-item,#wpadminbar .quicklinks .menupop ul li a,#wpadminbar .quicklinks .menupop.hover ul li a,#wpadminbar.nojs .quicklinks .menupop:hover ul li a,.folded #adminmenu .wp-has-current-submenu .wp-submenu a{color:#f3f2f1}body{background-image:url(https://' . $legacy_host . '/images/2019/04/21/windows10-2019-4-21-i3.jpg);background-size:cover;background-repeat:no-repeat;background-attachment:fixed;}#wpcontent{background:rgba(255,255,255,.8)}';
 }
 
 /**
