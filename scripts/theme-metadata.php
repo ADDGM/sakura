@@ -138,7 +138,9 @@ function sakura_theme_metadata_self_test(): int
         fwrite(STDERR, '主题元数据自测失败：' . $exception->getMessage() . "\n");
         return 1;
     } finally {
-        @unlink($file);
+        if (is_file($file)) {
+            unlink($file); // nosemgrep: php.lang.security.unlink-use.unlink-use
+        }
     }
 
     echo "主题元数据自测通过。\n";

@@ -708,14 +708,22 @@ function specs_zan()
         $specs_raters = get_post_meta($id, 'specs_zan', true);
         $expire = time() + 99999999;
         $host = sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'] ?? ''));
-        $domain = ($host !== '' && $host !== 'localhost') ? $host : false; // make cookies work with localhost
-        setcookie('specs_zan_' . $id, $id, $expire, '/', $domain, false);
+        $host = preg_replace('/:\d+$/', '', $host);
+        $domain = ($host !== '' && $host !== 'localhost') ? $host : '';
+        setcookie('specs_zan_' . $id, (string) $id, array(
+            'expires' => $expire,
+            'path' => '/',
+            'domain' => $domain,
+            'secure' => is_ssl(),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ));
         if (!$specs_raters || !is_numeric($specs_raters)) {
             update_post_meta($id, 'specs_zan', 1);
         } else {
             update_post_meta($id, 'specs_zan', ($specs_raters + 1));
         }
-        echo get_post_meta($id, 'specs_zan', true);
+        echo esc_html((string) absint(get_post_meta($id, 'specs_zan', true)));
     }
     die;
 }

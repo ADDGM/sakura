@@ -30,21 +30,14 @@ function sakura_release_argument(string $name, string $default = ''): string
     return $default;
 }
 
-function sakura_release_git_command(string $arguments): string
+function sakura_release_git_command(array $arguments): string
 {
-    $lines = array();
-    $exitCode = 0;
-    exec('git ' . $arguments . ' 2>&1', $lines, $exitCode);
-    $output = implode("\n", $lines);
-    if ($exitCode !== 0) {
-        throw new RuntimeException('Git 命令执行失败：' . ($output !== '' ? $output : $arguments));
-    }
-    return $output;
+    return sakura_run_git_command(array_merge(array('git'), $arguments));
 }
 
 function sakura_release_commits(string $range): array
 {
-    $output = sakura_release_git_command('log --no-merges --format=%H%x09%s%x09%an ' . escapeshellarg($range));
+    $output = sakura_release_git_command(array('log', '--no-merges', '--format=%H%x09%s%x09%an', sakura_validate_git_range($range)));
 
     $commits = array();
     foreach (sakura_split_git_lines($output) as $line) {
@@ -68,7 +61,7 @@ function sakura_release_commits(string $range): array
 
 function sakura_release_files(string $previous, string $tag): array
 {
-    $output = sakura_release_git_command('diff --name-only ' . escapeshellarg($previous) . ' ' . escapeshellarg($tag));
+    $output = sakura_release_git_command(array('diff', '--name-only', sakura_validate_git_ref($previous), sakura_validate_git_ref($tag)));
     return array_values(array_filter(sakura_split_git_lines($output)));
 }
 

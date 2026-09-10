@@ -1,0 +1,5 @@
+# Vendored minified JavaScript bundles; upgrade separately from their upstream sources.
+cdn/js/src/01.jquery.min.js
+cdn/js/src/07.APlayer.min.js
+cdn/js/src/16.hls.js
+inc/js/iris.min.js

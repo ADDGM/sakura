@@ -30,9 +30,14 @@ class QQ
         global $sakura_privkey;
         if (isset($encrypted)) {
             $iv = str_repeat($sakura_privkey, 2);
-            $encrypted = base64_decode(urldecode($encrypted));
-            $qq_number = openssl_decrypt($encrypted, 'aes-128-cbc', $sakura_privkey, 0, $iv);
-            preg_match('/^\d{3,}$/', $qq_number, $matches);
+            $encrypted = base64_decode(urldecode($encrypted), true);
+            if ($encrypted === false) {
+                return '';
+            }
+            $qq_number = openssl_decrypt($encrypted, 'aes-128-cbc', $sakura_privkey, 0, $iv); // nosemgrep: php.lang.security.audit.openssl-decrypt-validate.openssl-decrypt-validate
+            if ($qq_number === false || !preg_match('/^\d{3,}$/', $qq_number, $matches)) {
+                return '';
+            }
             $imgurl = 'https://q2.qlogo.cn/headimg_dl?dst_uin=' . $matches[0] . '&spec=100';
             return $imgurl;
         }

@@ -376,6 +376,9 @@ function get_qq_avatar(WP_REST_Request $request) {
         return new WP_REST_Response(array('status' => 400, 'success' => false, 'message' => 'Bad Request'), 400);
     }
     $imgurl = QQ::get_qq_avatar($encrypted);
+    if ($imgurl === '') {
+        return new WP_REST_Response(array('status' => 400, 'success' => false, 'message' => 'Invalid QQ avatar token.'), 400);
+    }
     if (akina_option('qq_avatar_link') == 'type_2') {
         $imgdata = file_get_contents($imgurl);
         $response = new WP_REST_Response();

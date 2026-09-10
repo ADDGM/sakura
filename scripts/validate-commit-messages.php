@@ -25,6 +25,50 @@ function sakura_split_git_lines(string $output): array
     return preg_split('/\r\n|\r|\n/', trim($output)) ?: array();
 }
 
+function sakura_validate_git_ref(string $ref): string
+{
+    $ref = trim($ref);
+    if ($ref === '' || $ref[0] === '-' || !preg_match('/^[A-Za-z0-9][A-Za-z0-9._\/~^-]*$/', $ref)) {
+        throw new InvalidArgumentException('Git 引用格式无效：' . $ref);
+    }
+    return $ref;
+}
+
+function sakura_validate_git_range(string $range): string
+{
+    $parts = explode('..', trim($range), 2);
+    if (count($parts) !== 2) {
+        throw new InvalidArgumentException('Git 提交范围格式无效：' . $range);
+    }
+    return sakura_validate_git_ref($parts[0]) . '..' . sakura_validate_git_ref($parts[1]);
+}
+
+function sakura_run_git_command(array $arguments): string
+{
+    if (($arguments[0] ?? '') !== 'git') {
+        throw new InvalidArgumentException('只允许执行 Git 命令。');
+    }
+    $descriptors = array(
+        1 => array('pipe', 'w'),
+        2 => array('pipe', 'w'),
+    );
+    $process = proc_open($arguments, $descriptors, $pipes); // nosemgrep: php.lang.security.exec-use.exec-use
+    if (!is_resource($process)) {
+        throw new RuntimeException('无法启动 Git 命令。');
+    }
+
+    $output = stream_get_contents($pipes[1]);
+    $error = stream_get_contents($pipes[2]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    $exitCode = proc_close($process);
+    if ($exitCode !== 0) {
+        $message = trim($error !== '' ? $error : $output);
+        throw new RuntimeException('Git 命令执行失败：' . $message);
+    }
+    return $output;
+}
+
 function sakura_parse_commit_title(string $title): ?array
 {
     $pattern = '/^(新增|修复|兼容|优化|重构|文档|构建|测试|发布)(?:\(([^)]+)\))?[：:]\s*(.+)$/u';
@@ -46,11 +90,8 @@ function sakura_parse_commit_title(string $title): ?array
 
 function sakura_commit_lines(string $range): array
 {
-    $command = 'git log --no-merges --format=%H%x09%s ' . escapeshellarg($range);
-    $output = shell_exec($command);
-    if ($output === null) {
-        throw new RuntimeException('无法读取 Git 提交记录：' . $range);
-    }
+    $range = sakura_validate_git_range($range);
+    $output = sakura_run_git_command(array('git', 'log', '--no-merges', '--format=%H%x09%s', $range));
 
     $commits = array();
     foreach (sakura_split_git_lines($output) as $line) {

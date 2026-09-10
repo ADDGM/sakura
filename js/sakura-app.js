@@ -154,7 +154,11 @@ function code_highlight_style() {
         $('pre:eq(' + i + ') code').attr('data-rel', lang.toUpperCase());
     }
     $('pre code').each(function (i, block) {
-        hljs.highlightBlock(block);
+        if (typeof hljs.highlightElement === 'function') {
+            hljs.highlightElement(block);
+        } else {
+            hljs.highlightBlock(block);
+        }
     });
     for (var i = 0; i < $('pre').length; i++) {
         gen_top_bar(i);
@@ -837,8 +841,38 @@ function add_copyright() {
 
     function setClipboardText(event) {
         event.preventDefault();
-        var htmlData = "# 商业转载请联系作者获得授权，非商业转载请注明出处。<br>" + "# For commercial use, please contact the author for authorization. For non-commercial use, please indicate the source.<br>" + "# 协议(License)：署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)<br>" + "# 作者(Author)：" + mashiro_option.author_name + "<br>" + "# 链接(URL)：" + window.location.href + "<br>" + "# 来源(Source)：" + mashiro_option.site_name + "<br><br>" + window.getSelection().toString().replace(/\r\n/g, "<br>");;
-        var textData = "# 商业转载请联系作者获得授权，非商业转载请注明出处。\n" + "# For commercial use, please contact the author for authorization. For non-commercial use, please indicate the source.\n" + "# 协议(License)：署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)\n" + "# 作者(Author)：" + mashiro_option.author_name + "\n" + "# 链接(URL)：" + window.location.href + "\n" + "# 来源(Source)：" + mashiro_option.site_name + "\n\n" + window.getSelection().toString().replace(/\r\n/g, "\n");
+        var selectedText = window.getSelection().toString();
+        var htmlContainer = document.createElement("div");
+        var appendText = function (value) {
+            htmlContainer.appendChild(document.createTextNode(String(value == null ? '' : value)));
+        };
+        var appendBreak = function () {
+            htmlContainer.appendChild(document.createElement("br"));
+        };
+        appendText("# 商业转载请联系作者获得授权，非商业转载请注明出处。");
+        appendBreak();
+        appendText("# For commercial use, please contact the author for authorization. For non-commercial use, please indicate the source.");
+        appendBreak();
+        appendText("# 协议(License)：署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)");
+        appendBreak();
+        appendText("# 作者(Author)：");
+        appendText(mashiro_option.author_name);
+        appendBreak();
+        appendText("# 链接(URL)：");
+        appendText(window.location.href);
+        appendBreak();
+        appendText("# 来源(Source)：");
+        appendText(mashiro_option.site_name);
+        appendBreak();
+        appendBreak();
+        selectedText.split(/\r?\n/).forEach(function (line, index) {
+            if (index > 0) {
+                appendBreak();
+            }
+            appendText(line);
+        });
+        var htmlData = htmlContainer.innerHTML;
+        var textData = "# 商业转载请联系作者获得授权，非商业转载请注明出处。\n" + "# For commercial use, please contact the author for authorization. For non-commercial use, please indicate the source.\n" + "# 协议(License)：署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)\n" + "# 作者(Author)：" + mashiro_option.author_name + "\n" + "# 链接(URL)：" + window.location.href + "\n" + "# 来源(Source)：" + mashiro_option.site_name + "\n\n" + selectedText.replace(/\r?\n/g, "\n");
         if (event.clipboardData) {
             event.clipboardData.setData("text/html", htmlData);
             event.clipboardData.setData("text/plain", textData);
@@ -1558,13 +1592,20 @@ var home = location.href,
                     }
 
                     function Cx(arr, q) {
-                        q = q.replace(q, "^(?=.*?" + q + ").+$").replace(/\s/g, ")(?=.*?");
-                        i = arr.filter(
-                            v => Object.values(v).some(
-                                v => new RegExp(q + '').test(v)
-                            )
-                        );
-                        return i;
+                        var terms = String(q || '').trim().split(/\s+/).filter(function (term) {
+                            return term !== '';
+                        });
+                        if (!terms.length) {
+                            return arr;
+                        }
+                        return arr.filter(function (item) {
+                            return Object.values(item).some(function (value) {
+                                var text = String(value);
+                                return terms.every(function (term) {
+                                    return text.indexOf(term) !== -1;
+                                });
+                            });
+                        });
                     }
 
                     function div_href() {
@@ -2003,7 +2044,7 @@ $(function () {
                 nonce: Poi.nonce
             };
             $.post(Poi.ajaxurl, ajax_data, function (data) {
-                $(rateHolder).html(data);
+                $(rateHolder).text(data);
             });
             return false;
         }
