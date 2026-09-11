@@ -186,6 +186,14 @@ function sakura_core_resource_is_local($option_key)
 }
 
 /**
+ * Return the cache-busting version shared by frontend theme assets.
+ */
+function sakura_frontend_cache_version()
+{
+    return SAKURA_VERSION . (string) akina_option('cookie_version', '');
+}
+
+/**
  * Resolve a core resource URL while preserving the legacy local/remote switches.
  */
 function sakura_core_resource_url($path, $option_key, $versioned = false)
@@ -205,7 +213,7 @@ function sakura_core_resource_url($path, $option_key, $versioned = false)
     if ($versioned) {
         $url = add_query_arg(
             'ver',
-            SAKURA_VERSION . (string) akina_option('cookie_version', ''),
+            sakura_frontend_cache_version(),
             $url
         );
     }
@@ -223,29 +231,31 @@ function sakura_theme_asset_url($path)
 
 function sakura_scripts()
 {
+    $cache_version = sakura_frontend_cache_version();
+
     wp_enqueue_script(
         'js_lib',
         sakura_core_resource_url('cdn/js/lib.js', 'jsdelivr_cdn_test'),
         array(),
-        SAKURA_VERSION . akina_option('cookie_version', ''),
+        $cache_version,
         true
     );
     $app_dependencies = array();
     if (akina_option('aplayer_server') != 'off') {
-        wp_enqueue_script('aplayer_localization', get_template_directory_uri() . '/js/aplayer-localization.js', array('js_lib'), SAKURA_VERSION, true);
+        wp_enqueue_script('aplayer_localization', get_template_directory_uri() . '/js/aplayer-localization.js', array('js_lib'), $cache_version, true);
         $app_dependencies[] = 'aplayer_localization';
     }
     wp_enqueue_style(
         'saukra_css',
         sakura_core_resource_url('style.css', 'app_no_jsdelivr_cdn'),
         array(),
-        SAKURA_VERSION
+        $cache_version
     );
     wp_enqueue_script(
         'app',
         sakura_core_resource_url('js/sakura-app.js', 'app_no_jsdelivr_cdn'),
         $app_dependencies,
-        SAKURA_VERSION,
+        $cache_version,
         true
     );
     //wp_enqueue_script('github_card', 'https://cdn.jsdelivr.net/github-cards/latest/widget.js', array(), SAKURA_VERSION, true);

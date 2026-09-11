@@ -58,9 +58,9 @@ mashiro_option.clipboardCopyright = true;
 <?php } ?>
 
 <?php if(akina_option('entry_content_theme') == "sakura"){ ?>
-mashiro_option.entry_content_theme_src = "<?php echo get_template_directory_uri() ?>/cdn/theme/sakura.css?<?php echo SAKURA_VERSION.akina_option('cookie_version', ''); ?>";
+mashiro_option.entry_content_theme_src = "<?php echo get_template_directory_uri() ?>/cdn/theme/sakura.css?<?php echo esc_js(sakura_frontend_cache_version()); ?>";
 <?php }elseif(akina_option('entry_content_theme') == "github") {?>
-mashiro_option.entry_content_theme_src = "<?php echo get_template_directory_uri() ?>/cdn/theme/github.css?<?php echo SAKURA_VERSION.akina_option('cookie_version', ''); ?>";
+mashiro_option.entry_content_theme_src = "<?php echo get_template_directory_uri() ?>/cdn/theme/github.css?<?php echo esc_js(sakura_frontend_cache_version()); ?>";
 <?php } ?>
 mashiro_option.entry_content_theme = "<?php echo akina_option('entry_content_theme'); ?>";
 

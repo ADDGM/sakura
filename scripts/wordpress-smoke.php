@@ -41,6 +41,7 @@ $sourceChecks = array(
     array('inc/api.php', 'public, max-age=', 'Meting 未提供公开播放器缓存头。'),
     array('inc/swicher.php', 'meting_api', '前端播放器未注入公开签名令牌 URL。'),
     array('functions.php', 'sakura_set_frontend_cache_headers', '前台页面未按登录状态隔离缓存。'),
+    array('functions.php', 'function sakura_frontend_cache_version', '前端资源未使用统一的缓存版本函数。'),
     array('functions.php', 'aplayer_localization', '前端未加载 APlayer 中文提示兼容脚本。'),
     array('js/aplayer-localization.js', '音频加载失败', 'APlayer 音频错误提示未完成中文化。'),
     array('js/aplayer-localization.js', '歌词加载失败', 'APlayer 歌词错误提示未完成中文化。'),
@@ -107,6 +108,7 @@ $sourceChecks = array(
     array('functions.php', "images/loaders/trans.ajax-spinner-preloader.svg", '评论和头像加载占位图未使用主题内置资源。'),
     array('functions.php', "images/level/level_0.svg", '评论等级图标未使用主题内置资源。'),
     array('inc/swicher.php', "sakura_core_resource_url('cdn/css/lib.css', 'jsdelivr_cdn_test', true)", '前端动态 lib.css 地址没有复用本地优先资源解析器。'),
+    array('inc/swicher.php', 'sakura_frontend_cache_version()', '文章代码主题 CSS 未复用统一的前端缓存版本。'),
     array('inc/theme_plus.php', "images/loaders/orange.progress-bar-stripe-loader.svg", '页面头图加载占位图未使用主题内置资源。'),
     array('js/sakura-app.js', 'mashiro_option.template_url + "/cdn/js/src/16.hls.js"', 'HLS 脚本仍未使用主题内置副本。'),
     array('style.css', 'background-image: url(images/comment-bg.png)', '评论框背景图未使用主题内置资源。'),
@@ -177,7 +179,7 @@ foreach ($sourceChecks as $check) {
     }
 }
 
-if (function_exists('sakura_core_resource_url')) {
+if (function_exists('sakura_core_resource_url') && function_exists('sakura_frontend_cache_version')) {
     $frameworkFilter = static function ($value) {
         return array('id' => 'sakura');
     };
@@ -211,6 +213,21 @@ if (function_exists('sakura_core_resource_url')) {
     }
     if (strpos($remoteThemeUrl, $remotePrefix . 'style.css') !== 0) {
         $errors[] = '旧设置值 0 没有解析到固定版本的 ADDGM 主题 CSS。';
+    }
+
+    $cacheOptionsFilter = static function () {
+        return array('cookie_version' => 'cache-check');
+    };
+    add_filter('pre_option_sakura', $cacheOptionsFilter);
+    $cacheVersion = sakura_frontend_cache_version();
+    $versionedLocalUrl = sakura_core_resource_url('style.css', 'app_no_jsdelivr_cdn', true);
+    remove_filter('pre_option_sakura', $cacheOptionsFilter);
+    $expectedCacheVersion = SAKURA_VERSION . 'cache-check';
+    if ($cacheVersion !== $expectedCacheVersion) {
+        $errors[] = '前端缓存版本函数没有合并 cookie_version。';
+    }
+    if (strpos($versionedLocalUrl, 'ver=' . rawurlencode($expectedCacheVersion)) === false) {
+        $errors[] = '本地核心资源 URL 没有附加统一的前端缓存版本。';
     }
 }
 
