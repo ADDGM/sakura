@@ -12,7 +12,7 @@ define('BUILD_VERSION', '3');
 
 // 远程模式只作为显式兼容选项；固定到已发布标签，避免跟随不存在的维护版版本号。
 if (!defined('SAKURA_REMOTE_RESOURCE_TAG')) {
-    define('SAKURA_REMOTE_RESOURCE_TAG', 'v3.5.0-beta.6');
+    define('SAKURA_REMOTE_RESOURCE_TAG', 'v3.5.0-beta.7');
 }
 
 if (!function_exists('akina_setup')):
