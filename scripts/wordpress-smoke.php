@@ -201,7 +201,6 @@ if (function_exists('sakura_core_resource_url') && function_exists('sakura_front
     $remoteLibraryUrl = sakura_core_resource_url('cdn/js/lib.js', 'jsdelivr_cdn_test');
     $remoteThemeUrl = sakura_core_resource_url('style.css', 'app_no_jsdelivr_cdn');
     remove_filter('pre_option_sakura', $remoteOptionsFilter);
-    remove_filter('pre_option_optionsframework', $frameworkFilter);
 
     $remotePrefix = 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@' . (defined('SAKURA_REMOTE_RESOURCE_TAG') ? SAKURA_REMOTE_RESOURCE_TAG : '') . '/';
 
@@ -229,6 +228,8 @@ if (function_exists('sakura_core_resource_url') && function_exists('sakura_front
     if (strpos($versionedLocalUrl, 'ver=' . rawurlencode($expectedCacheVersion)) === false) {
         $errors[] = '本地核心资源 URL 没有附加统一的前端缓存版本。';
     }
+
+    remove_filter('pre_option_optionsframework', $frameworkFilter);
 }
 
 // 旧的动态配色端点必须彻底移除：它无鉴权且直接回显查询参数，构成反射型 CSS 注入。
