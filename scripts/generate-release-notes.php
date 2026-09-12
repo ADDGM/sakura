@@ -120,6 +120,25 @@ function sakura_release_metadata(array $release, string $key, string $default = 
  */
 function sakura_release_version_notes(string $version): array
 {
+    if ($version === '3.5.0-rc.1') {
+        return array(
+            '本版本重点' => array(
+                '以 `v3.5.0-beta.7` 为稳定基线，进入发布候选阶段；继续使用主题包内本地核心资源，远程兼容模式固定使用已发布标签。',
+                '纳入 WordPress 7.0/7.1 与 PHP 8.0/8.1/8.2 兼容性、烟雾测试、工作流质量检查和 Release 包校验范围。',
+                'RC 版本用于最终安装、升级和关键页面回归，不新增与发布候选无关的主题功能。',
+            ),
+            '已知限制' => array(
+                'RC 仍是预发布版本，不建议直接用于生产站点；请先在测试环境完成主题设置、邮件、资源和前台页面回归。',
+                'Google Fonts、阿里图标、光标、社交图标及播放器增强仍属于可选远程资源，网络受限时可能退化，但不影响核心页面。',
+                '测试邮件显示“发送成功”只代表 `wp_mail()` 或邮件插件接受请求，不代表邮件已经最终送达。',
+            ),
+            '升级提示' => array(
+                '请从 GitHub Release 页面下载 `sakura-3.5.0-rc.1.zip` 并直接上传 WordPress；Actions Artifact 是外层资料包，需要先解压。',
+                '升级前请备份数据库、主题设置和 `wp-content/uploads`，并记录当前主题版本及资源开关。',
+            ),
+        );
+    }
+
     if ($version !== '3.5.0-beta.6') {
         return array();
     }
@@ -157,7 +176,13 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
     $workflowUrl = sakura_release_metadata($release, 'workflow_url', '');
     $runNumber = sakura_release_metadata($release, 'run_number', '');
     $sourceSha = sakura_release_metadata($release, 'source_sha', '');
-    $releaseType = $prerelease ? '测试版（Prerelease）' : '正式版';
+    if (!$prerelease) {
+        $releaseType = '正式版';
+    } elseif (strpos($version, '-rc.') !== false) {
+        $releaseType = '发布候选版（RC，Prerelease）';
+    } else {
+        $releaseType = '测试版（Beta，Prerelease）';
+    }
     $workflow = $workflowUrl !== ''
         ? '[#' . ($runNumber !== '' ? $runNumber : '查看运行') . '](' . $workflowUrl . ')'
         : '未提供';
@@ -315,6 +340,14 @@ function sakura_release_self_test(): int
         || strpos($betaSixNotes, '## 升级提示') === false
         || strpos($betaSixNotes, 'Actions Artifact') === false) {
         fwrite(STDERR, "Beta.6 Release 说明自测失败。\n");
+        return 1;
+    }
+    $rcNotes = sakura_render_release_notes('v3.5.0-rc.1', 'v3.5.0-beta.7', array(), array(), '', array('version' => '3.5.0-rc.1'), true);
+    if (strpos($rcNotes, '发布候选版（RC，Prerelease）') === false
+        || strpos($rcNotes, '进入发布候选阶段') === false
+        || strpos($rcNotes, '`sakura-3.5.0-rc.1.zip`') === false
+        || strpos($rcNotes, '## 已知限制') === false) {
+        fwrite(STDERR, "RC Release 说明自测失败。\n");
         return 1;
     }
     echo "Release 说明自测通过。\n";

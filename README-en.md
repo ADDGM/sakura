@@ -32,6 +32,9 @@ Config your theme at `Mune-Appearance-Sakura Options`. Core CSS, JavaScript, and
 ### Beta.7 resource policy
 Core styles, scripts, comment backgrounds, loading placeholders, level icons, footer preload images, and the HLS script are bundled with the theme. Google Fonts, Ali icon CSS, cursors, and social icons remain optional enhancements with system-style fallbacks. User-configured avatars, cover images, background URLs, upload services, and music APIs are not mirrored by the theme. The auditable inventory and hashes are tracked in the Beta.7 development resource inventory.
 
+### Release channels
+Release ZIPs use the version from their tag. `v3.5.0-beta.N` is a Beta prerelease, `v3.5.0-rc.N` is a Release Candidate prerelease, and `v3.5.0` is a stable release. Beta and RC packages are for test servers and final regression only; download the theme ZIP from the GitHub Release page for direct WordPress installation. Actions artifacts are outer bundles and must be extracted first.
+
 ### Update
 ```bash
 cd /wp-content/themes/Sakura

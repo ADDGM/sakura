@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing release tag, for example v3.5.0 or v3.5.0-beta.1'
+        description: 'Existing release tag, for example v3.5.0, v3.5.0-beta.1, or v3.5.0-rc.1'
         required: true
         type: string
       previous_tag:
@@ -51,17 +51,17 @@ jobs:
             TAG="$GITHUB_REF_NAME"
           fi
 
-          TAG_PATTERN='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-beta\.(0|[1-9][0-9]*))?$'
+          TAG_PATTERN='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(beta|rc)\.(0|[1-9][0-9]*))?$'
           if [[ ! "$TAG" =~ $TAG_PATTERN ]]; then
-            echo "发布标签必须使用 vX.Y.Z 或 vX.Y.Z-beta.N，且数字不能有前导零"
+            echo "发布标签必须使用 vX.Y.Z、vX.Y.Z-beta.N 或 vX.Y.Z-rc.N，且数字不能有前导零"
             exit 1
           fi
 
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
-          if [[ "$TAG" == *-beta.* ]]; then
+          if [[ "$TAG" == *-beta.* || "$TAG" == *-rc.* ]]; then
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
-            echo "label=测试版" >> "$GITHUB_OUTPUT"
+            echo "label=预发布版" >> "$GITHUB_OUTPUT"
           else
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
             echo "label=正式版" >> "$GITHUB_OUTPUT"
@@ -268,7 +268,7 @@ jobs:
             *状态*: `${{ needs.package-and-release.result == 'failure' && '❌ 发布失败' || needs.package-and-release.result == 'cancelled' && '⚪ 发布取消' || needs.package-and-release.result == 'success' && '🚀 发布成功' || '⚠️ 发布未完成' }}`
             *发布任务*: `${{ needs.package-and-release.result }}`
             *标签*: `${{ env.RELEASE_TAG }}`
-            *类型*: `${{ needs.package-and-release.outputs.prerelease == 'true' && 'Beta / Prerelease' || needs.package-and-release.outputs.prerelease == 'false' && 'Stable' || 'Unknown' }}`
+            *类型*: `${{ needs.package-and-release.outputs.prerelease == 'true' && 'Prerelease (Beta / RC)' || needs.package-and-release.outputs.prerelease == 'false' && 'Stable' || 'Unknown' }}`
             *提交*: ${{ env.SOURCE_SHA != '' && format('[{0}]({1}/{2}/commit/{0})', env.SOURCE_SHA, github.server_url, github.repository) || '`未解析`' }}
             *工作流运行*: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
             *触发人*: `${{ github.actor }}`

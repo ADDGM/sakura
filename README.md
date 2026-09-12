@@ -35,9 +35,9 @@
 - `Requires PHP: 8.0` 是允许安装的最低 PHP 版本；当前 CI 会验证 PHP 8.0、8.1 和 8.2。
 - Release 中的主题 ZIP 是通用安装包，不按 WordPress 或 PHP 版本分别构建；只要运行环境满足最低版本并处于已验证矩阵内，即可使用同一个包。
 
-CI 会从 `style.css` 自动读取源码基准版本，并使用 `<源码版本>-dev.<运行编号>` 作为测试包版本。Release 包使用去掉 `v` 前缀后的标签版本，例如标签 `v3.5.0-beta.2` 对应主题版本 `3.5.0-beta.2`；发布前会校验标签核心版本与源码基准版本一致。
+CI 会从 `style.css` 自动读取源码基准版本，并使用 `<源码版本>-dev.<运行编号>` 作为测试包版本。Release 包使用去掉 `v` 前缀后的标签版本，例如标签 `v3.5.0-beta.2` 或 `v3.5.0-rc.1` 分别对应主题版本 `3.5.0-beta.2` 或 `3.5.0-rc.1`；发布前会校验标签核心版本与源码基准版本一致。
 
-WordPress 上传主题后会读取并显示完整版本字符串，因此测试包会显示类似 `3.5.0-dev.123`，预发布包会显示 `3.5.0-beta.2`。WordPress 通常不会额外显示“测试版”徽标，需要通过版本号中的 `dev` 或 `beta` 判断；正式版本则显示为 `3.5.0`。
+WordPress 上传主题后会读取并显示完整版本字符串，因此测试包会显示类似 `3.5.0-dev.123`，Beta 预发布包会显示 `3.5.0-beta.2`，发布候选包会显示 `3.5.0-rc.1`。WordPress 通常不会额外显示“测试版”徽标，需要通过版本号中的 `dev`、`beta` 或 `rc` 判断；正式版本则显示为 `3.5.0`。
 
 ### 构建包、测试包与发布包
 
@@ -63,7 +63,7 @@ Actions Artifact（外层下载压缩包）
 
 CI Artifact 只用于快速验证最新 `develop` 提交，当前保留 7 天，不作为长期下载地址。
 
-Release 工作流也会上传一个 Actions Artifact，名称为 `sakura-release-bundle-X.Y.Z` 或 `sakura-release-bundle-X.Y.Z-beta.N`。它同样是外层资料包，不能直接上传 WordPress；下载后请先解压，再上传其中的 `sakura-X.Y.Z.zip` 或 `sakura-X.Y.Z-beta.N.zip`。Release 页面中的版本主题 ZIP（例如 `sakura-3.5.0-beta.5.zip`）则是可直接安装的包：
+Release 工作流也会上传一个 Actions Artifact，名称为 `sakura-release-bundle-X.Y.Z`、`sakura-release-bundle-X.Y.Z-beta.N` 或 `sakura-release-bundle-X.Y.Z-rc.N`。它同样是外层资料包，不能直接上传 WordPress；下载后请先解压，再上传其中的版本主题 ZIP。Release 页面中的版本主题 ZIP（例如 `sakura-3.5.0-beta.5.zip` 或 `sakura-3.5.0-rc.1.zip`）则是可直接安装的包：
 
 ```text
 Actions Artifact（外层发布资料包）
@@ -82,15 +82,15 @@ sakura-3.5.0-beta.4.zip.sha256
 release-notes.zh-CN.md
 ```
 
-标签包只有一个，是因为 Release 发布的是同一份通用主题源代码；PHP/WordPress 矩阵的职责是验证兼容性，不是为每个环境制作不同安装包。Release 包由 PHP 8.2 的打包任务生成，但仍适用于已验证的 WordPress 7.0/7.1 与 PHP 8.0/8.1/8.2 环境。正式标签 `v3.5.0` 与预发布标签 `v3.5.0-beta.4` 的 ZIP 结构相同，区别在于版本号和 Release 是否标记为预发布。
+标签包只有一个，是因为 Release 发布的是同一份通用主题源代码；PHP/WordPress 矩阵的职责是验证兼容性，不是为每个环境制作不同安装包。Release 包由 PHP 8.2 的打包任务生成，但仍适用于已验证的 WordPress 7.0/7.1 与 PHP 8.0/8.1/8.2 环境。正式标签 `v3.5.0`、Beta 标签和 RC 标签的 ZIP 结构相同，区别在于版本号和 Release 是否标记为预发布。RC 只用于发布前最终回归，不能视为正式版。
 
 各类文件的使用建议如下：
 
 | 文件或包 | 适用场景 | 是否建议上传 WordPress |
 | --- | --- | --- |
 | `sakura-ci-phpX.Y-N` | 验证某次 `develop` 提交，优先选择与测试服务器 PHP 相同的矩阵包 | 解压外层后，上传内部 `sakura-ci-N.zip` |
-| `sakura-release-bundle-X.Y.Z[-beta.N]` | 查看标签发布工作流生成的完整资料 | 解压外层后，上传内部版本主题 ZIP |
-| `sakura-X.Y.Z-beta.N.zip` | 测试服务器、预发布环境和候选版本验收 | 是 |
+| `sakura-release-bundle-X.Y.Z[-beta.N 或 -rc.N]` | 查看标签发布工作流生成的完整资料 | 解压外层后，上传内部版本主题 ZIP |
+| `sakura-X.Y.Z-beta.N.zip` 或 `sakura-X.Y.Z-rc.N.zip` | 测试服务器、预发布环境和候选版本验收 | 是 |
 | `sakura-X.Y.Z.zip` | 正式生产环境 | 是 |
 | GitHub `Download ZIP` 源码包 | 浏览源码或临时开发 | 不建议，优先使用 Release 主题 ZIP |
 | `*.sha256` | 下载后校验主题 ZIP 是否完整 | 不上传 |

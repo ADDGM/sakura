@@ -13,7 +13,7 @@ const SAKURA_THEME_EXPECTED_HEADERS = array(
     'Requires PHP' => '8.0',
 );
 
-const SAKURA_THEME_VERSION_PATTERN = '/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-(?:dev|beta)\.(0|[1-9][0-9]*))?$/';
+const SAKURA_THEME_VERSION_PATTERN = '/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-(?:dev|beta|rc)\.(0|[1-9][0-9]*))?$/';
 
 function sakura_theme_argument(array $arguments, string $name, string $default = ''): string
 {
@@ -134,6 +134,8 @@ function sakura_theme_metadata_self_test(): int
         sakura_theme_load_and_validate($file, '3.5.0-dev.12');
         sakura_theme_update_version($file, '3.5.0-beta.2');
         sakura_theme_load_and_validate($file, '3.5.0-beta.2');
+        sakura_theme_update_version($file, '3.5.0-rc.1');
+        sakura_theme_load_and_validate($file, '3.5.0-rc.1');
     } catch (Throwable $exception) {
         fwrite(STDERR, '主题元数据自测失败：' . $exception->getMessage() . "\n");
         return 1;
@@ -207,9 +209,9 @@ function sakura_theme_metadata_cli(array $arguments): int
 
     fwrite(STDERR, "用法：\n");
     fwrite(STDERR, "  php scripts/theme-metadata.php source-version --file=style.css\n");
-    fwrite(STDERR, "  php scripts/theme-metadata.php check-release-base --file=style.css --version=X.Y.Z[-beta.N]\n");
-    fwrite(STDERR, "  php scripts/theme-metadata.php prepare --file=style.css --version=X.Y.Z[-dev.N|-beta.N]\n");
-    fwrite(STDERR, "  php scripts/theme-metadata.php verify --file=style.css --version=X.Y.Z[-dev.N|-beta.N]\n");
+    fwrite(STDERR, "  php scripts/theme-metadata.php check-release-base --file=style.css --version=X.Y.Z[-beta.N|-rc.N]\n");
+    fwrite(STDERR, "  php scripts/theme-metadata.php prepare --file=style.css --version=X.Y.Z[-dev.N|-beta.N|-rc.N]\n");
+    fwrite(STDERR, "  php scripts/theme-metadata.php verify --file=style.css --version=X.Y.Z[-dev.N|-beta.N|-rc.N]\n");
     return 2;
 }
 
