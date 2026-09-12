@@ -10,9 +10,9 @@
 define('SAKURA_VERSION', wp_get_theme()->get('Version'));
 define('BUILD_VERSION', '3');
 
-// 远程模式只作为显式兼容选项；固定到已发布标签，避免跟随不存在的维护版版本号。
+// 远程模式只作为显式兼容选项；固定到当前正式发布标签，避免跟随分支或浮动版本。
 if (!defined('SAKURA_REMOTE_RESOURCE_TAG')) {
-    define('SAKURA_REMOTE_RESOURCE_TAG', 'v3.5.0-beta.7');
+    define('SAKURA_REMOTE_RESOURCE_TAG', 'v3.5.0');
 }
 
 if (!function_exists('akina_setup')):
