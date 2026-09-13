@@ -2044,3 +2044,112 @@ msgstr ""
 #: inc/options-sanitize.php
 msgid "Enter a valid site launch date in YYYY-MM-DD format that is not in the future."
 msgstr ""
+
+#: inc/release-info.php
+msgid "WordPress HTTP API is unavailable."
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
+msgid "GitHub returned HTTP %d."
+msgstr ""
+
+#: inc/release-info.php
+msgid "GitHub returned invalid data."
+msgstr ""
+
+#: inc/release-info.php
+msgid "Unknown time"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Status unavailable"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Update available"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Up to date"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Download theme package"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Download source ZIP"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Open download page"
+msgstr ""
+
+#: inc/release-info.php
+msgid "The refresh link has expired. Please try again."
+msgstr ""
+
+#: inc/release-info.php
+msgid "Unable to check"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Stable release"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Development branch"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Watching: %s"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Current version"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Check now"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Latest stable release badge"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Data unavailable"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Release notes"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Latest commit loaded"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Latest development commit badge"
+msgstr ""
+
+#: inc/release-info.php
+msgid "View commit"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Download develop ZIP"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Last checked: %s. Release data is cached for six hours. The development download is a source ZIP and is not an automatic WordPress update."
+msgstr ""
+
+#: inc/release-info.php
+msgid "Version channel"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Unknown"
+msgstr ""

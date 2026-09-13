@@ -38,6 +38,14 @@ add_filter( 'of_sanitize_select', 'of_sanitize_enum', 10, 2);
 add_filter( 'of_sanitize_radio', 'of_sanitize_enum', 10, 2);
 add_filter( 'of_sanitize_images', 'of_sanitize_enum', 10, 2);
 add_filter( 'of_sanitize_colorradio', 'of_sanitize_enum', 10, 2);
+
+function of_sanitize_release_status( $input, $option ) {
+	$value = sanitize_key( (string) $input );
+	$choices = isset( $option['options'] ) && is_array( $option['options'] ) ? array_keys( $option['options'] ) : array( 'stable', 'develop' );
+	return in_array( $value, $choices, true ) ? $value : ( $option['std'] ?? 'stable' );
+}
+add_filter( 'of_sanitize_release_status', 'of_sanitize_release_status', 10, 2 );
+
 function of_sanitize_checkbox( $input ) {
 	if ( $input ) {
 		$output = '1';

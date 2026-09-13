@@ -2132,3 +2132,112 @@ msgstr "網站在各種災難中運行了 %d 天~"
 #: inc/options-sanitize.php
 msgid "Enter a valid site launch date in YYYY-MM-DD format that is not in the future."
 msgstr "請輸入有效的建站日期，格式為 YYYY-MM-DD，且日期不能晚於今天。"
+
+#: inc/release-info.php
+msgid "WordPress HTTP API is unavailable."
+msgstr "WordPress HTTP API 不可用。"
+
+#: inc/release-info.php
+#, php-format
+msgid "GitHub returned HTTP %d."
+msgstr "GitHub 返回了 HTTP %d。"
+
+#: inc/release-info.php
+msgid "GitHub returned invalid data."
+msgstr "GitHub 返回的資料無效。"
+
+#: inc/release-info.php
+msgid "Unknown time"
+msgstr "時間未知"
+
+#: inc/release-info.php
+msgid "Status unavailable"
+msgstr "狀態不可用"
+
+#: inc/release-info.php
+msgid "Update available"
+msgstr "有可用更新"
+
+#: inc/release-info.php
+msgid "Up to date"
+msgstr "已是最新"
+
+#: inc/release-info.php
+msgid "Download theme package"
+msgstr "下載主題包"
+
+#: inc/release-info.php
+msgid "Download source ZIP"
+msgstr "下載原始碼 ZIP"
+
+#: inc/release-info.php
+msgid "Open download page"
+msgstr "開啟下載頁面"
+
+#: inc/release-info.php
+msgid "The refresh link has expired. Please try again."
+msgstr "重新整理連結已失效，請重試。"
+
+#: inc/release-info.php
+msgid "Unable to check"
+msgstr "暫時無法檢查"
+
+#: inc/release-info.php
+msgid "Stable release"
+msgstr "穩定版"
+
+#: inc/release-info.php
+msgid "Development branch"
+msgstr "開發分支"
+
+#: inc/release-info.php
+msgid "Watching: %s"
+msgstr "關注：%s"
+
+#: inc/release-info.php
+msgid "Current version"
+msgstr "目前版本"
+
+#: inc/release-info.php
+msgid "Check now"
+msgstr "立即檢查"
+
+#: inc/release-info.php
+msgid "Latest stable release badge"
+msgstr "最新穩定版徽章"
+
+#: inc/release-info.php
+msgid "Data unavailable"
+msgstr "資料不可用"
+
+#: inc/release-info.php
+msgid "Release notes"
+msgstr "發佈說明"
+
+#: inc/release-info.php
+msgid "Latest commit loaded"
+msgstr "已取得最新提交"
+
+#: inc/release-info.php
+msgid "Latest development commit badge"
+msgstr "最新開發提交徽章"
+
+#: inc/release-info.php
+msgid "View commit"
+msgstr "檢視提交"
+
+#: inc/release-info.php
+msgid "Download develop ZIP"
+msgstr "下載 develop ZIP"
+
+#: inc/release-info.php
+msgid "Last checked: %s. Release data is cached for six hours. The development download is a source ZIP and is not an automatic WordPress update."
+msgstr "上次檢查：%s。版本資料快取 6 小時。開發版下載的是原始碼 ZIP，不會自動更新 WordPress。"
+
+#: inc/release-info.php
+msgid "Version channel"
+msgstr "版本通道"
+
+#: inc/release-info.php
+msgid "Unknown"
+msgstr "未知"

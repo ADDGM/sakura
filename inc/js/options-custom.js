@@ -106,4 +106,22 @@ jQuery(document).ready(function($) {
 		syncImageRadio(this);
 	});
 
+	// Keep the selected version channel visibly in sync before the settings are saved.
+	function syncReleaseChannel(radio) {
+		var $radio = $(radio);
+		var $field = $radio.closest('.sakura-release-field');
+		$field.find('.sakura-release-channel-option').removeClass('is-selected');
+		$radio.closest('.sakura-release-channel-option').addClass('is-selected');
+		$field.find('.sakura-release-card').removeClass('is-selected');
+		$field.find('.sakura-release-card-' + $radio.val()).addClass('is-selected');
+		$field.attr('data-channel', $radio.val());
+		var summary = $field.find('.sakura-release-channel-summary');
+		var label = $radio.val() === 'develop' ? summary.attr('data-develop-label') : summary.attr('data-stable-label');
+		summary.text(label || '');
+	}
+
+	$('.sakura-release-channel input').on('change', function() {
+		syncReleaseChannel(this);
+	});
+
 });

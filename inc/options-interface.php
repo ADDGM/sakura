@@ -61,7 +61,7 @@ function optionsframework_fields() {
 			$id = 'section-' . $value['id'];
 			$heading_id = $id . '-heading';
 			$field_label = isset( $value['name'] ) ? $value['name'] : $value['id'];
-			$group_types = array( 'radio', 'multicheck', 'images', 'colorradio' );
+			$group_types = array( 'radio', 'multicheck', 'images', 'colorradio', 'release_status' );
 			$group_attributes = in_array( $value['type'], $group_types, true )
 				? ' role="group" aria-labelledby="' . esc_attr( $heading_id ) . '"'
 				: '';
@@ -100,6 +100,9 @@ function optionsframework_fields() {
 					$val = stripslashes( $val );
 				}
 			}
+		}
+		if ( isset( $value['id'] ) && 'release_info' === $value['id'] && function_exists( 'sakura_release_normalize_channel' ) ) {
+			$val = sakura_release_normalize_channel( $val );
 		}
 
 		// If there is a description save it for labels
@@ -174,6 +177,13 @@ function optionsframework_fields() {
 			foreach ($value['options'] as $key => $option) {
 				$id = $option_name . '-' . $value['id'] .'-'. $key;
 				$output .= '<span class="of-radio-option"><input class="of-input of-radio" type="radio" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="'. esc_attr( $key ) . '" '. checked( $val, $key, false) .' /><label for="' . esc_attr( $id ) . '">' . esc_html( $option ) . '</label></span>';
+			}
+			break;
+
+		// Sakura release status and channel selector
+		case 'release_status':
+			if ( function_exists( 'sakura_release_render_field' ) ) {
+				$output .= sakura_release_render_field( $option_name, $value['id'], $val );
 			}
 			break;
 
@@ -458,7 +468,7 @@ function optionsframework_fields() {
 
 		if ( ( $value['type'] != "heading" ) && ( $value['type'] != "info" ) ) {
 			$output .= '</div>';
-			if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) ) {
+			if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) && ( $value['type'] != 'release_status' ) ) {
 				$output .= '<div class="explain">' . wp_kses( $explain_value, $allowedtags ) . '</div>'."\n";
 			}
 			$output .= '</div></div>'."\n";

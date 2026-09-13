@@ -15,6 +15,8 @@ if (!defined('SAKURA_REMOTE_RESOURCE_TAG')) {
     define('SAKURA_REMOTE_RESOURCE_TAG', 'v3.5.0');
 }
 
+require_once dirname(__FILE__) . '/inc/release-info.php';
+
 if (!function_exists('akina_setup')):
 /**
  * Sets up theme defaults and registers support for various WordPress features.

@@ -1066,17 +1066,13 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Check for Updates', 'sakura'), /*检查更新*/
-        'desc' => __('Choose a status badge below. The links use the ADDGM/sakura fork; the latest tag is the newest packaged version and the develop badge is the latest commit on the development branch.', 'sakura'),
-        'id' => "release_info",
-        'std' => "tag",
-        'type' => "images",
+        'desc' => '',
+        'id' => 'release_info',
+        'std' => 'stable',
+        'type' => 'release_status',
         'options' => array(
-            'tag' => 'https://img.shields.io/github/tag/ADDGM/sakura.svg?style=flat-square&label=latest%20tag',
-            'tag2' => 'https://img.shields.io/github/last-commit/ADDGM/sakura/develop.svg?style=flat-square&label=develop',
-        ),
-        'labels' => array(
-            'tag' => __('Latest tag', 'sakura'),
-            'tag2' => __('Latest develop commit', 'sakura'),
+            'stable' => __('Stable release', 'sakura'),
+            'develop' => __('Development branch', 'sakura'),
         ),
     );
 

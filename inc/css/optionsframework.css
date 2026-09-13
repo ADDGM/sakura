@@ -636,6 +636,214 @@
   outline-offset: 2px;
 }
 
+/* 版本与更新：通道选择、徽章状态和外部入口。 */
+
+#optionsframework .section-release_status .controls {
+  float: none;
+  width: 100%;
+  max-width: none;
+  padding-right: 0;
+}
+
+#optionsframework .sakura-release-field {
+  width: 100%;
+  color: var(--options-text);
+}
+
+#optionsframework .sakura-release-channel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+
+#optionsframework .sakura-release-channel-option {
+  position: relative;
+  display: block;
+  margin: 0;
+  cursor: pointer;
+}
+
+#optionsframework .sakura-release-channel-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+#optionsframework .sakura-release-channel-option span {
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid var(--options-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+  color: var(--options-muted-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+#optionsframework .sakura-release-channel-option:hover span,
+#optionsframework .sakura-release-channel-option.is-selected span {
+  border-color: var(--options-control-border);
+  background: var(--options-surface-alt);
+  color: var(--options-text);
+}
+
+#optionsframework .sakura-release-channel-option input:focus-visible + span {
+  outline: 2px solid var(--options-focus);
+  outline-offset: 2px;
+}
+
+#optionsframework .sakura-release-overview {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(180px, 1.4fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--options-border);
+  border-radius: 4px;
+  background: var(--options-surface-alt);
+}
+
+#optionsframework .sakura-release-overview strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--options-text);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+#optionsframework .sakura-release-label {
+  display: block;
+  color: var(--options-muted-text);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+#optionsframework .sakura-release-channel-summary {
+  color: var(--options-muted-text);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+#optionsframework .sakura-release-overview .button {
+  margin: 0;
+  white-space: nowrap;
+}
+
+#optionsframework .sakura-release-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#optionsframework .sakura-release-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--options-border);
+  border-radius: 4px;
+  background: var(--options-surface);
+}
+
+#optionsframework .sakura-release-card.is-selected {
+  border-color: var(--options-control-border);
+  background: var(--options-surface-alt);
+}
+
+#optionsframework .sakura-release-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#optionsframework .sakura-release-card h5 {
+  margin: 0 0 5px;
+  color: var(--options-text);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+#optionsframework .sakura-release-card img {
+  display: block;
+  flex: 0 0 auto;
+  max-width: 100%;
+  height: 20px;
+}
+
+#optionsframework .sakura-release-status {
+  display: inline-block;
+  color: var(--options-muted-text);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+#optionsframework .sakura-release-status.is-success {
+  color: var(--sakura-release-success, #16794a);
+}
+
+#optionsframework .sakura-release-status.is-warning {
+  color: var(--sakura-release-warning, #9a6700);
+}
+
+#optionsframework .sakura-release-status.is-info {
+  color: var(--sakura-release-info, #2271b1);
+}
+
+#optionsframework .sakura-release-card > p {
+  margin: 10px 0 0;
+  color: var(--options-muted-text);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+#optionsframework .sakura-release-card > p span {
+  margin-left: 8px;
+}
+
+#optionsframework .sakura-release-card .sakura-release-commit-message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#optionsframework .sakura-release-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 10px;
+}
+
+#optionsframework .sakura-release-actions a {
+  color: var(--options-control-hover);
+  font-size: 13px;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+#optionsframework .sakura-release-actions a:hover {
+  text-decoration: underline;
+}
+
+#optionsframework .sakura-release-help {
+  margin: 10px 0 0;
+  color: var(--options-muted-text);
+  font-size: 12px;
+  line-height: 18px;
+}
+
 #optionsframework .section-color .controls,
 #optionsframework .section-colorradio .explain,
 #optionsframework .section-radio .controls,
@@ -1129,6 +1337,19 @@
 
   #optionsframework .sakura-action-button {
     width: 100%;
+  }
+
+  #optionsframework .sakura-release-overview {
+    grid-template-columns: 1fr auto;
+  }
+
+  #optionsframework .sakura-release-channel-summary {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  #optionsframework .sakura-release-cards {
+    grid-template-columns: 1fr;
   }
 
   #optionsframework .section-typography .controls,
