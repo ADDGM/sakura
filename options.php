@@ -1059,10 +1059,10 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('About', 'sakura'), /*关于*/
-        'desc' => sprintf(__('Theme Sakura v %s  |  <a href="https://github.com/ADDGM/sakura#readme">Theme document</a>  |  <a href="https://github.com/ADDGM/sakura/">Source code</a><a href="https://github.com/ADDGM/sakura/releases/latest"><img src="https://img.shields.io/github/release/ADDGM/sakura.svg?style=flat-square" alt="GitHub release"></a>', 'sakura'), SAKURA_VERSION), /*Theme Sakura v'.SAKURA_VERSION.'  |  主题说明  |  源码*/
+        'desc' => '',
         'id' => 'theme_intro',
         'std' => '',
-        'type' => 'typography ');
+        'type' => 'release_about');
 
     $options[] = array(
         'name' => __('Check for Updates', 'sakura'), /*检查更新*/
@@ -1072,7 +1072,7 @@ function optionsframework_options()
         'type' => 'release_status',
         'options' => array(
             'stable' => __('Stable release', 'sakura'),
-            'develop' => __('Development branch', 'sakura'),
+            'testing' => __('Testing release', 'sakura'),
         ),
     );
 

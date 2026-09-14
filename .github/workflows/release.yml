@@ -161,9 +161,14 @@ jobs:
           rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
           php scripts/theme-metadata.php check-release-base --file=dist/sakura/style.css --version="$VERSION"
           php scripts/theme-metadata.php prepare --file=dist/sakura/style.css --version="$VERSION"
+          CHANNEL="stable"
+          if [[ "$VERSION" == *-beta.* || "$VERSION" == *-rc.* ]]; then
+            CHANNEL="testing"
+          fi
           {
             echo "tag=${TAG}"
             echo "version=${VERSION}"
+            echo "channel=${CHANNEL}"
             echo "source_sha=${SOURCE_SHA}"
             echo "event=${GITHUB_EVENT_NAME}"
             echo "ref=${GITHUB_REF}"

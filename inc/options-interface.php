@@ -187,6 +187,13 @@ function optionsframework_fields() {
 			}
 			break;
 
+		// Sakura build and source information
+		case 'release_about':
+			if ( function_exists( 'sakura_release_render_about' ) ) {
+				$output .= sakura_release_render_about();
+			}
+			break;
+
 		// Image Selectors
 		case "images":
 			$name = $option_name .'['. $value['id'] .']';
@@ -468,7 +475,7 @@ function optionsframework_fields() {
 
 		if ( ( $value['type'] != "heading" ) && ( $value['type'] != "info" ) ) {
 			$output .= '</div>';
-			if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) && ( $value['type'] != 'release_status' ) ) {
+			if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) && ! in_array( $value['type'], array( 'release_status', 'release_about' ), true ) ) {
 				$output .= '<div class="explain">' . wp_kses( $explain_value, $allowedtags ) . '</div>'."\n";
 			}
 			$output .= '</div></div>'."\n";

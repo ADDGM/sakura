@@ -2241,3 +2241,86 @@ msgstr "版本通道"
 #: inc/release-info.php
 msgid "Unknown"
 msgstr "未知"
+
+#: inc/release-info.php
+msgid "Stable release available"
+msgstr "稳定版可用"
+
+#: inc/release-info.php
+msgid "Current build is newer"
+msgstr "当前构建版本较新"
+
+#: inc/release-info.php
+msgid "No prerelease available"
+msgstr "暂无预发布版本"
+
+#: inc/release-info.php
+msgid "Prerelease available"
+msgstr "有可用预发布版本"
+
+#: inc/release-info.php
+msgid "Testing update available"
+msgstr "有可用测试版更新"
+
+#: inc/release-info.php
+msgid "Stable build"
+msgstr "稳定版构建"
+
+#: inc/release-info.php
+msgid "Testing build"
+msgstr "测试版构建"
+
+#: inc/release-info.php
+msgid "Development build"
+msgstr "开发构建"
+
+#: inc/release-info.php
+msgid "Unknown build"
+msgstr "未知构建"
+
+#: inc/release-info.php
+#, php-format
+msgid "Current branch: %s"
+msgstr "当前分支：%s"
+
+#: inc/release-info.php
+#, php-format
+msgid "Current commit: %s"
+msgstr "当前提交：%s"
+
+#: inc/release-info.php
+msgid "Theme document"
+msgstr "主题说明"
+
+#: inc/release-info.php
+msgid "Source code"
+msgstr "源码"
+
+#: inc/release-info.php
+msgid "View current commit"
+msgstr "查看当前提交"
+
+#: inc/release-info.php
+msgid "Download current branch ZIP"
+msgstr "下载当前分支源码 ZIP"
+
+#: inc/release-info.php
+msgid "Browse current branch"
+msgstr "浏览当前分支"
+
+#: inc/release-info.php
+msgid "Branch metadata is unavailable for this installation."
+msgstr "此安装缺少分支构建元数据。"
+
+#: inc/release-info.php
+msgid "Testing release"
+msgstr "测试版"
+
+#: inc/release-info.php
+msgid "Latest testing release badge"
+msgstr "最新测试版徽章"
+
+#: inc/release-info.php
+#, php-format
+msgid "Last checked: %s. Release data is cached for six hours. Testing releases come from GitHub prereleases."
+msgstr "上次检查：%s。版本数据缓存 6 小时，测试版来自 GitHub 预发布版本。"

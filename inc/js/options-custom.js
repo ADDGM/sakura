@@ -116,7 +116,7 @@ jQuery(document).ready(function($) {
 		$field.find('.sakura-release-card-' + $radio.val()).addClass('is-selected');
 		$field.attr('data-channel', $radio.val());
 		var summary = $field.find('.sakura-release-channel-summary');
-		var label = $radio.val() === 'develop' ? summary.attr('data-develop-label') : summary.attr('data-stable-label');
+		var label = summary.attr('data-' + $radio.val() + '-label');
 		summary.text(label || '');
 	}
 

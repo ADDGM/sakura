@@ -2153,3 +2153,86 @@ msgstr ""
 #: inc/release-info.php
 msgid "Unknown"
 msgstr ""
+
+#: inc/release-info.php
+msgid "Stable release available"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Current build is newer"
+msgstr ""
+
+#: inc/release-info.php
+msgid "No prerelease available"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Prerelease available"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Testing update available"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Stable build"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Testing build"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Development build"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Unknown build"
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
+msgid "Current branch: %s"
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
+msgid "Current commit: %s"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Theme document"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Source code"
+msgstr ""
+
+#: inc/release-info.php
+msgid "View current commit"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Download current branch ZIP"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Browse current branch"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Branch metadata is unavailable for this installation."
+msgstr ""
+
+#: inc/release-info.php
+msgid "Testing release"
+msgstr ""
+
+#: inc/release-info.php
+msgid "Latest testing release badge"
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
+msgid "Last checked: %s. Release data is cached for six hours. Testing releases come from GitHub prereleases."
+msgstr ""

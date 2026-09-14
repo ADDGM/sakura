@@ -99,7 +99,9 @@ $sourceChecks = array(
     array('functions.php', "'styleSheetId' => 'sakura-admin-color-scheme-preview-css'", '个人资料页预览未标识静态后台配色样式表。'),
     array('inc/release-info.php', 'function sakura_release_info', '检查更新模块未提供 GitHub 数据缓存。'),
     array('inc/release-info.php', 'function sakura_release_maybe_refresh', '检查更新模块未提供带 nonce 的手动刷新入口。'),
-    array('inc/release-info.php', 'archive/refs/heads/develop.zip', '检查更新模块缺少开发分支下载入口。'),
+    array('inc/release-info.php', 'function sakura_release_build_info', '关于区域未读取主题构建元数据。'),
+    array('inc/release-info.php', 'function sakura_release_ref_url', '关于区域未根据当前分支生成源码入口。'),
+    array('inc/release-info.php', 'github/last-commit/', '关于区域缺少 develop 状态徽章。'),
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
     array('functions.php', 'function sakura_core_resource_url', '核心资源没有统一的本地/远程 URL 解析函数。'),
     array('functions.php', 'function sakura_theme_asset_url', '主题内置资源没有统一的本地 URL 解析函数。'),
@@ -401,22 +403,22 @@ if (!$imageRadioBlockValid) {
     $errors[] = '主题设置页图片 radio 未输出语义包装或未支持独立标签。';
 }
 $optionsSource = file_get_contents(get_template_directory() . '/options.php');
-if ($optionsSource === false || strpos($optionsSource, "'id' => 'release_info'") === false || strpos($optionsSource, "'std' => 'stable'") === false || strpos($optionsSource, "'type' => 'release_status'") === false) {
-    $errors[] = '检查更新区域未使用版本状态模块或稳定版默认值。';
+if ($optionsSource === false || strpos($optionsSource, "'id' => 'release_info'") === false || strpos($optionsSource, "'std' => 'stable'") === false || strpos($optionsSource, "'type' => 'release_status'") === false || strpos($optionsSource, "'testing' => __('Testing release', 'sakura')") === false) {
+    $errors[] = '检查更新区域未使用稳定版/测试版状态模块。';
 }
 $releaseInfoSource = file_get_contents(get_template_directory() . '/inc/release-info.php');
-if ($releaseInfoSource === false || strpos($releaseInfoSource, 'https://api.github.com/repos/') === false || strpos($releaseInfoSource, 'github/tag/') === false || strpos($releaseInfoSource, 'github/last-commit/') === false || strpos($releaseInfoSource, 'function sakura_release_download_link') === false) {
-    $errors[] = '检查更新模块缺少 ADDGM/sakura 徽章、远程状态或下载入口。';
+if ($releaseInfoSource === false || strpos($releaseInfoSource, 'https://api.github.com/repos/') === false || strpos($releaseInfoSource, 'releases?per_page=20') === false || strpos($releaseInfoSource, 'github/v/release/') === false || strpos($releaseInfoSource, 'github/last-commit/') === false || strpos($releaseInfoSource, 'function sakura_release_download_link') === false || strpos($releaseInfoSource, 'ob_get_clean()') === false) {
+    $errors[] = '检查更新模块缺少正式/预发布状态、徽章、下载入口或返回式渲染。';
 }
 if ($releaseInfoSource !== false && strpos($releaseInfoSource, 'mashirozx/Sakura') !== false) {
     $errors[] = '检查更新区域仍引用上游 mashirozx/Sakura。';
 }
 $aboutBlock = '';
-if ($optionsSource !== false && preg_match("/'name'\s*=>\s*__\('About'.*?'id'\s*=>\s*'theme_intro'/s", $optionsSource, $aboutMatch)) {
+if ($optionsSource !== false && preg_match("/'name'\s*=>\s*__\('About'.*?'id'\s*=>\s*'theme_intro'.*?'type'\s*=>\s*'release_about'/s", $optionsSource, $aboutMatch)) {
     $aboutBlock = $aboutMatch[0];
 }
-if ($aboutBlock === '' || strpos($aboutBlock, 'https://github.com/ADDGM/sakura#readme') === false || strpos($aboutBlock, 'https://github.com/ADDGM/sakura/') === false || strpos($aboutBlock, 'https://github.com/ADDGM/sakura/releases/latest') === false || strpos($aboutBlock, 'img.shields.io/github/release/ADDGM/sakura.svg') === false) {
-    $errors[] = '关于区域的文档、源码或 Release 链接未统一到 ADDGM/sakura。';
+if ($aboutBlock === '' || strpos($aboutBlock, "'type' => 'release_about'") === false || strpos($releaseInfoSource, 'sakura_release_render_about') === false || strpos($releaseInfoSource, 'Download current branch ZIP') === false) {
+    $errors[] = '关于区域未使用构建信息组件或缺少当前分支源码入口。';
 }
 if ($aboutBlock !== '' && strpos($aboutBlock, 'mashirozx/Sakura') !== false) {
     $errors[] = '关于区域仍引用上游 mashirozx/Sakura 链接。';

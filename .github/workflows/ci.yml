@@ -64,11 +64,16 @@ jobs:
           git archive --format=tar --prefix=sakura/ HEAD | tar -xf - -C dist
           rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
           php scripts/theme-metadata.php prepare --file=dist/sakura/style.css --version="$VERSION"
+          BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          SOURCE_SHA="$(git rev-parse HEAD)"
           {
             echo "event=${GITHUB_EVENT_NAME}"
             echo "ref=${GITHUB_REF}"
             echo "ref_name=${GITHUB_REF_NAME}"
-            echo "sha=$(git rev-parse HEAD)"
+            echo "channel=development"
+            echo "branch=${BRANCH}"
+            echo "sha=${SOURCE_SHA}"
+            echo "source_sha=${SOURCE_SHA}"
             echo "run_id=${GITHUB_RUN_ID}"
             echo "run_number=${GITHUB_RUN_NUMBER}"
             echo "php=${PHP_VERSION}"
