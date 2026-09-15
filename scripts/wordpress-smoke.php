@@ -407,7 +407,7 @@ if ($optionsSource === false || strpos($optionsSource, "'id' => 'release_info'")
     $errors[] = '检查更新区域未使用稳定版/测试版状态模块。';
 }
 $releaseInfoSource = file_get_contents(get_template_directory() . '/inc/release-info.php');
-if ($releaseInfoSource === false || strpos($releaseInfoSource, 'https://api.github.com/repos/') === false || strpos($releaseInfoSource, 'releases?per_page=20') === false || strpos($releaseInfoSource, 'github/v/release/') === false || strpos($releaseInfoSource, 'github/last-commit/') === false || strpos($releaseInfoSource, 'function sakura_release_download_link') === false || strpos($releaseInfoSource, 'ob_get_clean()') === false) {
+if ($releaseInfoSource === false || strpos($releaseInfoSource, 'https://api.github.com/repos/') === false || strpos($releaseInfoSource, 'releases?per_page=20') === false || strpos($releaseInfoSource, 'github/v/release/') === false || strpos($releaseInfoSource, 'github/last-commit/') === false || strpos($releaseInfoSource, 'function sakura_release_download_link') === false || strpos($releaseInfoSource, 'sakura_release_rate_limited') === false || strpos($releaseInfoSource, 'error_states') === false || strpos($releaseInfoSource, 'GitHub API rate limit reached') === false || strpos($releaseInfoSource, 'ob_get_clean()') === false) {
     $errors[] = '检查更新模块缺少正式/预发布状态、徽章、下载入口或返回式渲染。';
 }
 if ($releaseInfoSource !== false && strpos($releaseInfoSource, 'mashirozx/Sakura') !== false) {

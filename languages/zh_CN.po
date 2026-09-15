@@ -2143,6 +2143,15 @@ msgid "GitHub returned HTTP %d."
 msgstr "GitHub 返回了 HTTP %d。"
 
 #: inc/release-info.php
+msgid "GitHub API rate limit reached. Please try again later."
+msgstr "GitHub API 请求频率已达上限，请稍后重试。"
+
+#: inc/release-info.php
+#, php-format
+msgid "GitHub API rate limit reached; retry after %s."
+msgstr "GitHub API 请求频率已达上限，请在 %s 后重试。"
+
+#: inc/release-info.php
 msgid "GitHub returned invalid data."
 msgstr "GitHub 返回的数据无效。"
 

@@ -1868,6 +1868,15 @@ msgid "GitHub returned HTTP %d."
 msgstr ""
 
 #: inc/release-info.php
+msgid "GitHub API rate limit reached. Please try again later."
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
+msgid "GitHub API rate limit reached; retry after %s."
+msgstr ""
+
+#: inc/release-info.php
 msgid "GitHub returned invalid data."
 msgstr ""
 

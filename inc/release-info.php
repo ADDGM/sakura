@@ -14,7 +14,7 @@ function sakura_release_api_url( $resource ) {
 }
 
 function sakura_release_cache_key() {
-	return 'sakura_release_info_v2';
+	return 'sakura_release_info_v3';
 }
 
 function sakura_release_normalize_channel( $channel ) {
@@ -148,16 +148,91 @@ function sakura_release_api_request( $url ) {
 
 	$status_code = (int) wp_remote_retrieve_response_code( $response );
 	$body        = wp_remote_retrieve_body( $response );
-	if ( $status_code < 200 || $status_code >= 300 || '' === $body ) {
-		return new WP_Error( 'sakura_release_http_error', sprintf( __( 'GitHub returned HTTP %d.', 'sakura' ), $status_code ) );
+	$data        = '' !== $body ? json_decode( $body, true ) : array();
+	$remaining   = wp_remote_retrieve_header( $response, 'x-ratelimit-remaining' );
+	$reset       = wp_remote_retrieve_header( $response, 'x-ratelimit-reset' );
+	$remaining   = is_numeric( $remaining ) ? (int) $remaining : -1;
+	$reset       = is_numeric( $reset ) ? (int) $reset : 0;
+	$message     = is_array( $data ) && ! empty( $data['message'] ) ? sanitize_text_field( $data['message'] ) : '';
+
+	if ( 403 === $status_code && ( 0 === $remaining || false !== stripos( $message, 'rate limit' ) ) ) {
+		return new WP_Error(
+			'sakura_release_rate_limited',
+			__( 'GitHub API rate limit reached. Please try again later.', 'sakura' ),
+			array(
+				'status'    => $status_code,
+				'retry_at'  => $reset,
+				'remaining' => $remaining,
+			)
+		);
 	}
 
-	$data = json_decode( $body, true );
+	if ( $status_code < 200 || $status_code >= 300 || '' === $body ) {
+		return new WP_Error(
+			'sakura_release_http_error',
+			sprintf( __( 'GitHub returned HTTP %d.', 'sakura' ), $status_code ),
+			array( 'status' => $status_code )
+		);
+	}
+
 	if ( ! is_array( $data ) ) {
 		return new WP_Error( 'sakura_release_invalid_json', __( 'GitHub returned invalid data.', 'sakura' ) );
 	}
 
 	return $data;
+}
+
+function sakura_release_error_state( $error = null, $legacy_message = '' ) {
+	$state = array(
+		'type'     => 'none',
+		'status'   => 0,
+		'retry_at' => 0,
+	);
+
+	if ( is_array( $error ) && isset( $error['type'] ) ) {
+		$type = sanitize_key( (string) $error['type'] );
+		$state['type'] = in_array( $type, array( 'rate_limited', 'http_error', 'network_error', 'invalid_data', 'unknown' ), true ) ? $type : 'unknown';
+		$state['status'] = isset( $error['status'] ) ? (int) $error['status'] : 0;
+		$state['retry_at'] = isset( $error['retry_at'] ) ? (int) $error['retry_at'] : 0;
+		return $state;
+	}
+
+	$code    = '';
+	$message = (string) $legacy_message;
+	$data    = array();
+	if ( is_wp_error( $error ) ) {
+		$code    = (string) $error->get_error_code();
+		$message = $error->get_error_message();
+		$error_data = $error->get_error_data();
+		$data = is_array( $error_data ) ? $error_data : array();
+	}
+
+	$status = isset( $data['status'] ) ? (int) $data['status'] : 0;
+	$retry_at = isset( $data['retry_at'] ) ? (int) $data['retry_at'] : 0;
+	if ( 'sakura_release_rate_limited' === $code || 403 === $status || preg_match( '/rate limit|GitHub returned HTTP 403\./i', $message ) ) {
+		$state['type'] = 'rate_limited';
+	} elseif ( 'sakura_release_http_error' === $code || $status >= 400 ) {
+		$state['type'] = 'http_error';
+	} elseif ( 'sakura_release_invalid_json' === $code ) {
+		$state['type'] = 'invalid_data';
+	} elseif ( '' !== $message ) {
+		$state['type'] = 'network_error';
+	}
+
+	$state['status'] = $status;
+	$state['retry_at'] = $retry_at;
+	return $state;
+}
+
+function sakura_release_error_label( $state ) {
+	$state = sakura_release_error_state( $state );
+	if ( 'rate_limited' === $state['type'] && $state['retry_at'] > time() ) {
+		return sprintf( __( 'GitHub API rate limit reached; retry after %s.', 'sakura' ), sakura_release_format_time( $state['retry_at'] ) );
+	}
+	if ( 'rate_limited' === $state['type'] ) {
+		return __( 'GitHub API rate limit reached. Please try again later.', 'sakura' );
+	}
+	return __( 'Unable to check', 'sakura' );
 }
 
 function sakura_release_normalize_release( $release ) {
@@ -224,23 +299,27 @@ function sakura_release_info( $force = false ) {
 
 	$release  = sakura_release_api_request( sakura_release_api_url( 'releases/latest' ) );
 	$releases = sakura_release_api_request( sakura_release_api_url( 'releases?per_page=20' ) );
-	$errors   = array();
+	$errors       = array();
+	$error_states = array();
 
 	if ( is_wp_error( $release ) ) {
-		$errors['stable'] = $release->get_error_message();
-		$release          = array();
+		$errors['stable']       = $release->get_error_message();
+		$error_states['stable'] = sakura_release_error_state( $release );
+		$release                = array();
 	}
 	if ( is_wp_error( $releases ) ) {
-		$errors['testing'] = $releases->get_error_message();
-		$releases          = array();
+		$errors['testing']       = $releases->get_error_message();
+		$error_states['testing'] = sakura_release_error_state( $releases );
+		$releases                = array();
 	}
 
 	$stable_release = sakura_release_normalize_release( $release );
 	$data = array(
 		'release'     => $stable_release,
 		'prerelease'  => sakura_release_latest_prerelease( $releases, $stable_release ),
-		'errors'      => $errors,
-		'checked_at'  => time(),
+		'errors'       => $errors,
+		'error_states' => $error_states,
+		'checked_at'   => time(),
 	);
 	$ttl  = empty( $errors ) ? 6 * HOUR_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
 	set_transient( sakura_release_cache_key(), $data, $ttl );
@@ -400,8 +479,13 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 	$release          = $info['release'] ?? array();
 	$prerelease       = $info['prerelease'] ?? array();
 	$errors           = $info['errors'] ?? array();
-	$stable_status    = ! empty( $errors['stable'] ) ? array( 'class' => 'is-muted', 'label' => __( 'Unable to check', 'sakura' ) ) : sakura_release_stable_status( $release );
-	$testing_status   = ! empty( $errors['testing'] ) ? array( 'class' => 'is-muted', 'label' => __( 'Unable to check', 'sakura' ) ) : sakura_release_testing_status( $prerelease );
+	$error_states     = $info['error_states'] ?? array();
+	$stable_error      = sakura_release_error_state( $error_states['stable'] ?? null, $errors['stable'] ?? '' );
+	$testing_error     = sakura_release_error_state( $error_states['testing'] ?? null, $errors['testing'] ?? '' );
+	$stable_has_error  = 'none' !== $stable_error['type'];
+	$testing_has_error = 'none' !== $testing_error['type'];
+	$stable_status    = $stable_has_error ? array( 'class' => 'is-muted', 'label' => sakura_release_error_label( $stable_error ) ) : sakura_release_stable_status( $release );
+	$testing_status   = $testing_has_error ? array( 'class' => 'is-muted', 'label' => sakura_release_error_label( $testing_error ) ) : sakura_release_testing_status( $prerelease );
 	$stable_download  = sakura_release_download_link( $release );
 	$testing_download = sakura_release_download_link( $prerelease );
 	$checked_at       = ! empty( $info['checked_at'] ) ? sakura_release_format_time( $info['checked_at'] ) : __( 'Unknown time', 'sakura' );
@@ -409,7 +493,7 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 	$stable_badge     = 'https://img.shields.io/github/v/release/' . sakura_release_repository() . '?display_name=tag&style=flat-square&label=stable';
 	$testing_version  = $prerelease['tag_name'] ?? '';
 	$testing_badge    = 'https://img.shields.io/badge/prerelease-' . rawurlencode( '' !== $testing_version ? $testing_version : 'unavailable' ) . '-d97706.svg?style=flat-square';
-	$testing_summary  = '' !== $testing_version ? sakura_release_version_from_tag( $testing_version ) : ( ! empty( $errors['testing'] ) ? __( 'Data unavailable', 'sakura' ) : __( 'No prerelease available', 'sakura' ) );
+	$testing_summary  = '' !== $testing_version ? sakura_release_version_from_tag( $testing_version ) : ( $testing_has_error ? __( 'Data unavailable', 'sakura' ) : __( 'No prerelease available', 'sakura' ) );
 
 	ob_start();
 	?>
