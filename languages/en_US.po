@@ -2201,6 +2201,21 @@ msgstr ""
 
 #: inc/release-info.php
 #, php-format
+msgid "Build source: %s"
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
+msgid "Branch %s"
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
+msgid "Release tag %s"
+msgstr ""
+
+#: inc/release-info.php
+#, php-format
 msgid "Current branch: %s"
 msgstr ""
 
@@ -2231,6 +2246,10 @@ msgstr ""
 
 #: inc/release-info.php
 msgid "Branch metadata is unavailable for this installation."
+msgstr ""
+
+#: inc/release-info.php
+msgid "Build source metadata is unavailable for this installation."
 msgstr ""
 
 #: inc/release-info.php

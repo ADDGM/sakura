@@ -407,7 +407,7 @@ if ($optionsSource === false || strpos($optionsSource, "'id' => 'release_info'")
     $errors[] = '检查更新区域未使用稳定版/测试版状态模块。';
 }
 $releaseInfoSource = file_get_contents(get_template_directory() . '/inc/release-info.php');
-if ($releaseInfoSource === false || strpos($releaseInfoSource, 'https://api.github.com/repos/') === false || strpos($releaseInfoSource, 'releases?per_page=20') === false || strpos($releaseInfoSource, 'github/v/release/') === false || strpos($releaseInfoSource, 'github/last-commit/') === false || strpos($releaseInfoSource, 'function sakura_release_download_link') === false || strpos($releaseInfoSource, 'sakura_release_rate_limited') === false || strpos($releaseInfoSource, 'error_states') === false || strpos($releaseInfoSource, "str_replace( '-', '--'") === false || strpos($releaseInfoSource, 'GitHub API rate limit reached') === false || strpos($releaseInfoSource, 'ob_get_clean()') === false) {
+if ($releaseInfoSource === false || strpos($releaseInfoSource, 'https://api.github.com/repos/') === false || strpos($releaseInfoSource, 'releases?per_page=20') === false || strpos($releaseInfoSource, 'github/v/release/') === false || strpos($releaseInfoSource, 'github/last-commit/') === false || strpos($releaseInfoSource, 'function sakura_release_download_link') === false || strpos($releaseInfoSource, 'function sakura_release_is_valid_tag') === false || strpos($releaseInfoSource, 'function sakura_release_build_source_label') === false || strpos($releaseInfoSource, 'sakura_release_rate_limited') === false || strpos($releaseInfoSource, 'error_states') === false || strpos($releaseInfoSource, "str_replace( '-', '--'") === false || strpos($releaseInfoSource, 'GitHub API rate limit reached') === false || strpos($releaseInfoSource, 'ob_get_clean()') === false) {
     $errors[] = '检查更新模块缺少正式/预发布状态、徽章、下载入口或返回式渲染。';
 }
 if ($releaseInfoSource !== false && strpos($releaseInfoSource, 'mashirozx/Sakura') !== false) {
@@ -417,11 +417,22 @@ $aboutBlock = '';
 if ($optionsSource !== false && preg_match("/'name'\s*=>\s*__\('About'.*?'id'\s*=>\s*'theme_intro'.*?'type'\s*=>\s*'release_about'/s", $optionsSource, $aboutMatch)) {
     $aboutBlock = $aboutMatch[0];
 }
-if ($aboutBlock === '' || strpos($aboutBlock, "'type' => 'release_about'") === false || strpos($releaseInfoSource, 'sakura_release_render_about') === false || strpos($releaseInfoSource, 'Download current branch ZIP') === false) {
+if ($aboutBlock === '' || strpos($aboutBlock, "'type' => 'release_about'") === false || strpos($releaseInfoSource, 'sakura_release_render_about') === false || strpos($releaseInfoSource, 'Build source: %s') === false || strpos($releaseInfoSource, 'Release tag %s') === false || strpos($releaseInfoSource, 'Download current branch ZIP') === false) {
     $errors[] = '关于区域未使用构建信息组件或缺少当前分支源码入口。';
 }
 if ($aboutBlock !== '' && strpos($aboutBlock, 'mashirozx/Sakura') !== false) {
     $errors[] = '关于区域仍引用上游 mashirozx/Sakura 链接。';
+}
+if (function_exists('sakura_release_is_valid_tag') && function_exists('sakura_release_build_source_label')) {
+    if (!sakura_release_is_valid_tag('v3.6.0-rc.2') || sakura_release_is_valid_tag('develop')) {
+        $errors[] = 'Release 标签校验未正确区分合法标签与分支名。';
+    }
+    $branchSource = sakura_release_build_source_label(array('branch' => 'develop'));
+    $tagSource = sakura_release_build_source_label(array('tag' => 'v3.6.0-rc.2'));
+    $unknownSource = sakura_release_build_source_label(array());
+    if (strpos($branchSource, 'develop') === false || strpos($tagSource, 'v3.6.0-rc.2') === false || $unknownSource === '') {
+        $errors[] = '构建来源标签未按分支、Release 标签和未知状态正确生成。';
+    }
 }
 $dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-scheme.css');
 if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {

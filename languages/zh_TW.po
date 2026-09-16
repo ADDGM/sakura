@@ -2289,6 +2289,21 @@ msgstr "未知構建"
 
 #: inc/release-info.php
 #, php-format
+msgid "Build source: %s"
+msgstr "構建來源：%s"
+
+#: inc/release-info.php
+#, php-format
+msgid "Branch %s"
+msgstr "分支 %s"
+
+#: inc/release-info.php
+#, php-format
+msgid "Release tag %s"
+msgstr "標籤 %s"
+
+#: inc/release-info.php
+#, php-format
 msgid "Current branch: %s"
 msgstr "目前分支：%s"
 
@@ -2320,6 +2335,10 @@ msgstr "瀏覽目前分支"
 #: inc/release-info.php
 msgid "Branch metadata is unavailable for this installation."
 msgstr "此安裝缺少分支構建元資料。"
+
+#: inc/release-info.php
+msgid "Build source metadata is unavailable for this installation."
+msgstr "此安裝缺少構建來源元資料。"
 
 #: inc/release-info.php
 msgid "Testing release"

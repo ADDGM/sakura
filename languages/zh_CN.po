@@ -2289,6 +2289,21 @@ msgstr "未知构建"
 
 #: inc/release-info.php
 #, php-format
+msgid "Build source: %s"
+msgstr "构建来源：%s"
+
+#: inc/release-info.php
+#, php-format
+msgid "Branch %s"
+msgstr "分支 %s"
+
+#: inc/release-info.php
+#, php-format
+msgid "Release tag %s"
+msgstr "标签 %s"
+
+#: inc/release-info.php
+#, php-format
 msgid "Current branch: %s"
 msgstr "当前分支：%s"
 
@@ -2320,6 +2335,10 @@ msgstr "浏览当前分支"
 #: inc/release-info.php
 msgid "Branch metadata is unavailable for this installation."
 msgstr "此安装缺少分支构建元数据。"
+
+#: inc/release-info.php
+msgid "Build source metadata is unavailable for this installation."
+msgstr "此安装缺少构建来源元数据。"
 
 #: inc/release-info.php
 msgid "Testing release"

@@ -82,6 +82,14 @@ function sakura_release_build_info() {
 		$branch = '';
 	}
 
+	$tag = $values['tag'] ?? '';
+	if ( '' === $tag && 0 === strpos( $ref, 'refs/tags/' ) ) {
+		$tag = substr( $ref, strlen( 'refs/tags/' ) );
+	}
+	if ( ! sakura_release_is_valid_tag( $tag ) ) {
+		$tag = '';
+	}
+
 	$commit = $values['source_sha'] ?? ( $values['sha'] ?? '' );
 	if ( ! preg_match( '/^[0-9a-f]{7,40}$/i', $commit ) ) {
 		$commit = '';
@@ -93,7 +101,7 @@ function sakura_release_build_info() {
 	}
 	$info['branch'] = $branch;
 	$info['commit'] = strtolower( $commit );
-	$info['tag'] = sanitize_text_field( $values['tag'] ?? '' );
+	$info['tag'] = $tag;
 
 	return $info;
 }
@@ -108,6 +116,10 @@ function sakura_release_is_valid_ref( $ref ) {
 		&& '/' !== substr( $ref, 0, 1 )
 		&& '/' !== substr( $ref, -1 )
 		&& '.lock' !== substr( $ref, -5 );
+}
+
+function sakura_release_is_valid_tag( $tag ) {
+	return 1 === preg_match( '/^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-(?:beta|rc)\.(?:0|[1-9][0-9]*))?$/', trim( (string) $tag ) );
 }
 
 function sakura_release_encode_ref( $ref ) {
@@ -405,11 +417,26 @@ function sakura_release_build_channel_label( $channel ) {
 	return $labels[ $channel ] ?? $labels['unknown'];
 }
 
+function sakura_release_build_source_label( $build ) {
+	$branch = trim( (string) ( $build['branch'] ?? '' ) );
+	if ( '' !== $branch ) {
+		return sprintf( __( 'Branch %s', 'sakura' ), $branch );
+	}
+
+	$tag = trim( (string) ( $build['tag'] ?? '' ) );
+	if ( '' !== $tag ) {
+		return sprintf( __( 'Release tag %s', 'sakura' ), $tag );
+	}
+
+	return __( 'Unknown', 'sakura' );
+}
+
 function sakura_release_render_about() {
 	$build = sakura_release_build_info();
 	$version = '' !== $build['version'] ? 'v' . $build['version'] : __( 'Unknown', 'sakura' );
 	$branch = $build['branch'];
 	$commit = $build['commit'];
+	$source = sakura_release_build_source_label( $build );
 	$branch_url = sakura_release_ref_url( $branch );
 	$branch_download = sakura_release_ref_url( $branch, 'archive' );
 	$commit_url = '' !== $commit ? 'https://github.com/' . sakura_release_repository() . '/commit/' . rawurlencode( $commit ) : '';
@@ -423,7 +450,7 @@ function sakura_release_render_about() {
 			<span class="sakura-release-build-channel"><?php echo esc_html( sakura_release_build_channel_label( $build['channel'] ) ); ?></span>
 		</div>
 		<div class="sakura-release-build-meta">
-			<span><?php echo esc_html( sprintf( __( 'Current branch: %s', 'sakura' ), '' !== $branch ? $branch : __( 'Unknown', 'sakura' ) ) ); ?></span>
+			<span><?php echo esc_html( sprintf( __( 'Build source: %s', 'sakura' ), $source ) ); ?></span>
 			<?php if ( '' !== $commit ) : ?><span><?php echo esc_html( sprintf( __( 'Current commit: %s', 'sakura' ), substr( $commit, 0, 7 ) ) ); ?></span><?php endif; ?>
 		</div>
 		<div class="sakura-release-about-actions">
@@ -436,7 +463,7 @@ function sakura_release_render_about() {
 		<a class="sakura-release-develop-badge" href="https://github.com/ADDGM/sakura/commits/develop" target="_blank" rel="noopener noreferrer">
 			<img src="<?php echo esc_url( $develop_badge ); ?>" alt="<?php esc_attr_e( 'Latest development commit badge', 'sakura' ); ?>" />
 		</a>
-		<?php if ( '' === $branch ) : ?><p class="sakura-release-about-note"><?php esc_html_e( 'Branch metadata is unavailable for this installation.', 'sakura' ); ?></p><?php endif; ?>
+		<?php if ( '' === $branch && '' === $build['tag'] ) : ?><p class="sakura-release-about-note"><?php esc_html_e( 'Build source metadata is unavailable for this installation.', 'sakura' ); ?></p><?php endif; ?>
 	</div>
 	<?php
 	return (string) ob_get_clean();
