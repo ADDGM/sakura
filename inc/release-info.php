@@ -492,7 +492,8 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 	$name             = $option_name . '[' . $field_id . ']';
 	$stable_badge     = 'https://img.shields.io/github/v/release/' . sakura_release_repository() . '?display_name=tag&style=flat-square&label=stable';
 	$testing_version  = $prerelease['tag_name'] ?? '';
-	$testing_badge    = 'https://img.shields.io/badge/prerelease-' . rawurlencode( '' !== $testing_version ? $testing_version : 'unavailable' ) . '-d97706.svg?style=flat-square';
+	$testing_badge_value = '' !== $testing_version ? str_replace( '-', '--', rawurlencode( $testing_version ) ) : 'unavailable';
+	$testing_badge    = 'https://img.shields.io/badge/prerelease-' . $testing_badge_value . '-d97706.svg?style=flat-square';
 	$testing_summary  = '' !== $testing_version ? sakura_release_version_from_tag( $testing_version ) : ( $testing_has_error ? __( 'Data unavailable', 'sakura' ) : __( 'No prerelease available', 'sakura' ) );
 
 	ob_start();
