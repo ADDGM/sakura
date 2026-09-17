@@ -502,6 +502,12 @@ if (function_exists('sakura_release_theme_update')) {
 }
 if (function_exists('sakura_release_protect_channel_update')) {
     $frameworkSettings = get_option('optionsframework');
+    if (!is_array($frameworkSettings) || empty($frameworkSettings['id'])) {
+        $frameworkSettings = array(
+            'id' => preg_replace('/\W/', '_', strtolower((string) wp_get_theme())),
+        );
+        update_option('optionsframework', $frameworkSettings);
+    }
     $themeOptionName = is_array($frameworkSettings) ? ($frameworkSettings['id'] ?? '') : '';
     $originalUserId = get_current_user_id();
     if ($themeOptionName !== '') {
