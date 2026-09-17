@@ -1066,7 +1066,7 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('Check for Updates', 'sakura'), /*检查更新*/
-        'desc' => '',
+        'desc' => __('The selected channel controls native WordPress theme updates. Automatic updates are disabled by default and run only after an administrator enables them in WordPress.', 'sakura'),
         'id' => 'release_info',
         'std' => 'stable',
         'type' => 'release_status',

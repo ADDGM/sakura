@@ -17,6 +17,23 @@ function sakura_release_cache_key() {
 	return 'sakura_release_info_v3';
 }
 
+function sakura_release_manage_capability() {
+	return 'manage_options';
+}
+
+function sakura_release_can_manage_updates() {
+	return current_user_can( sakura_release_manage_capability() );
+}
+
+function sakura_release_channel() {
+	return sakura_release_normalize_channel( function_exists( 'akina_option' ) ? akina_option( 'release_info', 'stable' ) : 'stable' );
+}
+
+function sakura_release_clear_update_cache() {
+	delete_transient( sakura_release_cache_key() );
+	delete_site_transient( 'update_themes' );
+}
+
 function sakura_release_normalize_channel( $channel ) {
 	$channel = sanitize_key( (string) $channel );
 	$legacy_map = array(
@@ -407,6 +424,125 @@ function sakura_release_download_link( $release ) {
 	return array( $release['html_url'] ?? '', __( 'Open download page', 'sakura' ) );
 }
 
+function sakura_release_installable_package( $release ) {
+	$version = sakura_release_version_from_tag( $release['tag_name'] ?? '' );
+	if ( '' === $version || ! sakura_release_is_valid_tag( $release['tag_name'] ?? '' ) ) {
+		return '';
+	}
+
+	$expected_name = 'sakura-' . $version . '.zip';
+	foreach ( (array) ( $release['assets'] ?? array() ) as $asset ) {
+		$name = sanitize_file_name( $asset['name'] ?? '' );
+		$url  = esc_url_raw( $asset['url'] ?? '' );
+		if ( $expected_name === $name && '' !== $url ) {
+			return $url;
+		}
+	}
+
+	return '';
+}
+
+function sakura_release_update_candidate( $channel, $release, $prerelease ) {
+	$channel    = sakura_release_normalize_channel( $channel );
+	$candidates = array(
+		array(
+			'release'    => $release,
+			'prerelease' => false,
+		),
+	);
+	if ( 'testing' === $channel ) {
+		$candidates[] = array(
+			'release'    => $prerelease,
+			'prerelease' => true,
+		);
+	}
+
+	$selected         = array();
+	$selected_version = '';
+	foreach ( $candidates as $item ) {
+		$candidate = $item['release'];
+		if ( ! is_array( $candidate ) || ! empty( $candidate['draft'] ) ) {
+			continue;
+		}
+		if ( (bool) ( $candidate['prerelease'] ?? false ) !== $item['prerelease'] ) {
+			continue;
+		}
+		$version = sakura_release_version_from_tag( $candidate['tag_name'] ?? '' );
+		if ( '' === $version || '' === sakura_release_installable_package( $candidate ) ) {
+			continue;
+		}
+		if ( '' === $selected_version || version_compare( $version, $selected_version, '>' ) ) {
+			$selected         = $candidate;
+			$selected_version = $version;
+		}
+	}
+
+	return $selected;
+}
+
+function sakura_release_theme_update( $update, $theme_data, $theme_stylesheet, $locales ) {
+	$update_uri = esc_url_raw( $theme_data['UpdateURI'] ?? '' );
+	if ( untrailingslashit( $update_uri ) !== 'https://github.com/ADDGM/sakura' ) {
+		return $update;
+	}
+
+	$info      = sakura_release_info();
+	$candidate = sakura_release_update_candidate(
+		sakura_release_channel(),
+		$info['release'] ?? array(),
+		$info['prerelease'] ?? array()
+	);
+	return sakura_release_update_payload( $candidate, $theme_stylesheet );
+}
+
+function sakura_release_update_payload( $candidate, $theme_stylesheet ) {
+	$version = sakura_release_version_from_tag( $candidate['tag_name'] ?? '' );
+	$package = sakura_release_installable_package( $candidate );
+	if ( '' === $version || '' === $package ) {
+		return false;
+	}
+
+	return array(
+		'theme'        => $theme_stylesheet,
+		'version'      => $version,
+		'url'          => esc_url_raw( $candidate['html_url'] ?? '' ),
+		'package'      => $package,
+		'requires'     => '7.0',
+		'tested'       => '7.1',
+		'requires_php' => '8.0',
+		'autoupdate'   => false,
+	);
+}
+add_filter( 'update_themes_github.com', 'sakura_release_theme_update', 10, 4 );
+
+function sakura_release_protect_channel_update( $value, $option, $old_value ) {
+	$settings    = get_option( 'optionsframework' );
+	$option_name = is_array( $settings ) && isset( $settings['id'] ) ? (string) $settings['id'] : '';
+	if ( '' === $option_name || $option_name !== $option || ! is_array( $value ) ) {
+		return $value;
+	}
+
+	$old_options = is_array( $old_value ) ? $old_value : array();
+	$old_channel = sakura_release_normalize_channel( $old_options['release_info'] ?? 'stable' );
+	if ( ! sakura_release_can_manage_updates() ) {
+		if ( array_key_exists( 'release_info', $old_options ) ) {
+			$value['release_info'] = $old_channel;
+		} else {
+			unset( $value['release_info'] );
+		}
+		return $value;
+	}
+
+	$new_channel = sakura_release_normalize_channel( $value['release_info'] ?? $old_channel );
+	$value['release_info'] = $new_channel;
+	if ( $old_channel !== $new_channel ) {
+		sakura_release_clear_update_cache();
+	}
+
+	return $value;
+}
+add_filter( 'pre_update_option', 'sakura_release_protect_channel_update', 10, 3 );
+
 function sakura_release_build_channel_label( $channel ) {
 	$labels = array(
 		'stable'      => __( 'Stable build', 'sakura' ),
@@ -485,15 +621,18 @@ function sakura_release_maybe_refresh() {
 	if ( ! is_admin() || 'themes.php' !== $pagenow || 'options-framework' !== sanitize_key( $_GET['page'] ?? '' ) || empty( $_GET['sakura_release_refresh'] ) ) {
 		return;
 	}
-	if ( ! current_user_can( 'edit_theme_options' ) ) {
-		return;
+	if ( ! sakura_release_can_manage_updates() ) {
+		wp_die( esc_html__( 'You are not allowed to manage theme updates.', 'sakura' ) );
 	}
 	$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ?? '' ) );
 	if ( ! wp_verify_nonce( $nonce, 'sakura_release_refresh' ) ) {
 		wp_die( esc_html__( 'The refresh link has expired. Please try again.', 'sakura' ) );
 	}
 
-	delete_transient( sakura_release_cache_key() );
+	sakura_release_clear_update_cache();
+	if ( function_exists( 'wp_update_themes' ) ) {
+		wp_update_themes();
+	}
 	$redirect = admin_url( 'themes.php?page=options-framework' );
 	wp_safe_redirect( $redirect . '#section-release_info' );
 	exit;
@@ -522,15 +661,17 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 	$testing_badge_value = '' !== $testing_version ? str_replace( '-', '--', rawurlencode( $testing_version ) ) : 'unavailable';
 	$testing_badge    = 'https://img.shields.io/badge/prerelease-' . $testing_badge_value . '-d97706.svg?style=flat-square';
 	$testing_summary  = '' !== $testing_version ? sakura_release_version_from_tag( $testing_version ) : ( $testing_has_error ? __( 'Data unavailable', 'sakura' ) : __( 'No prerelease available', 'sakura' ) );
+	$can_manage       = sakura_release_can_manage_updates();
 
 	ob_start();
 	?>
 	<div class="sakura-release-field" data-channel="<?php echo esc_attr( $selected ); ?>">
+		<?php if ( ! $can_manage ) : ?><input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $selected ); ?>" /><?php endif; ?>
 		<fieldset class="sakura-release-channel">
 			<legend class="screen-reader-text"><?php esc_html_e( 'Version channel', 'sakura' ); ?></legend>
 			<?php foreach ( array( 'stable' => __( 'Stable release', 'sakura' ), 'testing' => __( 'Testing release', 'sakura' ) ) as $channel => $label ) : ?>
 				<label class="sakura-release-channel-option<?php echo $selected === $channel ? ' is-selected' : ''; ?>">
-					<input type="radio" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $channel ); ?>"<?php checked( $selected, $channel ); ?> />
+					<input type="radio" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $channel ); ?>"<?php checked( $selected, $channel ); ?><?php disabled( ! $can_manage ); ?> />
 					<span><?php echo esc_html( $label ); ?></span>
 				</label>
 			<?php endforeach; ?>
@@ -542,7 +683,7 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 				data-stable-label="<?php echo esc_attr( sprintf( __( 'Watching: %s', 'sakura' ), __( 'Stable release', 'sakura' ) ) ); ?>"
 				data-testing-label="<?php echo esc_attr( sprintf( __( 'Watching: %s', 'sakura' ), __( 'Testing release', 'sakura' ) ) ); ?>"
 			><?php echo esc_html( sprintf( __( 'Watching: %s', 'sakura' ), 'stable' === $selected ? __( 'Stable release', 'sakura' ) : __( 'Testing release', 'sakura' ) ) ); ?></span>
-			<a class="button button-secondary" href="<?php echo esc_url( sakura_release_refresh_url() ); ?>"><?php esc_html_e( 'Check now', 'sakura' ); ?></a>
+			<?php if ( $can_manage ) : ?><a class="button button-secondary" href="<?php echo esc_url( sakura_release_refresh_url() ); ?>"><?php esc_html_e( 'Check now', 'sakura' ); ?></a><?php endif; ?>
 		</div>
 
 		<div class="sakura-release-cards">
@@ -577,7 +718,8 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 			</article>
 		</div>
 
-		<p class="sakura-release-help"><?php echo esc_html( sprintf( __( 'Last checked: %s. Release data is cached for six hours. Testing releases come from GitHub prereleases.', 'sakura' ), $checked_at ) ); ?></p>
+		<p class="sakura-release-help"><?php echo esc_html( sprintf( __( 'Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates; automatic updates remain off until an administrator enables them in WordPress.', 'sakura' ), $checked_at ) ); ?></p>
+		<?php if ( ! $can_manage ) : ?><p class="sakura-release-help"><?php esc_html_e( 'Only administrators can change the update channel or check for updates now.', 'sakura' ); ?></p><?php endif; ?>
 	</div>
 	<?php
 	return (string) ob_get_clean();

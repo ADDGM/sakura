@@ -8,6 +8,7 @@ declare(strict_types=1);
 const SAKURA_THEME_EXPECTED_HEADERS = array(
     'Theme Name' => 'Sakura',
     'Author' => 'ADDGM',
+    'Update URI' => 'https://github.com/ADDGM/sakura',
     'Requires at least' => '7.0',
     'Tested up to' => '7.1',
     'Requires PHP' => '8.0',
@@ -116,6 +117,7 @@ function sakura_theme_metadata_self_test(): int
         . "Theme Name: Sakura\r\n"
         . "Author: ADDGM\r\n"
         . "Version: 3.5.0\r\n"
+        . "Update URI: https://github.com/ADDGM/sakura\r\n"
         . "Requires at least: 7.0\r\n"
         . "Tested up to: 7.1\r\n"
         . "Requires PHP: 8.0\r\n"

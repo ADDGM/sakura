@@ -2352,3 +2352,20 @@ msgstr "最新測試版徽章"
 #, php-format
 msgid "Last checked: %s. Release data is cached for six hours. Testing releases come from GitHub prereleases."
 msgstr "上次檢查：%s。版本資料快取 6 小時，測試版來自 GitHub 預發佈版本。"
+
+#: options.php
+msgid "The selected channel controls native WordPress theme updates. Automatic updates are disabled by default and run only after an administrator enables them in WordPress."
+msgstr "所選頻道會控制 WordPress 原生佈景主題更新。自動更新預設關閉，僅在管理員於 WordPress 中主動啟用後執行。"
+
+#: inc/release-info.php
+msgid "You are not allowed to manage theme updates."
+msgstr "你沒有管理佈景主題更新的權限。"
+
+#: inc/release-info.php
+#, php-format
+msgid "Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates; automatic updates remain off until an administrator enables them in WordPress."
+msgstr "上次檢查：%s。版本資料快取 6 小時；所選頻道會控制 WordPress 原生佈景主題更新，自動更新在管理員主動啟用前保持關閉。"
+
+#: inc/release-info.php
+msgid "Only administrators can change the update channel or check for updates now."
+msgstr "只有管理員可以切換更新頻道或立即檢查更新。"

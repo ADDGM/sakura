@@ -102,6 +102,9 @@ $sourceChecks = array(
     array('inc/release-info.php', 'function sakura_release_build_info', '关于区域未读取主题构建元数据。'),
     array('inc/release-info.php', 'function sakura_release_ref_url', '关于区域未根据当前分支生成源码入口。'),
     array('inc/release-info.php', 'github/last-commit/', '关于区域缺少 develop 状态徽章。'),
+    array('inc/release-info.php', "add_filter( 'update_themes_github.com'", '主题未注册 GitHub Update URI 官方更新过滤器。'),
+    array('inc/release-info.php', "return 'manage_options';", '更新渠道操作未限制为管理员能力。'),
+    array('inc/release-info.php', "'autoupdate'   => false", '主题更新响应未默认关闭自动更新。'),
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
     array('functions.php', 'function sakura_core_resource_url', '核心资源没有统一的本地/远程 URL 解析函数。'),
     array('functions.php', 'function sakura_theme_asset_url', '主题内置资源没有统一的本地 URL 解析函数。'),
@@ -406,12 +409,19 @@ $optionsSource = file_get_contents(get_template_directory() . '/options.php');
 if ($optionsSource === false || strpos($optionsSource, "'id' => 'release_info'") === false || strpos($optionsSource, "'std' => 'stable'") === false || strpos($optionsSource, "'type' => 'release_status'") === false || strpos($optionsSource, "'testing' => __('Testing release', 'sakura')") === false) {
     $errors[] = '检查更新区域未使用稳定版/测试版状态模块。';
 }
+$themeUpdateUri = $theme->get('UpdateURI');
+if ($themeUpdateUri !== 'https://github.com/ADDGM/sakura') {
+    $errors[] = '主题头缺少正确的 GitHub Update URI。';
+}
 $releaseInfoSource = file_get_contents(get_template_directory() . '/inc/release-info.php');
 if ($releaseInfoSource === false || strpos($releaseInfoSource, 'https://api.github.com/repos/') === false || strpos($releaseInfoSource, 'releases?per_page=20') === false || strpos($releaseInfoSource, 'github/v/release/') === false || strpos($releaseInfoSource, 'github/last-commit/') === false || strpos($releaseInfoSource, 'function sakura_release_download_link') === false || strpos($releaseInfoSource, 'function sakura_release_is_valid_tag') === false || strpos($releaseInfoSource, 'function sakura_release_build_source_label') === false || strpos($releaseInfoSource, 'sakura_release_rate_limited') === false || strpos($releaseInfoSource, 'error_states') === false || strpos($releaseInfoSource, "str_replace( '-', '--'") === false || strpos($releaseInfoSource, 'GitHub API rate limit reached') === false || strpos($releaseInfoSource, 'ob_get_clean()') === false) {
     $errors[] = '检查更新模块缺少正式/预发布状态、徽章、下载入口或返回式渲染。';
 }
 if ($releaseInfoSource !== false && strpos($releaseInfoSource, 'mashirozx/Sakura') !== false) {
     $errors[] = '检查更新区域仍引用上游 mashirozx/Sakura。';
+}
+if (false === has_filter('update_themes_github.com', 'sakura_release_theme_update')) {
+    $errors[] = 'GitHub Update URI 官方更新过滤器未在运行时注册。';
 }
 $aboutBlock = '';
 if ($optionsSource !== false && preg_match("/'name'\s*=>\s*__\('About'.*?'id'\s*=>\s*'theme_intro'.*?'type'\s*=>\s*'release_about'/s", $optionsSource, $aboutMatch)) {
@@ -433,6 +443,106 @@ if (function_exists('sakura_release_is_valid_tag') && function_exists('sakura_re
     if (strpos($branchSource, 'develop') === false || strpos($tagSource, 'v3.6.0-rc.2') === false || $unknownSource === '') {
         $errors[] = '构建来源标签未按分支、Release 标签和未知状态正确生成。';
     }
+}
+if (function_exists('sakura_release_installable_package') && function_exists('sakura_release_update_candidate')) {
+    $releaseFixture = static function ($tag, $prerelease, $assets = array()) {
+        return array(
+            'tag_name' => $tag,
+            'html_url' => 'https://github.com/ADDGM/sakura/releases/tag/' . $tag,
+            'prerelease' => $prerelease,
+            'draft' => false,
+            'assets' => $assets,
+        );
+    };
+    $assetFixture = static function ($name) {
+        return array(
+            'name' => $name,
+            'url' => 'https://github.com/ADDGM/sakura/releases/download/test/' . rawurlencode($name),
+        );
+    };
+    $stable = $releaseFixture('v3.6.1', false, array($assetFixture('sakura-3.6.1.zip')));
+    $testing = $releaseFixture('v3.7.0-rc.1', true, array($assetFixture('sakura-3.7.0-rc.1.zip')));
+    $stableCandidate = sakura_release_update_candidate('stable', $stable, $testing);
+    $testingCandidate = sakura_release_update_candidate('testing', $stable, $testing);
+    if (($stableCandidate['tag_name'] ?? '') !== 'v3.6.1' || ($testingCandidate['tag_name'] ?? '') !== 'v3.7.0-rc.1') {
+        $errors[] = '稳定版或测试版更新渠道没有选择正确的 Release。';
+    }
+    $olderTesting = $releaseFixture('v3.6.1-rc.2', true, array($assetFixture('sakura-3.6.1-rc.2.zip')));
+    $testingFallback = sakura_release_update_candidate('testing', $stable, $olderTesting);
+    if (($testingFallback['tag_name'] ?? '') !== 'v3.6.1') {
+        $errors[] = '测试渠道没有在预发布版本较旧时回退到更高的稳定版。';
+    }
+    $unsafe = $releaseFixture('v3.6.2', false, array($assetFixture('source.zip'), $assetFixture('sakura-3.6.2.zip.sha256')));
+    if (sakura_release_installable_package($unsafe) !== '' || sakura_release_update_candidate('stable', $unsafe, array()) !== array()) {
+        $errors[] = '自动更新接受了非严格命名的主题安装包。';
+    }
+    if (sakura_release_installable_package($stable) === '') {
+        $errors[] = '严格命名的主题安装包未被自动更新识别。';
+    }
+    if (function_exists('sakura_release_update_payload')) {
+        $updatePayload = sakura_release_update_payload($testing, 'sakura');
+        if (!is_array($updatePayload) || ($updatePayload['version'] ?? '') !== '3.7.0-rc.1' || ($updatePayload['theme'] ?? '') !== 'sakura' || ($updatePayload['requires'] ?? '') !== '7.0' || ($updatePayload['tested'] ?? '') !== '7.1' || ($updatePayload['requires_php'] ?? '') !== '8.0' || ($updatePayload['autoupdate'] ?? true) !== false) {
+            $errors[] = '主题更新数据不完整或错误地默认启用了自动更新。';
+        }
+        if (sakura_release_update_payload($unsafe, 'sakura') !== false) {
+            $errors[] = '缺少严格安装包时仍生成了主题更新数据。';
+        }
+    }
+}
+if (function_exists('sakura_release_theme_update')) {
+    $themeUpdate = sakura_release_theme_update(
+        array('preserve' => true),
+        array('UpdateURI' => 'https://example.com/theme'),
+        'other-theme',
+        array('zh_CN')
+    );
+    if (($themeUpdate['preserve'] ?? false) !== true) {
+        $errors[] = 'GitHub 更新过滤器错误修改了其他主题的更新数据。';
+    }
+}
+if (function_exists('sakura_release_protect_channel_update')) {
+    $frameworkSettings = get_option('optionsframework');
+    $themeOptionName = is_array($frameworkSettings) ? ($frameworkSettings['id'] ?? '') : '';
+    $originalUserId = get_current_user_id();
+    if ($themeOptionName !== '') {
+        set_transient(sakura_release_cache_key(), array('checked_at' => 1), MINUTE_IN_SECONDS);
+        set_site_transient('update_themes', (object) array('last_checked' => 1));
+        wp_set_current_user(0);
+        $protectedChannel = sakura_release_protect_channel_update(
+            array('release_info' => 'testing'),
+            $themeOptionName,
+            array('release_info' => 'stable')
+        );
+        $adminUser = get_user_by('login', 'admin');
+        if (($protectedChannel['release_info'] ?? '') !== 'stable') {
+            $errors[] = '非管理员可以伪造请求修改主题更新渠道。';
+        }
+        if (false === get_transient(sakura_release_cache_key()) || false === get_site_transient('update_themes')) {
+            $errors[] = '非管理员的无效渠道变更错误清除了更新缓存。';
+        }
+        if (!($adminUser instanceof WP_User)) {
+            $errors[] = '无法取得管理员用户以验证更新渠道权限。';
+        } else {
+            wp_set_current_user($adminUser->ID);
+            $allowedChannel = sakura_release_protect_channel_update(
+                array('release_info' => 'testing'),
+                $themeOptionName,
+                array('release_info' => 'stable')
+            );
+            if (($allowedChannel['release_info'] ?? '') !== 'testing') {
+                $errors[] = '管理员无法修改主题更新渠道。';
+            }
+            if (false !== get_transient(sakura_release_cache_key()) || false !== get_site_transient('update_themes')) {
+                $errors[] = '管理员切换更新渠道后未清理发布数据或 WordPress 主题更新缓存。';
+            }
+        }
+    } else {
+        $errors[] = '无法确定主题设置 option 名称以验证更新渠道权限。';
+    }
+    wp_set_current_user($originalUserId);
+}
+if (in_array('sakura', (array) get_site_option('auto_update_themes', array()), true)) {
+    $errors[] = '全新安装不应默认启用主题自动更新。';
 }
 $dashSchemeSource = file_get_contents(get_template_directory() . '/inc/css/dash-scheme.css');
 if ($dashSchemeSource === false || !preg_match('/\.wp-core-ui \.button-primary:active,[\s\S]*?\.wp-core-ui \.button-primary\.active:focus\s*\{[^}]*background:\s*var\(--sakura-dash-primary\);/s', $dashSchemeSource)) {
