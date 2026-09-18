@@ -100,7 +100,7 @@ $sourceChecks = array(
     array('inc/release-info.php', 'function sakura_release_info', '检查更新模块未提供 GitHub 数据缓存。'),
     array('inc/release-info.php', 'function sakura_release_maybe_refresh', '检查更新模块未提供带 nonce 的手动刷新入口。'),
     array('inc/release-info.php', 'function sakura_release_auto_update_url', '检查更新模块未提供 WordPress 原生自动更新管理入口。'),
-    array('inc/release-info.php', "__( 'Manage automatic updates', 'sakura' )", '检查更新模块缺少自动更新管理按钮。'),
+    array('inc/release-info.php', "esc_html_e( 'Manage automatic updates', 'sakura' )", '检查更新模块缺少自动更新管理按钮。'),
     array('inc/release-info.php', 'function sakura_release_build_info', '关于区域未读取主题构建元数据。'),
     array('inc/release-info.php', 'function sakura_release_ref_url', '关于区域未根据当前分支生成源码入口。'),
     array('inc/release-info.php', 'github/last-commit/', '关于区域缺少 develop 状态徽章。'),
