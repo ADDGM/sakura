@@ -2265,8 +2265,8 @@ msgstr ""
 msgid "Last checked: %s. Release data is cached for six hours. Testing releases come from GitHub prereleases."
 msgstr ""
 
-#: options.php
-msgid "The selected channel controls native WordPress theme updates. Automatic updates are disabled by default and run only after an administrator enables them in WordPress."
+#: inc/release-info.php
+msgid "Manage automatic updates"
 msgstr ""
 
 #: inc/release-info.php
@@ -2275,7 +2275,7 @@ msgstr ""
 
 #: inc/release-info.php
 #, php-format
-msgid "Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates; automatic updates remain off until an administrator enables them in WordPress."
+msgid "Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates. Automatic updates are off by default and can be enabled from the Sakura theme details."
 msgstr ""
 
 #: inc/release-info.php

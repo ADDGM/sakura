@@ -2353,9 +2353,9 @@ msgstr "最新测试版徽章"
 msgid "Last checked: %s. Release data is cached for six hours. Testing releases come from GitHub prereleases."
 msgstr "上次检查：%s。版本数据缓存 6 小时，测试版来自 GitHub 预发布版本。"
 
-#: options.php
-msgid "The selected channel controls native WordPress theme updates. Automatic updates are disabled by default and run only after an administrator enables them in WordPress."
-msgstr "所选渠道会控制 WordPress 原生主题更新。自动更新默认关闭，仅在管理员于 WordPress 中主动启用后运行。"
+#: inc/release-info.php
+msgid "Manage automatic updates"
+msgstr "管理自动更新"
 
 #: inc/release-info.php
 msgid "You are not allowed to manage theme updates."
@@ -2363,8 +2363,8 @@ msgstr "你没有管理主题更新的权限。"
 
 #: inc/release-info.php
 #, php-format
-msgid "Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates; automatic updates remain off until an administrator enables them in WordPress."
-msgstr "上次检查：%s。版本数据缓存 6 小时；所选渠道会控制 WordPress 原生主题更新，自动更新在管理员主动启用前保持关闭。"
+msgid "Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates. Automatic updates are off by default and can be enabled from the Sakura theme details."
+msgstr "上次检查：%s。版本数据缓存 6 小时；所选渠道会控制 WordPress 原生主题更新。自动更新默认关闭，可在 Sakura 主题详情中启用。"
 
 #: inc/release-info.php
 msgid "Only administrators can change the update channel or check for updates now."

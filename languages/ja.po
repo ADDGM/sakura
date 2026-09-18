@@ -101,8 +101,8 @@ msgstr "サイトはあらゆる災害の中で %d 日間稼働しています~"
 msgid "Enter a valid site launch date in YYYY-MM-DD format that is not in the future."
 msgstr "有効なサイト開設日を YYYY-MM-DD 形式で入力してください。未来の日付は指定できません。"
 
-#: options.php
-msgid "The selected channel controls native WordPress theme updates. Automatic updates are disabled by default and run only after an administrator enables them in WordPress."
+#: inc/release-info.php
+msgid "Manage automatic updates"
 msgstr ""
 
 #: inc/release-info.php
@@ -111,7 +111,7 @@ msgstr ""
 
 #: inc/release-info.php
 #, php-format
-msgid "Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates; automatic updates remain off until an administrator enables them in WordPress."
+msgid "Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates. Automatic updates are off by default and can be enabled from the Sakura theme details."
 msgstr ""
 
 #: inc/release-info.php

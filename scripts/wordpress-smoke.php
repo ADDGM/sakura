@@ -99,6 +99,8 @@ $sourceChecks = array(
     array('functions.php', "'styleSheetId' => 'sakura-admin-color-scheme-preview-css'", '个人资料页预览未标识静态后台配色样式表。'),
     array('inc/release-info.php', 'function sakura_release_info', '检查更新模块未提供 GitHub 数据缓存。'),
     array('inc/release-info.php', 'function sakura_release_maybe_refresh', '检查更新模块未提供带 nonce 的手动刷新入口。'),
+    array('inc/release-info.php', 'function sakura_release_auto_update_url', '检查更新模块未提供 WordPress 原生自动更新管理入口。'),
+    array('inc/release-info.php', "__( 'Manage automatic updates', 'sakura' )", '检查更新模块缺少自动更新管理按钮。'),
     array('inc/release-info.php', 'function sakura_release_build_info', '关于区域未读取主题构建元数据。'),
     array('inc/release-info.php', 'function sakura_release_ref_url', '关于区域未根据当前分支生成源码入口。'),
     array('inc/release-info.php', 'github/last-commit/', '关于区域缺少 develop 状态徽章。'),
@@ -500,6 +502,17 @@ if (function_exists('sakura_release_theme_update')) {
         $errors[] = 'GitHub 更新过滤器错误修改了其他主题的更新数据。';
     }
 }
+if (function_exists('sakura_release_auto_update_url')) {
+    $autoUpdateUrl = sakura_release_auto_update_url();
+    $autoUpdateQuery = wp_parse_url($autoUpdateUrl, PHP_URL_QUERY);
+    $autoUpdateArgs = array();
+    if (is_string($autoUpdateQuery)) {
+        parse_str($autoUpdateQuery, $autoUpdateArgs);
+    }
+    if (strpos($autoUpdateUrl, admin_url('themes.php')) !== 0 || ($autoUpdateArgs['theme'] ?? '') !== get_template()) {
+        $errors[] = '自动更新管理入口未指向当前主题详情。';
+    }
+}
 if (function_exists('sakura_release_protect_channel_update')) {
     $frameworkSettings = get_option('optionsframework');
     if (!is_array($frameworkSettings) || empty($frameworkSettings['id'])) {
@@ -520,8 +533,12 @@ if (function_exists('sakura_release_protect_channel_update')) {
             array('release_info' => 'stable')
         );
         $adminUser = get_user_by('login', 'admin');
+        $nonAdminReleaseMarkup = function_exists('sakura_release_render_field') ? sakura_release_render_field($themeOptionName, 'release_info', 'stable') : '';
         if (($protectedChannel['release_info'] ?? '') !== 'stable') {
             $errors[] = '非管理员可以伪造请求修改主题更新渠道。';
+        }
+        if ($nonAdminReleaseMarkup !== '' && strpos($nonAdminReleaseMarkup, sakura_release_auto_update_url()) !== false) {
+            $errors[] = '非管理员可以看到自动更新管理入口。';
         }
         if (false === get_transient(sakura_release_cache_key()) || false === get_site_transient('update_themes')) {
             $errors[] = '非管理员的无效渠道变更错误清除了更新缓存。';
@@ -530,6 +547,10 @@ if (function_exists('sakura_release_protect_channel_update')) {
             $errors[] = '无法取得管理员用户以验证更新渠道权限。';
         } else {
             wp_set_current_user($adminUser->ID);
+            $adminReleaseMarkup = function_exists('sakura_release_render_field') ? sakura_release_render_field($themeOptionName, 'release_info', 'stable') : '';
+            if ($adminReleaseMarkup === '' || strpos($adminReleaseMarkup, sakura_release_auto_update_url()) === false) {
+                $errors[] = '管理员看不到自动更新管理入口。';
+            }
             $allowedChannel = sakura_release_protect_channel_update(
                 array('release_info' => 'testing'),
                 $themeOptionName,

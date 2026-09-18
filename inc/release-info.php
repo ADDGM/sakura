@@ -616,6 +616,10 @@ function sakura_release_refresh_url() {
 	return wp_nonce_url( $url, 'sakura_release_refresh' ) . '#section-release_info';
 }
 
+function sakura_release_auto_update_url() {
+	return add_query_arg( 'theme', get_template(), admin_url( 'themes.php' ) );
+}
+
 function sakura_release_maybe_refresh() {
 	global $pagenow;
 	if ( ! is_admin() || 'themes.php' !== $pagenow || 'options-framework' !== sanitize_key( $_GET['page'] ?? '' ) || empty( $_GET['sakura_release_refresh'] ) ) {
@@ -683,7 +687,12 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 				data-stable-label="<?php echo esc_attr( sprintf( __( 'Watching: %s', 'sakura' ), __( 'Stable release', 'sakura' ) ) ); ?>"
 				data-testing-label="<?php echo esc_attr( sprintf( __( 'Watching: %s', 'sakura' ), __( 'Testing release', 'sakura' ) ) ); ?>"
 			><?php echo esc_html( sprintf( __( 'Watching: %s', 'sakura' ), 'stable' === $selected ? __( 'Stable release', 'sakura' ) : __( 'Testing release', 'sakura' ) ) ); ?></span>
-			<?php if ( $can_manage ) : ?><a class="button button-secondary" href="<?php echo esc_url( sakura_release_refresh_url() ); ?>"><?php esc_html_e( 'Check now', 'sakura' ); ?></a><?php endif; ?>
+			<?php if ( $can_manage ) : ?>
+				<div class="sakura-release-overview-actions">
+					<a class="button button-secondary" href="<?php echo esc_url( sakura_release_refresh_url() ); ?>"><?php esc_html_e( 'Check now', 'sakura' ); ?></a>
+					<a class="button button-secondary" href="<?php echo esc_url( sakura_release_auto_update_url() ); ?>"><?php esc_html_e( 'Manage automatic updates', 'sakura' ); ?></a>
+				</div>
+			<?php endif; ?>
 		</div>
 
 		<div class="sakura-release-cards">
@@ -718,7 +727,7 @@ function sakura_release_render_field( $option_name, $field_id, $selected ) {
 			</article>
 		</div>
 
-		<p class="sakura-release-help"><?php echo esc_html( sprintf( __( 'Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates; automatic updates remain off until an administrator enables them in WordPress.', 'sakura' ), $checked_at ) ); ?></p>
+		<p class="sakura-release-help"><?php echo esc_html( sprintf( __( 'Last checked: %s. Release data is cached for six hours. The selected channel controls native WordPress theme updates. Automatic updates are off by default and can be enabled from the Sakura theme details.', 'sakura' ), $checked_at ) ); ?></p>
 		<?php if ( ! $can_manage ) : ?><p class="sakura-release-help"><?php esc_html_e( 'Only administrators can change the update channel or check for updates now.', 'sakura' ); ?></p><?php endif; ?>
 	</div>
 	<?php

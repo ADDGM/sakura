@@ -475,7 +475,7 @@ function optionsframework_fields() {
 
 		if ( ( $value['type'] != "heading" ) && ( $value['type'] != "info" ) ) {
 			$output .= '</div>';
-			if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) && 'release_about' !== $value['type'] ) {
+			if ( ( $value['type'] != "checkbox" ) && ( $value['type'] != "editor" ) && ! in_array( $value['type'], array( 'release_status', 'release_about' ), true ) ) {
 				$output .= '<div class="explain">' . wp_kses( $explain_value, $allowedtags ) . '</div>'."\n";
 			}
 			$output .= '</div></div>'."\n";
