@@ -19,6 +19,13 @@
 		}
 	?>
 	</div><!-- #page Pjax container-->
+	<?php if (sakura_live2d_is_enabled()) : ?>
+	<div id="landlord" aria-label="<?php esc_attr_e('Live2D widget', 'sakura'); ?>">
+		<div class="message" style="opacity:0"></div>
+		<canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+		<button type="button" class="hide-button"><?php esc_html_e('Hide', 'sakura'); ?></button>
+	</div>
+	<?php endif; ?>
 	<footer id="colophon" class="site-footer" role="contentinfo">
 		<div class="site-info" theme-info="Sakura v<?php echo SAKURA_VERSION; ?>">
 			<div class="footertext">

@@ -1231,6 +1231,37 @@ function optionsframework_options()
         'type' => 'text');
 
     $options[] = array(
+        'name' => __('Enable Live2D widget', 'sakura'),
+        'desc' => __('Enable the H-Siren style Live2D widget on desktop browsers. It uses the bundled Cubism 2 runtime and model assets.', 'sakura'),
+        'id' => 'live2d_s',
+        'std' => '0',
+        'type' => 'checkbox');
+
+    $options[] = array(
+        'name' => __('Live2D model', 'sakura'),
+        'id' => 'live2d_m',
+        'std' => 'tia',
+        'type' => 'radio',
+        'options' => array(
+            'tia' => __('Tia', 'sakura'),
+            'pio' => __('Pio', 'sakura'),
+        ));
+
+    $options[] = array(
+        'name' => __('Use remote Live2D costume API', 'sakura'),
+        'desc' => __('When enabled, load a costume PNG from the configured endpoint instead of selecting a bundled costume at random.', 'sakura'),
+        'id' => 'live2d_b',
+        'std' => '0',
+        'type' => 'checkbox');
+
+    $options[] = array(
+        'name' => __('Remote Live2D costume endpoint', 'sakura'),
+        'desc' => __('Enter the costume API base URL. The selected model name is appended as a path segment, matching the H-Siren integration.', 'sakura'),
+        'id' => 'live2d_i',
+        'std' => '',
+        'type' => 'text');
+
+    $options[] = array(
         'name' => __('Whether to enable the clipboard copyright', 'sakura'), /*是否开启剪贴板版权标识*/
         'desc' => __('Automatically add a copyright to the clipboard when copying more than 30 bytes, which is enabled by default.', 'sakura'), /*复制超过30个字节时自动向剪贴板添加版权标识，默认开启*/
         'id' => 'clipboard_copyright',

@@ -231,6 +231,14 @@ function sakura_theme_asset_url($path)
     return get_template_directory_uri() . '/' . ltrim((string) $path, '/');
 }
 
+/**
+ * Whether the optional Live2D widget is enabled.
+ */
+function sakura_live2d_is_enabled()
+{
+    return in_array(akina_option('live2d_s', false), array(true, 1, '1'), true);
+}
+
 function sakura_scripts()
 {
     $cache_version = sakura_frontend_cache_version();
@@ -260,6 +268,55 @@ function sakura_scripts()
         $cache_version,
         true
     );
+
+    if (sakura_live2d_is_enabled()) {
+        $live2d_model = sanitize_key((string) akina_option('live2d_m', 'tia'));
+        if (!in_array($live2d_model, array('tia', 'pio'), true)) {
+            $live2d_model = 'tia';
+        }
+
+        $dress_base = trim((string) akina_option('live2d_i', ''));
+        $use_remote_dress = in_array(akina_option('live2d_b', false), array(true, 1, '1'), true) && '' !== $dress_base;
+        $dress_url = '';
+        if ($use_remote_dress) {
+            $dress_url = trailingslashit(esc_url_raw($dress_base)) . $live2d_model . '?' . wp_rand(10000000, 99999999);
+        }
+
+        wp_enqueue_style(
+            'sakura-live2d',
+            sakura_theme_asset_url('live2d/css/live2d.css'),
+            array(),
+            $cache_version
+        );
+        wp_enqueue_script(
+            'sakura-live2d-runtime',
+            sakura_theme_asset_url('live2d/js/live2d.js'),
+            array('js_lib'),
+            $cache_version,
+            true
+        );
+        wp_enqueue_script(
+            'sakura-live2d-message',
+            sakura_theme_asset_url('live2d/js/message.js'),
+            array('js_lib', 'sakura-live2d-runtime'),
+            $cache_version,
+            true
+        );
+        wp_enqueue_script(
+            'sakura-live2d-loader',
+            sakura_theme_asset_url('live2d/js/' . ($use_remote_dress ? 'run_field.js' : 'run_local.js')),
+            array('sakura-live2d-message'),
+            $cache_version,
+            true
+        );
+        wp_localize_script('sakura-live2d-message', 'SakuraLive2D', array(
+            'enabled' => true,
+            'modelPath' => trailingslashit(sakura_theme_asset_url('live2d/model/' . $live2d_model)),
+            'messagePath' => trailingslashit(sakura_theme_asset_url('live2d')),
+            'homePath' => trailingslashit(home_url('/')),
+            'dressUrl' => $dress_url,
+        ));
+    }
     //wp_enqueue_script('github_card', 'https://cdn.jsdelivr.net/github-cards/latest/widget.js', array(), SAKURA_VERSION, true);
 
     if (is_singular() && comments_open() && get_option('thread_comments')) {
