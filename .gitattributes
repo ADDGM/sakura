@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# The legacy H-Siren costume catalog is not loaded by Sakura. Keep it in the
+# repository for reference, but exclude it from installable theme archives.
+live2d/textures/** export-ignore
+live2d/textures.json export-ignore
