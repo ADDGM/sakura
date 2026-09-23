@@ -52,6 +52,15 @@ jobs:
           php scripts/compile-translations.php --self-test
           php scripts/compile-translations.php --check
 
+      - name: Check Live2D JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          for script in js/sakura-app.js live2d/js/message.js live2d/js/run_local.js live2d/js/run_field.js; do
+            node --check "$script"
+          done
+          node --test scripts/tests/live2d.test.cjs
+
       - name: Build installable test package
         shell: bash
         env:
