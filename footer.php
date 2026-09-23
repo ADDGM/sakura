@@ -23,7 +23,17 @@
 	<div id="landlord" aria-label="<?php esc_attr_e('Live2D widget', 'sakura'); ?>">
 		<div class="message" style="opacity:0"></div>
 		<canvas id="live2d" width="280" height="250" class="live2d"></canvas>
-		<button type="button" class="hide-button"><?php esc_html_e('Hide', 'sakura'); ?></button>
+		<div class="live2d-controls" role="group" aria-label="<?php esc_attr_e('Live2D controls', 'sakura'); ?>">
+			<button type="button" class="drag-handle" aria-label="<?php esc_attr_e('Move Live2D', 'sakura'); ?>" title="<?php esc_attr_e('Move Live2D', 'sakura'); ?>">
+				<span aria-hidden="true">⠿</span>
+				<span class="live2d-visually-hidden"><?php esc_html_e('Move Live2D', 'sakura'); ?></span>
+			</button>
+			<button type="button" class="reset-position" aria-label="<?php esc_attr_e('Reset Live2D position', 'sakura'); ?>" title="<?php esc_attr_e('Reset Live2D position', 'sakura'); ?>">
+				<span aria-hidden="true">↺</span>
+				<span class="live2d-visually-hidden"><?php esc_html_e('Reset Live2D position', 'sakura'); ?></span>
+			</button>
+			<button type="button" class="hide-button"><?php esc_html_e('Hide', 'sakura'); ?></button>
+		</div>
 	</div>
 	<?php endif; ?>
 	<footer id="colophon" class="site-footer" role="contentinfo">

@@ -2369,3 +2369,211 @@ msgstr "上次检查：%s。版本数据缓存 6 小时；所选渠道会控制 
 #: inc/release-info.php
 msgid "Only administrators can change the update channel or check for updates now."
 msgstr "只有管理员可以切换更新渠道或立即检查更新。"
+
+#: functions.php
+msgid "Want to read <span style=\"color:#f6f;\">{text}</span>?"
+msgstr "要看看 <span style=\"color:#f6f;\">{text}</span> 么？"
+
+#: functions.php
+msgid "Do you like the featured image?"
+msgstr "文章特色配图好看嘛？"
+
+#: functions.php
+msgid "Keep reading to find out more!"
+msgstr "想要了解更多，那就再深入点吧~~"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to hear the songs picked for you? ♪</span>"
+msgstr "<span style=\"color:red;\">要听下主人精心挑选的歌曲么~~♪(^∇^*)</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Looking for something? Can I help?</span>"
+msgstr "<span style=\"color:red;\">在找什么东西呢，需要帮忙吗~~</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Shall we go back to the home page?</span>"
+msgstr "<span style=\"color:red;\">要返回主页嘛？</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">That is the menu button!</span>"
+msgstr "<span style=\"color:red;\">那是菜单按钮噢~~</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Please be gentle with that!</span>"
+msgstr "<span style=\"color:red;\">那不要乱玩噢~~</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to watch a video?</span>"
+msgstr "<span style=\"color:red;\">你要看下主人准备的 MMD 吗？~~</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Try the next video if you like!</span>"
+msgstr "<span style=\"color:red;\">不喜欢可以换下一部呢~~</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Follow the author on social media!</span>"
+msgstr "<span style=\"color:red;\">主人的社交ID，不关注下嘛？</span>"
+
+#: functions.php
+msgid "Cannot find what you want? Try searching."
+msgstr "找不到想看的内容？搜索看看吧。"
+
+#: functions.php
+msgid "Thank you for supporting the author!"
+msgstr "客官大人，是要准备给主人打赏吗？谢谢啦~~"
+
+#: functions.php
+msgid "Open the comments and join the conversation!"
+msgstr "评论都收起来啦，点开吐槽下吧~~"
+
+#: functions.php
+msgid "Have something to say?"
+msgstr "想要吐槽些什么吗？"
+
+#: functions.php
+msgid "Give this post a like!"
+msgstr "给这篇文章点个赞吧！"
+
+#: functions.php
+msgid "Share this post so more people can read it!"
+msgstr "把这篇文章分享出去可以让更多的人看到噢~~"
+
+#: functions.php
+msgid "Back to the top!"
+msgstr "回到顶部去吧~~"
+
+#: functions.php
+msgid "Check the privacy option before posting your comment."
+msgstr "评论先打卡，不想公开的话记得点隐私噢~~"
+
+#: functions.php
+msgid "What should I call you?"
+msgstr "敢问客官尊姓大名~~"
+
+#: functions.php
+msgid "Your email helps us find your avatar."
+msgstr "客官给个头像噢~~"
+
+#: functions.php
+msgid "Where is your blog? I would like to visit!"
+msgstr "客官的博客在哪儿呢？我要去看看。"
+
+#: functions.php
+msgid "Please be kind when you leave a comment."
+msgstr "嘛，东西可以乱吃，话可不能乱说噢~~"
+
+#: functions.php
+msgid "Would you like to pick an emoji?"
+msgstr "客官要挑选一个滑稽的表情吗？"
+
+#: functions.php
+msgid "Ready? Send your comment to the author!"
+msgstr "写好了就发送吧！我会第一时间通知主人的~~"
+
+#: functions.php
+msgid "There are more posts to read!"
+msgstr "还有文章哦~~"
+
+#: functions.php
+msgid "Turn the page here!"
+msgstr "这是翻页键~~"
+
+#: functions.php
+msgid "Meet the author's friends!"
+msgstr "这是主人的好伙伴噢~~"
+
+#: functions.php
+msgid "Read the previous post."
+msgstr "点击看上一篇文章~~"
+
+#: functions.php
+msgid "Read the next post."
+msgstr "点击看下一篇文章~~"
+
+#: functions.php
+msgid "You can hide me if you wish. Hmph!"
+msgstr "你不喜欢人家，尽管隐藏呗，哼~~"
+
+#: functions.php
+msgid "Hey, watch where you put that cursor!"
+msgstr "干嘛呢你，快把手拿开~~"
+
+#: functions.php
+msgid "Y-your cursor is in the wrong place!"
+msgstr "鼠…鼠标放错地方了！"
+
+#: functions.php
+msgid "Hands off!"
+msgstr "不要动手动脚的！快把手拿开~~"
+
+#: functions.php
+msgid "H-how shameless!"
+msgstr "真…真的是不知羞耻！"
+
+#: functions.php
+msgid "You tease!"
+msgstr "Hentai！"
+
+#: functions.php
+msgid "Keep that up and I will call for help!"
+msgstr "再摸的话我可要报警了！⌇●﹏●⌇"
+
+#: functions.php
+msgid "Help! Someone will not stop poking me!"
+msgstr "110吗，这里有个变态一直在摸我(ó﹏ò｡)"
+
+#: options.php
+msgid "Enable Live2D widget"
+msgstr "启用 Live2D 看板娘"
+
+#: options.php
+msgid "Enable the H-Siren style Live2D widget on desktop browsers. It uses the bundled Cubism 2 runtime and model assets."
+msgstr "在桌面浏览器启用 H-Siren 风格的 Live2D 看板娘，使用主题内置的 Cubism 2 运行时和模型资源。"
+
+#: options.php
+msgid "Live2D model"
+msgstr "Live2D 模型"
+
+#: options.php
+msgid "Tia"
+msgstr "Tia"
+
+#: options.php
+msgid "Pio"
+msgstr "Pio"
+
+#: options.php
+msgid "Use remote Live2D costume API"
+msgstr "使用远程 Live2D 换装接口"
+
+#: options.php
+msgid "When enabled, load a costume PNG from the configured endpoint instead of selecting a bundled costume at random."
+msgstr "启用后，从配置的接口加载 PNG 服装，不再随机选择内置服装。"
+
+#: options.php
+msgid "Remote Live2D costume endpoint"
+msgstr "远程 Live2D 换装接口地址"
+
+#: options.php
+msgid "Enter the costume API base URL. The selected model name is appended as a path segment, matching the H-Siren integration."
+msgstr "输入换装接口的基础地址。所选模型名称会作为路径片段追加到地址末尾，与 H-Siren 接口格式一致。"
+
+#: footer.php
+msgid "Live2D widget"
+msgstr "Live2D 看板娘"
+
+#: footer.php
+msgid "Live2D controls"
+msgstr "Live2D 控件"
+
+#: footer.php
+msgid "Move Live2D"
+msgstr "移动 Live2D（方向键可微调）"
+
+#: footer.php
+msgid "Reset Live2D position"
+msgstr "恢复 Live2D 默认位置"
+
+#: footer.php
+msgid "Hide"
+msgstr "隐藏"

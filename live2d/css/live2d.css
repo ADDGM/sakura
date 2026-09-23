@@ -5,9 +5,9 @@
     bottom: 0;
     width: 280px;
     height: 250px;
-    z-index: 10000;
+    z-index: 99;
     font-size: 0;
-    transition: all .3s ease-in-out;
+    transition: left .3s ease-in-out, bottom .3s ease-in-out;
 }
 
 #live2d {
@@ -45,7 +45,10 @@
     top: 10px;
     right: 0;
     /* bottom: 30px; */
-    display: none;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .2s ease;
     overflow: hidden;
     /* padding: 4px; */
     width: 60px;
@@ -57,6 +60,90 @@
     text-align: center;
     font-size: 12px;
     cursor: pointer;
+}
+
+#landlord .live2d-controls {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 2;
+}
+
+#landlord:hover .hide-button,
+#landlord:focus-within .hide-button {
+    visibility: visible;
+    opacity: 1;
+}
+
+#landlord .drag-handle,
+#landlord .reset-position {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid rgba(255, 137, 255, .4);
+    border-radius: 50%;
+    color: #555;
+    background: rgba(255, 255, 255, .78);
+    box-shadow: 0 2px 8px rgba(255, 137, 255, .25);
+    font-size: 14px;
+    line-height: 22px;
+    cursor: pointer;
+    opacity: .7;
+    transition: opacity .2s ease, background-color .2s ease;
+}
+
+#landlord .drag-handle {
+    cursor: grab;
+    touch-action: none;
+}
+
+#landlord:hover .drag-handle,
+#landlord:hover .reset-position,
+#landlord .drag-handle:focus-visible,
+#landlord .reset-position:focus-visible {
+    opacity: 1;
+}
+
+#landlord .live2d-controls .hide-button {
+    position: static;
+    top: auto;
+    right: auto;
+}
+
+#landlord .drag-handle:hover,
+#landlord .reset-position:hover {
+    background: #f4f6f8;
+}
+
+#landlord .drag-handle:focus-visible,
+#landlord .reset-position:focus-visible,
+#landlord .hide-button:focus-visible {
+    outline: 2px solid #2980b9;
+    outline-offset: 2px;
+}
+
+#landlord.is-dragging {
+    transition: none;
+}
+
+#landlord.is-dragging .drag-handle {
+    opacity: 1;
+    cursor: grabbing;
+}
+
+#landlord .live2d-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 #landlord .hide-button:hover {

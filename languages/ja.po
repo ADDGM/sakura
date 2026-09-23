@@ -117,3 +117,211 @@ msgstr ""
 #: inc/release-info.php
 msgid "Only administrators can change the update channel or check for updates now."
 msgstr ""
+
+#: functions.php
+msgid "Want to read <span style=\"color:#f6f;\">{text}</span>?"
+msgstr "<span style=\"color:#f6f;\">{text}</span> を読んでみる？"
+
+#: functions.php
+msgid "Do you like the featured image?"
+msgstr "記事のアイキャッチ画像、気に入った？"
+
+#: functions.php
+msgid "Keep reading to find out more!"
+msgstr "もっと知りたいなら、続きを読んでね！"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to hear the songs picked for you? ♪</span>"
+msgstr "<span style=\"color:red;\">選りすぐりの曲を聴いてみる？ ♪</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Looking for something? Can I help?</span>"
+msgstr "<span style=\"color:red;\">何かお探し？ お手伝いしようか？</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Shall we go back to the home page?</span>"
+msgstr "<span style=\"color:red;\">ホームページに戻る？</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">That is the menu button!</span>"
+msgstr "<span style=\"color:red;\">それはメニューボタンだよ！</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Please be gentle with that!</span>"
+msgstr "<span style=\"color:red;\">そこは優しく扱ってね！</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to watch a video?</span>"
+msgstr "<span style=\"color:red;\">用意した動画を見てみる？</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Try the next video if you like!</span>"
+msgstr "<span style=\"color:red;\">気に入らなかったら、次の動画もあるよ！</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Follow the author on social media!</span>"
+msgstr "<span style=\"color:red;\">作者のソーシャルメディアも見てね！</span>"
+
+#: functions.php
+msgid "Cannot find what you want? Try searching."
+msgstr "読みたいものが見つからない？ 検索してみてね。"
+
+#: functions.php
+msgid "Thank you for supporting the author!"
+msgstr "作者を応援してくれてありがとう！"
+
+#: functions.php
+msgid "Open the comments and join the conversation!"
+msgstr "コメントを開いて、お話ししよう！"
+
+#: functions.php
+msgid "Have something to say?"
+msgstr "何か伝えたいことはある？"
+
+#: functions.php
+msgid "Give this post a like!"
+msgstr "この記事に「いいね」してね！"
+
+#: functions.php
+msgid "Share this post so more people can read it!"
+msgstr "この記事をシェアして、みんなにも読んでもらおう！"
+
+#: functions.php
+msgid "Back to the top!"
+msgstr "ページの先頭に戻ろう！"
+
+#: functions.php
+msgid "Check the privacy option before posting your comment."
+msgstr "コメントを投稿する前に、プライバシー設定を確認してね。"
+
+#: functions.php
+msgid "What should I call you?"
+msgstr "何とお呼びすればいい？"
+
+#: functions.php
+msgid "Your email helps us find your avatar."
+msgstr "メールアドレスからアバターを表示できるよ。"
+
+#: functions.php
+msgid "Where is your blog? I would like to visit!"
+msgstr "あなたのブログはどこ？ 遊びに行きたいな！"
+
+#: functions.php
+msgid "Please be kind when you leave a comment."
+msgstr "コメントは思いやりを忘れずにね。"
+
+#: functions.php
+msgid "Would you like to pick an emoji?"
+msgstr "絵文字を選んでみる？"
+
+#: functions.php
+msgid "Ready? Send your comment to the author!"
+msgstr "書けたら送信してね！ 作者にお知らせするよ。"
+
+#: functions.php
+msgid "There are more posts to read!"
+msgstr "まだまだ記事があるよ！"
+
+#: functions.php
+msgid "Turn the page here!"
+msgstr "ここでページをめくれるよ！"
+
+#: functions.php
+msgid "Meet the author's friends!"
+msgstr "作者のお友達を紹介するね！"
+
+#: functions.php
+msgid "Read the previous post."
+msgstr "前の記事を読んでみよう。"
+
+#: functions.php
+msgid "Read the next post."
+msgstr "次の記事を読んでみよう。"
+
+#: functions.php
+msgid "You can hide me if you wish. Hmph!"
+msgstr "邪魔なら隠してもいいよ。ふんっ！"
+
+#: functions.php
+msgid "Hey, watch where you put that cursor!"
+msgstr "ちょっと、カーソルを置く場所に気をつけて！"
+
+#: functions.php
+msgid "Y-your cursor is in the wrong place!"
+msgstr "か、カーソルの位置が違うよ！"
+
+#: functions.php
+msgid "Hands off!"
+msgstr "触らないでってば！"
+
+#: functions.php
+msgid "H-how shameless!"
+msgstr "ほ、ほんとに恥ずかしいんだから！"
+
+#: functions.php
+msgid "You tease!"
+msgstr "もう、からかわないで！"
+
+#: functions.php
+msgid "Keep that up and I will call for help!"
+msgstr "まだ触るなら助けを呼ぶよ！⌇●﹏●⌇"
+
+#: functions.php
+msgid "Help! Someone will not stop poking me!"
+msgstr "助けて！ ずっとつついてくる人がいるの！(ó﹏ò｡)"
+
+#: options.php
+msgid "Enable Live2D widget"
+msgstr "Live2D ウィジェットを有効化"
+
+#: options.php
+msgid "Enable the H-Siren style Live2D widget on desktop browsers. It uses the bundled Cubism 2 runtime and model assets."
+msgstr "デスクトップブラウザーで H-Siren 風の Live2D ウィジェットを有効にします。同梱の Cubism 2 ランタイムとモデルを使用します。"
+
+#: options.php
+msgid "Live2D model"
+msgstr "Live2D モデル"
+
+#: options.php
+msgid "Tia"
+msgstr "Tia"
+
+#: options.php
+msgid "Pio"
+msgstr "Pio"
+
+#: options.php
+msgid "Use remote Live2D costume API"
+msgstr "リモートの Live2D 衣装 API を使用"
+
+#: options.php
+msgid "When enabled, load a costume PNG from the configured endpoint instead of selecting a bundled costume at random."
+msgstr "有効にすると、同梱の衣装をランダムに選ぶ代わりに、設定したエンドポイントから PNG 衣装を読み込みます。"
+
+#: options.php
+msgid "Remote Live2D costume endpoint"
+msgstr "リモートの Live2D 衣装エンドポイント"
+
+#: options.php
+msgid "Enter the costume API base URL. The selected model name is appended as a path segment, matching the H-Siren integration."
+msgstr "衣装 API のベース URL を入力してください。H-Siren と同じ形式で、選択したモデル名がパスの末尾に追加されます。"
+
+#: footer.php
+msgid "Live2D widget"
+msgstr "Live2D ウィジェット"
+
+#: footer.php
+msgid "Live2D controls"
+msgstr "Live2D の操作"
+
+#: footer.php
+msgid "Move Live2D"
+msgstr "Live2D を移動（矢印キーで微調整）"
+
+#: footer.php
+msgid "Reset Live2D position"
+msgstr "Live2D の位置をリセット"
+
+#: footer.php
+msgid "Hide"
+msgstr "非表示"

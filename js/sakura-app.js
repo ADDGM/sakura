@@ -887,6 +887,15 @@ $(function () {
 });
 
 if (mashiro_option.float_player_on) {
+    var live2DPlayerLayoutTimer;
+    function notifyLive2DPlayerLayout() {
+        if (window.sakuraLive2D && typeof window.sakuraLive2D.updatePlayerOffset === 'function') {
+            window.sakuraLive2D.updatePlayerOffset();
+            window.clearTimeout(live2DPlayerLayoutTimer);
+            live2DPlayerLayoutTimer = window.setTimeout(window.sakuraLive2D.updatePlayerOffset, 350);
+        }
+    }
+
     function aplayerF() {
         'use strict';
         var aplayers = [],
@@ -925,7 +934,7 @@ if (mashiro_option.float_player_on) {
                         console.log(a)
                     }
                     var lrcTag = 1;
-                    $(".aplayer.aplayer-fixed").click(function () {
+                    $(".aplayer.aplayer-fixed").off('click.sakuraLive2DLayout').on('click.sakuraLive2DLayout', function () {
                         if (lrcTag == 1) {
                             for (var f = 0; f < aplayers.length; f++) try {
                                 aplayers[f].lrc.show();
@@ -934,10 +943,13 @@ if (mashiro_option.float_player_on) {
                             }
                         }
                         lrcTag = 2;
+                        notifyLive2DPlayerLayout();
                     });
                     var apSwitchTag = 0;
-                    $(".aplayer.aplayer-fixed .aplayer-body").addClass("ap-hover");
-                    $(".aplayer-miniswitcher").click(function () {
+                    $(".aplayer.aplayer-fixed .aplayer-body").addClass("ap-hover")
+                        .off(".sakuraLive2DLayout")
+                        .on("mouseenter.sakuraLive2DLayout mouseleave.sakuraLive2DLayout transitionend.sakuraLive2DLayout", notifyLive2DPlayerLayout);
+                    $(".aplayer-miniswitcher").off('click.sakuraLive2DLayout').on('click.sakuraLive2DLayout', function () {
                         if (apSwitchTag == 0) {
                             $(".aplayer.aplayer-fixed .aplayer-body").removeClass("ap-hover");
                             $("#secondary").addClass("active");
@@ -947,7 +959,9 @@ if (mashiro_option.float_player_on) {
                             $("#secondary").removeClass("active");
                             apSwitchTag = 0;
                         }
+                        notifyLive2DPlayerLayout();
                     });
+                    notifyLive2DPlayerLayout();
                 }
                 var b = mashiro_option.meting_api_url + '?server=:server&type=:type&id=:id&_wpnonce=' + Poi.nonce;
                 'undefined' != typeof meting_api && (b = meting_api);
@@ -957,6 +971,7 @@ if (mashiro_option.float_player_on) {
                     console.log(a)
                 }
                 aplayers = [];
+                notifyLive2DPlayerLayout();
                 for (var c = document.querySelectorAll('.aplayer'), d = function () {
                         var d = c[e],
                             f = d.dataset.id;

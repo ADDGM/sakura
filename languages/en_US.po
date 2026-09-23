@@ -2281,3 +2281,211 @@ msgstr ""
 #: inc/release-info.php
 msgid "Only administrators can change the update channel or check for updates now."
 msgstr ""
+
+#: functions.php
+msgid "Want to read <span style=\"color:#f6f;\">{text}</span>?"
+msgstr "Want to read <span style=\"color:#f6f;\">{text}</span>?"
+
+#: functions.php
+msgid "Do you like the featured image?"
+msgstr "Do you like the featured image?"
+
+#: functions.php
+msgid "Keep reading to find out more!"
+msgstr "Keep reading to find out more!"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to hear the songs picked for you? ♪</span>"
+msgstr "<span style=\"color:red;\">Want to hear the songs picked for you? ♪</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Looking for something? Can I help?</span>"
+msgstr "<span style=\"color:red;\">Looking for something? Can I help?</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Shall we go back to the home page?</span>"
+msgstr "<span style=\"color:red;\">Shall we go back to the home page?</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">That is the menu button!</span>"
+msgstr "<span style=\"color:red;\">That is the menu button!</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Please be gentle with that!</span>"
+msgstr "<span style=\"color:red;\">Please be gentle with that!</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to watch a video?</span>"
+msgstr "<span style=\"color:red;\">Want to watch a video?</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Try the next video if you like!</span>"
+msgstr "<span style=\"color:red;\">Try the next video if you like!</span>"
+
+#: functions.php
+msgid "<span style=\"color:red;\">Follow the author on social media!</span>"
+msgstr "<span style=\"color:red;\">Follow the author on social media!</span>"
+
+#: functions.php
+msgid "Cannot find what you want? Try searching."
+msgstr "Cannot find what you want? Try searching."
+
+#: functions.php
+msgid "Thank you for supporting the author!"
+msgstr "Thank you for supporting the author!"
+
+#: functions.php
+msgid "Open the comments and join the conversation!"
+msgstr "Open the comments and join the conversation!"
+
+#: functions.php
+msgid "Have something to say?"
+msgstr "Have something to say?"
+
+#: functions.php
+msgid "Give this post a like!"
+msgstr "Give this post a like!"
+
+#: functions.php
+msgid "Share this post so more people can read it!"
+msgstr "Share this post so more people can read it!"
+
+#: functions.php
+msgid "Back to the top!"
+msgstr "Back to the top!"
+
+#: functions.php
+msgid "Check the privacy option before posting your comment."
+msgstr "Check the privacy option before posting your comment."
+
+#: functions.php
+msgid "What should I call you?"
+msgstr "What should I call you?"
+
+#: functions.php
+msgid "Your email helps us find your avatar."
+msgstr "Your email helps us find your avatar."
+
+#: functions.php
+msgid "Where is your blog? I would like to visit!"
+msgstr "Where is your blog? I would like to visit!"
+
+#: functions.php
+msgid "Please be kind when you leave a comment."
+msgstr "Please be kind when you leave a comment."
+
+#: functions.php
+msgid "Would you like to pick an emoji?"
+msgstr "Would you like to pick an emoji?"
+
+#: functions.php
+msgid "Ready? Send your comment to the author!"
+msgstr "Ready? Send your comment to the author!"
+
+#: functions.php
+msgid "There are more posts to read!"
+msgstr "There are more posts to read!"
+
+#: functions.php
+msgid "Turn the page here!"
+msgstr "Turn the page here!"
+
+#: functions.php
+msgid "Meet the author's friends!"
+msgstr "Meet the author's friends!"
+
+#: functions.php
+msgid "Read the previous post."
+msgstr "Read the previous post."
+
+#: functions.php
+msgid "Read the next post."
+msgstr "Read the next post."
+
+#: functions.php
+msgid "You can hide me if you wish. Hmph!"
+msgstr "You can hide me if you wish. Hmph!"
+
+#: functions.php
+msgid "Hey, watch where you put that cursor!"
+msgstr "Hey, watch where you put that cursor!"
+
+#: functions.php
+msgid "Y-your cursor is in the wrong place!"
+msgstr "Y-your cursor is in the wrong place!"
+
+#: functions.php
+msgid "Hands off!"
+msgstr "Hands off!"
+
+#: functions.php
+msgid "H-how shameless!"
+msgstr "H-how shameless!"
+
+#: functions.php
+msgid "You tease!"
+msgstr "You tease!"
+
+#: functions.php
+msgid "Keep that up and I will call for help!"
+msgstr "Keep that up and I will call for help!"
+
+#: functions.php
+msgid "Help! Someone will not stop poking me!"
+msgstr "Help! Someone will not stop poking me!"
+
+#: options.php
+msgid "Enable Live2D widget"
+msgstr "Enable Live2D widget"
+
+#: options.php
+msgid "Enable the H-Siren style Live2D widget on desktop browsers. It uses the bundled Cubism 2 runtime and model assets."
+msgstr "Enable the H-Siren style Live2D widget on desktop browsers. It uses the bundled Cubism 2 runtime and model assets."
+
+#: options.php
+msgid "Live2D model"
+msgstr "Live2D model"
+
+#: options.php
+msgid "Tia"
+msgstr "Tia"
+
+#: options.php
+msgid "Pio"
+msgstr "Pio"
+
+#: options.php
+msgid "Use remote Live2D costume API"
+msgstr "Use remote Live2D costume API"
+
+#: options.php
+msgid "When enabled, load a costume PNG from the configured endpoint instead of selecting a bundled costume at random."
+msgstr "When enabled, load a costume PNG from the configured endpoint instead of selecting a bundled costume at random."
+
+#: options.php
+msgid "Remote Live2D costume endpoint"
+msgstr "Remote Live2D costume endpoint"
+
+#: options.php
+msgid "Enter the costume API base URL. The selected model name is appended as a path segment, matching the H-Siren integration."
+msgstr "Enter the costume API base URL. The selected model name is appended as a path segment, matching the H-Siren integration."
+
+#: footer.php
+msgid "Live2D widget"
+msgstr "Live2D widget"
+
+#: footer.php
+msgid "Live2D controls"
+msgstr "Live2D controls"
+
+#: footer.php
+msgid "Move Live2D"
+msgstr "Move Live2D"
+
+#: footer.php
+msgid "Reset Live2D position"
+msgstr "Reset Live2D position"
+
+#: footer.php
+msgid "Hide"
+msgstr "Hide"

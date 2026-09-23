@@ -2094,3 +2094,211 @@ msgstr ""
 #: inc/release-info.php
 msgid "Only administrators can change the update channel or check for updates now."
 msgstr ""
+
+#: functions.php
+msgid "Want to read <span style=\"color:#f6f;\">{text}</span>?"
+msgstr ""
+
+#: functions.php
+msgid "Do you like the featured image?"
+msgstr ""
+
+#: functions.php
+msgid "Keep reading to find out more!"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to hear the songs picked for you? ♪</span>"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">Looking for something? Can I help?</span>"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">Shall we go back to the home page?</span>"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">That is the menu button!</span>"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">Please be gentle with that!</span>"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">Want to watch a video?</span>"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">Try the next video if you like!</span>"
+msgstr ""
+
+#: functions.php
+msgid "<span style=\"color:red;\">Follow the author on social media!</span>"
+msgstr ""
+
+#: functions.php
+msgid "Cannot find what you want? Try searching."
+msgstr ""
+
+#: functions.php
+msgid "Thank you for supporting the author!"
+msgstr ""
+
+#: functions.php
+msgid "Open the comments and join the conversation!"
+msgstr ""
+
+#: functions.php
+msgid "Have something to say?"
+msgstr ""
+
+#: functions.php
+msgid "Give this post a like!"
+msgstr ""
+
+#: functions.php
+msgid "Share this post so more people can read it!"
+msgstr ""
+
+#: functions.php
+msgid "Back to the top!"
+msgstr ""
+
+#: functions.php
+msgid "Check the privacy option before posting your comment."
+msgstr ""
+
+#: functions.php
+msgid "What should I call you?"
+msgstr ""
+
+#: functions.php
+msgid "Your email helps us find your avatar."
+msgstr ""
+
+#: functions.php
+msgid "Where is your blog? I would like to visit!"
+msgstr ""
+
+#: functions.php
+msgid "Please be kind when you leave a comment."
+msgstr ""
+
+#: functions.php
+msgid "Would you like to pick an emoji?"
+msgstr ""
+
+#: functions.php
+msgid "Ready? Send your comment to the author!"
+msgstr ""
+
+#: functions.php
+msgid "There are more posts to read!"
+msgstr ""
+
+#: functions.php
+msgid "Turn the page here!"
+msgstr ""
+
+#: functions.php
+msgid "Meet the author's friends!"
+msgstr ""
+
+#: functions.php
+msgid "Read the previous post."
+msgstr ""
+
+#: functions.php
+msgid "Read the next post."
+msgstr ""
+
+#: functions.php
+msgid "You can hide me if you wish. Hmph!"
+msgstr ""
+
+#: functions.php
+msgid "Hey, watch where you put that cursor!"
+msgstr ""
+
+#: functions.php
+msgid "Y-your cursor is in the wrong place!"
+msgstr ""
+
+#: functions.php
+msgid "Hands off!"
+msgstr ""
+
+#: functions.php
+msgid "H-how shameless!"
+msgstr ""
+
+#: functions.php
+msgid "You tease!"
+msgstr ""
+
+#: functions.php
+msgid "Keep that up and I will call for help!"
+msgstr ""
+
+#: functions.php
+msgid "Help! Someone will not stop poking me!"
+msgstr ""
+
+#: options.php
+msgid "Enable Live2D widget"
+msgstr ""
+
+#: options.php
+msgid "Enable the H-Siren style Live2D widget on desktop browsers. It uses the bundled Cubism 2 runtime and model assets."
+msgstr ""
+
+#: options.php
+msgid "Live2D model"
+msgstr ""
+
+#: options.php
+msgid "Tia"
+msgstr ""
+
+#: options.php
+msgid "Pio"
+msgstr ""
+
+#: options.php
+msgid "Use remote Live2D costume API"
+msgstr ""
+
+#: options.php
+msgid "When enabled, load a costume PNG from the configured endpoint instead of selecting a bundled costume at random."
+msgstr ""
+
+#: options.php
+msgid "Remote Live2D costume endpoint"
+msgstr ""
+
+#: options.php
+msgid "Enter the costume API base URL. The selected model name is appended as a path segment, matching the H-Siren integration."
+msgstr ""
+
+#: footer.php
+msgid "Live2D widget"
+msgstr ""
+
+#: footer.php
+msgid "Live2D controls"
+msgstr ""
+
+#: footer.php
+msgid "Move Live2D"
+msgstr ""
+
+#: footer.php
+msgid "Reset Live2D position"
+msgstr ""
+
+#: footer.php
+msgid "Hide"
+msgstr ""

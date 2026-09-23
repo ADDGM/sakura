@@ -2,7 +2,7 @@
     'use strict';
 
     var config = window.SakuraLive2D || {};
-    if (!config.enabled || !config.modelPath || typeof window.loadlive2d !== 'function' ||
+    if (!config.enabled || !config.modelPath || !$ || typeof $.getJSON !== 'function' || typeof window.loadlive2d !== 'function' ||
         !window.matchMedia || !window.matchMedia('(min-width: 861px)').matches) {
         return;
     }
