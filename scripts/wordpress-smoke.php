@@ -177,6 +177,10 @@ $sourceChecks = array(
 );
 foreach ($sourceChecks as $check) {
     $source = file_get_contents(get_template_directory() . '/' . $check[0]);
+    if (is_string($source)) {
+        // 兼容 Windows 安装包的 CRLF，避免多行源码契约误报。
+        $source = str_replace("\r\n", "\n", $source);
+    }
     if ($source === false) {
         $invalid = true;
     } elseif ($check[1] === 'utf8_encode(' || $check[1] === 'substr(the_excerpt()' || $check[1] === 'X-Real-IP' || strpos($check[1], "str_replace('http://") === 0) {

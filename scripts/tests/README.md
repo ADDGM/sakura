@@ -9,6 +9,8 @@ php scripts/generate-release-notes.php --self-test
 
 CI 会在 PHP 矩阵中执行这两项自测。
 
+完整 WordPress 检查使用 `wp eval-file scripts/wordpress-smoke.php`。源码契约比较会规范化 CRLF/LF 换行，以兼容 Windows 安装包；实际主题源码和运行时行为不受影响。
+
 ## Live2D 回归
 
 无需第三方依赖的 loader、翻译键和模型资源检查：
