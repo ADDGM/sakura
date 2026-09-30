@@ -70,13 +70,27 @@ const server = http.createServer((request, response) => {
         reports.push(name);
         console.log('PASS ' + name);
     };
-    async function setup({model, remote = false, blockedStorage = false} = {}) {
+    async function setup({model, remote = false, blockedStorage = false, fixedHeader = false, adminBar = false} = {}) {
         await page.goto(origin);
         await page.addStyleTag({url: origin + '/cdn/css/lib.css'});
         // The isolated fixture needs the base stylesheet for the bundled APlayer 1.10.1.
         await page.addStyleTag({path: process.env.APLAYER_CSS_PATH || require.resolve('aplayer/dist/APlayer.min.css')});
         await page.addStyleTag({content: 'body{margin:0;background:#fff} #aplayer-float{z-index:100}' + hoverStyle});
         await page.addStyleTag({path: path.join(root, 'live2d/css/live2d.css')});
+        if (fixedHeader) {
+            await page.evaluate(adminBar => {
+                const header = document.createElement('header');
+                header.className = 'site-header';
+                header.style.cssText = 'position:fixed;left:0;right:0;height:75px;z-index:9999;top:' + (adminBar ? 32 : 0) + 'px';
+                document.body.prepend(header);
+                if (adminBar) {
+                    const bar = document.createElement('div');
+                    bar.id = 'wpadminbar';
+                    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:32px;z-index:99999';
+                    document.body.prepend(bar);
+                }
+            }, adminBar);
+        }
         await page.addScriptTag({path: path.join(root, 'cdn/js/src/01.jquery.min.js')});
         await page.evaluate(({origin, messages, model, remoteTexture}) => {
             window.SakuraLive2D = {
@@ -209,6 +223,44 @@ const server = http.createServer((request, response) => {
             assert.equal(await bottom(), 470);
             await page.locator('.reset-position').click();
         });
+        await check('saved edge positions keep controls below the header and admin bar', async () => {
+            await page.evaluate(() => localStorage.setItem('sakura-live2d-position', JSON.stringify({left: 1000, bottom: 470})));
+            await setup({fixedHeader: true, adminBar: true});
+            assert.equal((await page.locator('#landlord').boundingBox()).y, 107);
+            assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('sakura-live2d-position')).bottom), 470);
+            await page.locator('.reset-position').click({timeout: 2000});
+            assert.equal(await bottom(), 0);
+        });
+        await check('drag and keyboard bounds preserve clickable controls after resizing', async () => {
+            await page.waitForTimeout(350);
+            const handle = await page.locator('.drag-handle').boundingBox();
+            await page.mouse.move(handle.x + 10, handle.y + 10);
+            await page.mouse.down();
+            await page.mouse.move(1600, -100, {steps: 5});
+            await page.mouse.up();
+            assert.equal(await bottom(), 363);
+            await page.locator('.drag-handle').focus();
+            await page.keyboard.press('ArrowUp');
+            assert.equal(await bottom(), 363);
+            await page.setViewportSize({width: 900, height: 400});
+            await page.waitForTimeout(350);
+            assert.equal((await page.locator('#landlord').boundingBox()).y, 107);
+            await page.locator('.reset-position').click({timeout: 2000});
+            await page.setViewportSize({width: 1280, height: 720});
+        });
+        await check('a translated header reserves space when it returns', async () => {
+            await page.evaluate(() => {
+                localStorage.setItem('sakura-live2d-position', JSON.stringify({left: 1000, bottom: 470}));
+            });
+            await setup({fixedHeader: true});
+            await page.locator('.site-header').evaluate(element => {element.style.transform = 'translateY(-75px)';});
+            await page.evaluate(() => window.sakuraLive2D.updatePlayerOffset());
+            await page.waitForTimeout(350);
+            assert.equal((await page.locator('#landlord').boundingBox()).y, 75);
+            await page.locator('.site-header').evaluate(element => {element.style.transform = '';});
+            await page.locator('.reset-position').click({timeout: 2000});
+            await setup();
+        });
         await check('player reinitialization keeps one layout click handler', async () => {
             await page.evaluate(() => window.aplayerF());
             const count = await page.evaluate(() => jQuery._data(document.querySelector('.aplayer.aplayer-fixed'), 'events').click
@@ -232,6 +284,44 @@ const server = http.createServer((request, response) => {
             await setup({blockedStorage: true});
             await page.locator('.reset-position').click();
             assert.equal(await bottom(), 0);
+        });
+        await check('clicks before texture readiness do not break the Cubism runtime', async () => {
+            let releaseTexture;
+            let textureRequested;
+            let textureResponse;
+            const textureGate = new Promise(resolve => {releaseTexture = resolve;});
+            const textureReady = new Promise(resolve => {textureRequested = resolve;});
+            const pattern = '**/live2d/model/pio/textures/*.png';
+            await page.route(pattern, route => {
+                textureRequested();
+                textureResponse = textureGate.then(() => route.continue());
+                return textureResponse;
+            });
+            const errorCount = errors.length;
+            try {
+                await setup({model: 'pio'});
+                await Promise.race([
+                    textureReady,
+                    page.waitForTimeout(5000).then(() => {throw new Error('Model did not request a texture');})
+                ]);
+                await page.locator('.reset-position').click();
+                await page.locator('#live2d').click({position: {x: 140, y: 160}});
+                await page.waitForTimeout(100);
+                assert.deepEqual(errors.slice(errorCount), []);
+            } finally {
+                releaseTexture();
+                if (textureResponse) {
+                    await textureResponse;
+                }
+                await page.unroute(pattern);
+            }
+            await page.waitForFunction(() => new Promise(resolve => requestAnimationFrame(() => {
+                const canvas = document.querySelector('#live2d');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                const pixels = new Uint8Array(canvas.width * canvas.height * 4);
+                gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+                resolve(pixels.filter((value, index) => index % 4 === 3 && value > 0).length > 500);
+            })));
         });
         for (const width of [860, 861]) {
             await check(width + 'px loading boundary', async () => {

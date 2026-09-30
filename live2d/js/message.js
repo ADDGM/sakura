@@ -49,9 +49,20 @@
     function getBounds() {
         var width = $landlord.outerWidth() || 280;
         var height = $landlord.outerHeight() || 250;
+        var topInset = 0;
+        $('.site-header, #wpadminbar').each(function () {
+            var style = window.getComputedStyle(this);
+            if (!$(this).is(':visible') || style.visibility === 'hidden' ||
+                (style.position !== 'fixed' && style.position !== 'sticky')) {
+                return;
+            }
+            var rect = this.getBoundingClientRect();
+            // Keep controls reachable even while the header is translated off screen.
+            topInset = Math.max(topInset, rect.bottom, rect.height + (parseFloat(style.top) || 0));
+        });
         return {
             maxLeft: Math.max(0, window.innerWidth - width),
-            maxBottom: Math.max(0, window.innerHeight - height)
+            maxBottom: Math.max(0, window.innerHeight - height - topInset)
         };
     }
 
@@ -130,8 +141,11 @@
         var point = original.touches ? original.touches[0] : original;
         var bounds = getBounds();
         var left = clamp(dragState.left + point.clientX - dragState.x, 0, bounds.maxLeft);
-        var top = clamp(dragState.top + point.clientY - dragState.y, 0, bounds.maxBottom);
-        savedPosition = {left: left, bottom: window.innerHeight - ($landlord.outerHeight() || 250) - top};
+        var top = dragState.top + point.clientY - dragState.y;
+        savedPosition = {
+            left: left,
+            bottom: clamp(window.innerHeight - ($landlord.outerHeight() || 250) - top, 0, bounds.maxBottom)
+        };
         playerOffset = 0;
         applyPosition(false);
         event.preventDefault();
