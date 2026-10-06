@@ -929,6 +929,9 @@ if (mashiro_option.float_player_on) {
                         aplayers.push(new APlayer(d))
                     }
                     for (var f = 0; f < aplayers.length; f++) try {
+                        aplayers[f].on('timeupdate', notifyLive2DPlayerLayout);
+                        aplayers[f].on('lrcshow', notifyLive2DPlayerLayout);
+                        aplayers[f].on('lrchide', notifyLive2DPlayerLayout);
                         aplayers[f].lrc.hide();
                     } catch (a) {
                         console.log(a)

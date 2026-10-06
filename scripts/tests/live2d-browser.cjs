@@ -151,27 +151,82 @@ const server = http.createServer((request, response) => {
             await page.waitForTimeout(350);
             await notOverlapping('.aplayer-list');
         });
-        await check('collapsed player restores the saved position', async () => {
+        await check('collapsed player restores the saved position while centered lyrics stay visible', async () => {
             await page.locator('.aplayer-miniswitcher').click();
             await page.mouse.move(900, 50);
-            await page.evaluate(() => {window.testPlayers[0].lrc.hide(); window.testPlayers[0].list.hide();});
-            await page.waitForTimeout(400);
-            await page.evaluate(() => window.sakuraLive2D.updatePlayerOffset());
+            await page.waitForTimeout(750);
+            assert.equal(await page.locator('.aplayer-lrc').evaluate(element => getComputedStyle(element).display !== 'none'), true);
             assert.equal(await bottom(), 0);
         });
-        await check('lyrics contained inside the widget are fully avoided', async () => {
+        await check('collapse restores a custom saved position without hiding lyrics', async () => {
+            await page.evaluate(() => localStorage.setItem('sakura-live2d-position', JSON.stringify({left: 100, bottom: 24})));
+            await setup();
+            await page.locator('.aplayer-miniswitcher').click();
+            await page.mouse.move(900, 50);
+            await page.waitForTimeout(750);
+            await page.locator('.aplayer-miniswitcher').click();
+            await page.mouse.move(900, 50);
+            await page.waitForTimeout(750);
+            assert.equal(await bottom(), 24);
+            assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('sakura-live2d-position'))), {left: 100, bottom: 24});
+            await page.locator('.reset-position').click();
+        });
+        await check('clipped and empty lyric lines do not reserve space', async () => {
+            await page.evaluate(() => {
+                const contents = document.querySelector('.aplayer-lrc-contents');
+                contents.style.transform = 'none';
+                contents.innerHTML = '<p>Short line</p><p>Next line</p><p>' + 'Wide lyric '.repeat(100) + '</p>';
+                window.sakuraLive2D.updatePlayerOffset();
+            });
+            assert.equal(await bottom(), 0);
+            await page.locator('.aplayer-lrc-contents').evaluate(element => {
+                element.innerHTML = '<p>   </p>';
+                window.sakuraLive2D.updatePlayerOffset();
+            });
+            assert.equal(await bottom(), 0);
+        });
+        await check('visible lyric text inside a custom widget position is fully avoided', async () => {
+            await page.evaluate(() => localStorage.setItem('sakura-live2d-position', JSON.stringify({left: 500, bottom: 0})));
+            await setup();
             await page.evaluate(() => {
                 const lyric = document.querySelector('.aplayer-lrc');
                 Object.assign(lyric.style, {display: 'block', opacity: '1', position: 'fixed', top: '600px', bottom: 'auto', left: '0', width: '100%', height: '30px', transform: 'none'});
                 window.sakuraLive2D.updatePlayerOffset();
             });
             await page.waitForTimeout(350);
-            await notOverlapping('.aplayer-lrc');
-            assert.equal(await bottom(), 120);
+            const textTop = await page.locator('.aplayer-lrc p').first().evaluate(element => {
+                const range = document.createRange();
+                range.selectNodeContents(element);
+                return Math.max(600, range.getBoundingClientRect().top);
+            });
+            assert.ok(Math.abs(await bottom() - (720 - textTop)) < 0.5);
         });
         await check('transparent lyrics do not reserve space', async () => {
             await page.locator('.aplayer-lrc').evaluate(element => {element.style.opacity = '0';});
             await page.evaluate(() => window.sakuraLive2D.updatePlayerOffset());
+            assert.equal(await bottom(), 0);
+        });
+        await check('lyric visibility and playback events update avoidance without manual recalculation', async () => {
+            await page.evaluate(() => localStorage.setItem('sakura-live2d-position', JSON.stringify({left: 30, bottom: 0})));
+            await setup();
+            await page.evaluate(() => {
+                const lines = document.querySelectorAll('.aplayer-lrc p');
+                lines.forEach((line, index) => {line.textContent = index === 0 ? 'Wide lyric '.repeat(100) : '';});
+                window.testPlayers[0].lrc.show();
+            });
+            await page.waitForTimeout(750);
+            assert.ok(await bottom() > 0);
+            await page.evaluate(() => window.testPlayers[0].lrc.hide());
+            await page.waitForTimeout(750);
+            assert.equal(await bottom(), 0);
+            await page.evaluate(() => window.testPlayers[0].lrc.show());
+            await page.waitForTimeout(750);
+            assert.ok(await bottom() > 0);
+            await page.evaluate(() => {
+                document.querySelector('.aplayer-lrc p').textContent = 'Short line';
+                window.testPlayers[0].audio.dispatchEvent(new Event('timeupdate'));
+            });
+            await page.waitForTimeout(750);
             assert.equal(await bottom(), 0);
         });
         await check('drag stays in the viewport and survives reload', async () => {

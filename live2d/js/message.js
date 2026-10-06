@@ -86,16 +86,41 @@
         if (!$player.length || !$player.is(':visible')) {
             return [];
         }
-        return $player.find('.aplayer-body, .aplayer-list, .aplayer-lrc').get().filter(function (element) {
+        return $player.find('.aplayer-body, .aplayer-list, .aplayer-lrc').get().reduce(function (rects, element) {
             var style = window.getComputedStyle(element);
             if (!$(element).is(':visible') || style.visibility === 'hidden' || Number(style.opacity) === 0) {
-                return false;
+                return rects;
             }
             var rect = element.getBoundingClientRect();
-            return rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.bottom > 0;
-        }).map(function (element) {
-            return element.getBoundingClientRect();
-        }).sort(function (first, second) {
+            if (rect.width <= 0 || rect.height <= 0 || rect.right <= 0 || rect.bottom <= 0) {
+                return rects;
+            }
+            if (!$(element).hasClass('aplayer-lrc')) {
+                rects.push(rect);
+                return rects;
+            }
+            // Lyrics span the viewport; only visible text should displace the widget.
+            $(element).find('p').each(function () {
+                var line = this.getBoundingClientRect();
+                var lineStyle = window.getComputedStyle(this);
+                if (!this.textContent.trim() || line.bottom <= rect.top || line.top >= rect.bottom ||
+                    lineStyle.visibility === 'hidden' || Number(lineStyle.opacity) === 0) {
+                    return;
+                }
+                var range = document.createRange();
+                range.selectNodeContents(this);
+                Array.prototype.forEach.call(range.getClientRects(), function (textRect) {
+                    var visible = {
+                        left: Math.max(rect.left, textRect.left), right: Math.min(rect.right, textRect.right),
+                        top: Math.max(rect.top, textRect.top), bottom: Math.min(rect.bottom, textRect.bottom)
+                    };
+                    if (visible.right > visible.left && visible.bottom > visible.top) {
+                        rects.push(visible);
+                    }
+                });
+            });
+            return rects;
+        }, []).sort(function (first, second) {
             return second.top - first.top;
         });
     }
