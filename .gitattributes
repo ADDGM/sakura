@@ -3,6 +3,7 @@
 
 # Development notes are shared in Git, not in installable theme archives.
 .agents export-ignore
+board.html export-ignore
 
 # The legacy H-Siren costume catalog is not loaded by Sakura. Keep it in the
 # repository for reference, but exclude it from installable theme archives.

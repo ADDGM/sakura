@@ -1,0 +1,1768 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="agent-notes-board">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工程决策看板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-surface-raised: #FFFFFF;
+    --bg-surface-subtle: #F1F5F9;
+    --border-subtle: #F1F5F9;
+    --border-normal: #E2E8F0;
+    --border-focus: #1D4ED8;
+
+    --text-pure: #0A0E1A;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-tertiary: #94A3B8;
+    --text-mono-faint: #CBD5E1;
+
+    --brand-blue: #1D4ED8;
+    --brand-blue-hover: #2563EB;
+    --brand-blue-glow: rgba(29, 78, 216, 0.12);
+    --alert-ruby: #DC2626;
+    --alert-ruby-subtle: #FEF2F2;
+    --amber-core: #D97706;
+    --emerald-live: #059669;
+    --purple-meta: #7C3AED;
+    --teal-prune: #0D9488;
+
+    --font-display: "Space Grotesk", -apple-system, sans-serif;
+    --font-body: "Plus Jakarta Sans", -apple-system, "PingFang SC", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* 瑞士工程图纸微网格背景 */
+  body {
+    background-color: var(--bg-base);
+    background-image:
+      linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--text-primary);
+    font: 14px/1.6 var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* 顶栏 HUD（磨砂象牙白） */
+  header.hud-topbar {
+    position: sticky; top: 0; z-index: 50;
+    height: 64px; background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-normal);
+    padding: 0 32px; display: flex; align-items: center; gap: 24px;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03);
+  }
+
+  .brand-group { display: flex; align-items: center; gap: 12px; }
+  .brand-logo {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: #0F172A; border: 1px solid #0F172A;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; box-shadow: 0 2px 6px rgba(15,23,42,0.15);
+  }
+  .brand-logo::before {
+    content: ''; position: absolute; width: 8px; height: 8px;
+    background: #60A5FA; border-radius: 50%;
+  }
+  .brand-text {
+    font-family: var(--font-display); font-size: 16px; font-weight: 700;
+    color: #0F172A; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;
+  }
+  .telemetry-chip {
+    font-family: var(--font-mono); font-size: 11px; padding: 2px 8px;
+    background: #F1F5F9; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); color: var(--text-secondary); font-weight: 600;
+  }
+
+  /* 导航控制器 Deck Tabs */
+  nav.deck-tabs {
+    display: flex; gap: 4px; background: #F1F5F9;
+    padding: 3px; border-radius: var(--radius-md); border: 1px solid var(--border-normal);
+  }
+  .deck-tab {
+    border: 0; background: transparent; color: var(--text-secondary);
+    font-family: var(--font-display); font-size: 13px; font-weight: 600;
+    padding: 6px 16px; border-radius: var(--radius-sm); cursor: pointer;
+    transition: all .18s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; align-items: center; gap: 8px; position: relative;
+  }
+  .deck-tab:hover { color: #0F172A; background: rgba(255,255,255,0.6); }
+  .deck-tab.active {
+    color: #0F172A; background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.08);
+  }
+  .deck-tab.active::after {
+    content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%;
+    height: 2px; background: var(--brand-blue);
+  }
+
+  .hud-grow { flex: 1; }
+
+  /* 战术全局搜索框 */
+  .hud-search { position: relative; width: 260px; }
+  .hud-search input {
+    width: 100%; height: 36px; background: #FFFFFF;
+    border: 1px solid var(--border-normal); border-radius: var(--radius-sm);
+    color: #0F172A; font-family: var(--font-mono); font-size: 12.5px;
+    padding: 0 34px 0 34px; outline: none; transition: all .2s;
+  }
+  .hud-search input:focus {
+    width: 320px; border-color: var(--brand-blue); background: #FFFFFF;
+    box-shadow: 0 0 0 3px var(--brand-blue-glow);
+  }
+  .hud-search .search-ico {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--text-tertiary); pointer-events: none;
+  }
+  .hud-search .shortcut-key {
+    position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+    font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary);
+    background: #F1F5F9; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-normal);
+  }
+
+  /* 即时搜索下拉浮窗 */
+  .search-popover {
+    position: absolute; top: calc(100% + 8px); left: 0; width: 440px;
+    background: #FFFFFF; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-md); box-shadow: 0 12px 36px rgba(15,23,42,0.14);
+    max-height: 420px; overflow-y: auto; z-index: 100; display: none;
+    flex-direction: column; padding: 4px 0;
+  }
+  .search-popover.open { display: flex; animation: viewIn .15s ease-out; }
+  .popover-item {
+    padding: 10px 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; transition: background .12s; border-bottom: 1px solid #F8FAFC;
+  }
+  .popover-item:hover, .popover-item.selected { background: #EFF6FF; }
+  .popover-item-main { flex: 1; min-width: 0; }
+  .popover-title {
+    font-size: 13px; font-weight: 600; color: #0F172A;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px;
+  }
+  .popover-sub {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .popover-empty {
+    padding: 24px; text-align: center; color: var(--text-tertiary);
+    font-family: var(--font-mono); font-size: 12px;
+  }
+  .popover-footer {
+    padding: 8px 14px; font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-tertiary); background: #F8FAFC; border-top: 1px solid var(--border-normal);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  /* 本地雷达自动同步指示器 */
+  .sync-beacon {
+    display: flex; align-items: center; gap: 10px;
+    background: #FFFFFF; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 6px 14px; font-size: 12px;
+    font-family: var(--font-mono); color: var(--text-secondary); cursor: pointer;
+    transition: all .2s; user-select: none; box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  }
+  .sync-beacon:hover { border-color: var(--brand-blue); color: #0F172A; box-shadow: 0 0 0 3px var(--brand-blue-glow); }
+  .radar-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #94A3B8; position: relative;
+  }
+  .radar-dot.active { background: var(--emerald-live); }
+  .radar-dot.active::after {
+    content: ''; position: absolute; inset: -4px; border-radius: 50%;
+    border: 1px solid var(--emerald-live); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .radar-dot.syncing { background: var(--amber-core); }
+  @keyframes ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
+
+  /* 主视口布局 */
+  main.mission-canvas {
+    max-width: 1440px; width: 100%; margin: 0 auto; padding: 28px 36px 80px;
+    flex: 1; display: flex; flex-direction: column; gap: 28px;
+  }
+
+  .canvas-view { display: none; }
+  .canvas-view.active { display: block; animation: viewIn .25s ease-out; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* 实体白皮书面板 */
+  .hud-panel {
+    background: var(--bg-surface); border: 1px solid var(--border-normal);
+    border-radius: var(--radius-md); padding: 24px 28px; position: relative;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 6px 16px rgba(15,23,42,0.03);
+    overflow: hidden;
+  }
+  .panel-masthead {
+    display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px;
+  }
+  .panel-headline {
+    font-family: var(--font-display); font-size: 16px; font-weight: 700;
+    color: #0F172A; letter-spacing: -0.2px; display: flex; align-items: center; gap: 10px;
+  }
+  .panel-annotation {
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-tertiary);
+  }
+
+  /* KPI 战术度量仪表阵列 */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+  @media (max-width: 960px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+  .kpi-instrument {
+    background: var(--bg-surface); border: 1px solid var(--border-normal);
+    border-radius: var(--radius-md); padding: 20px 24px; cursor: pointer;
+    transition: all .2s; position: relative; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.02);
+  }
+  .kpi-instrument:hover {
+    border-color: var(--brand-blue); transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(15,23,42,0.08);
+  }
+  .kpi-tag {
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: space-between; font-weight: 600;
+  }
+  .kpi-num {
+    font-family: var(--font-display); font-size: 38px; font-weight: 700;
+    color: #0F172A; line-height: 1.1; margin: 10px 0 6px; letter-spacing: -1px;
+  }
+  .kpi-caption { font-size: 12.5px; color: var(--text-tertiary); }
+  .kpi-accent-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+
+  /* 核心承重墙网格（Structural Pillars） */
+  .pillars-vault { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .pillar-specimen {
+    background: #FFFFFF; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 18px; cursor: pointer;
+    transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column; justify-content: space-between; position: relative;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  }
+  .pillar-specimen:hover {
+    border-color: var(--brand-blue); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(29, 78, 216, 0.08);
+  }
+  .pillar-specimen::after {
+    content: ''; position: absolute; right: 12px; top: 12px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--amber-core);
+  }
+  .pillar-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .pillar-core-title {
+    font-family: var(--font-display); font-size: 15px; font-weight: 700;
+    color: #0F172A; line-height: 1.35; margin-bottom: 10px;
+  }
+  .pillar-abstract {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .pillar-telemetry {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-tertiary);
+    border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: auto;
+  }
+  .weight-gauge {
+    color: var(--brand-blue); font-weight: 700; background: #EFF6FF;
+    border: 1px solid #BFDBFE; border-radius: 3px; padding: 2px 7px;
+  }
+
+  /* 领域分类矩阵（Domain Matrix） */
+  .matrix-chambers {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px; width: 100%;
+  }
+  @media (max-width: 1200px) { .matrix-chambers { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 768px) { .matrix-chambers { grid-template-columns: minmax(0, 1fr); } }
+  .chamber-pod {
+    background: #F8FAFC; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 16px; min-width: 0; overflow: hidden;
+  }
+  .chamber-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border-normal); margin-bottom: 12px;
+  }
+  .chamber-name {
+    font-family: var(--font-display); font-size: 13.5px; font-weight: 700;
+    color: #0F172A; display: flex; align-items: center; gap: 8px;
+  }
+  .chamber-count { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); font-weight: 600; }
+  .chamber-stream {
+    display: flex; flex-direction: column; gap: 8px; max-height: 420px;
+    overflow-y: auto; min-width: 0; width: 100%; padding-right: 4px;
+  }
+  .chamber-stream::-webkit-scrollbar { width: 4px; }
+  .chamber-stream::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+  .chamber-stream::-webkit-scrollbar-track { background: transparent; }
+
+  .specimen-row {
+    flex-shrink: 0; /* 绝对禁止压扁 */
+    min-height: 54px; display: flex; flex-direction: column; justify-content: center;
+    background: #FFFFFF; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 10px 12px; cursor: pointer; transition: all .15s;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.02); min-width: 0; width: 100%; box-sizing: border-box;
+  }
+  .specimen-row:hover {
+    border-color: var(--brand-blue); transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(15,23,42,0.06);
+  }
+  .specimen-title {
+    font-size: 13px; font-weight: 600; color: #0F172A; line-height: 1.4; margin-bottom: 4px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;
+  }
+  .specimen-info {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); line-height: 1.2;
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+  }
+
+  /* 时间线筛选工具栏 */
+  .timeline-toolbar {
+    display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;
+    background: #F8FAFC; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 14px 18px;
+  }
+  .filter-row {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%;
+  }
+  .filter-group-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
+    font-weight: 700; display: flex; align-items: center; gap: 6px; flex-shrink: 0; min-width: 76px;
+  }
+  .month-pills, .class-pills {
+    display: flex; gap: 6px; overflow-x: auto; max-width: calc(100% - 90px); padding-bottom: 2px;
+  }
+  .month-pill, .class-pill {
+    border: 1px solid var(--border-normal); background: #FFFFFF;
+    color: var(--text-secondary); font-family: var(--font-mono); font-size: 11px;
+    font-weight: 600; padding: 3px 9px; border-radius: 4px; cursor: pointer;
+    transition: all .15s; white-space: nowrap;
+  }
+  .month-pill:hover, .class-pill:hover { border-color: var(--brand-blue); color: var(--brand-blue); }
+  .month-pill.active {
+    background: var(--brand-blue); border-color: var(--brand-blue);
+    color: #FFFFFF; box-shadow: 0 1px 4px rgba(29,78,216,0.25);
+  }
+  .class-pill.active {
+    background: #0F172A; border-color: #0F172A;
+    color: #FFFFFF; box-shadow: 0 1px 4px rgba(15,23,42,0.2);
+  }
+  .filter-summary-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--border-subtle); padding-top: 8px; margin-top: 2px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+  }
+
+  /* 时间线 Chrono-Track */
+  .chrono-track { position: relative; padding-left: 36px; }
+  .chrono-track::before {
+    content: ''; position: absolute; left: 11px; top: 12px; bottom: 12px; width: 2px;
+    background: linear-gradient(180deg, var(--brand-blue) 0%, rgba(15, 23, 42, 0.1) 100%);
+  }
+  .chrono-node-epoch { margin-bottom: 36px; position: relative; }
+  .chrono-epoch-badge {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    background: #FFFFFF; border: 1px solid var(--border-normal); color: var(--brand-blue);
+    padding: 4px 14px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 8px;
+    margin-left: -36px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+  }
+  .chrono-cards { display: flex; flex-direction: column; gap: 14px; }
+  .chrono-card {
+    background: #FFFFFF; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 18px 22px; cursor: pointer;
+    transition: all .2s; position: relative; box-shadow: 0 1px 3px rgba(15,23,42,0.03);
+  }
+  .chrono-card:hover {
+    border-color: var(--brand-blue); transform: translateX(4px);
+    box-shadow: 0 6px 20px rgba(15,23,42,0.06);
+  }
+  .chrono-pulse {
+    position: absolute; left: -31px; top: 24px; width: 10px; height: 10px;
+    border-radius: 50%; background: #FFFFFF; border: 2px solid var(--brand-blue);
+  }
+  .chrono-date-badge {
+    font-family: var(--font-mono); font-size: 11.5px; font-weight: 700;
+    color: #1D4ED8; background: #EFF6FF; border: 1px solid #BFDBFE;
+    padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;
+    flex-shrink: 0;
+  }
+  .chrono-meta-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .chrono-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-tertiary); }
+  .chrono-heading { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #0F172A; }
+  .chrono-body { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* 避坑与反思智库（Pitfalls Vault） */
+  .alt-controls { display: flex; gap: 14px; margin-bottom: 24px; align-items: center; flex-wrap: wrap; }
+  .alt-search-input {
+    flex: 1; min-width: 280px; height: 40px; background: #FFFFFF;
+    border: 1px solid var(--border-normal); border-radius: var(--radius-sm);
+    color: #0F172A; font-family: var(--font-mono); font-size: 13px; padding: 0 16px; outline: none;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+  }
+  .alt-search-input:focus { border-color: var(--alert-ruby); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12); }
+
+  .pitfalls-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 18px; }
+  .pitfall-dossier {
+    background: #FFFFFF; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 22px; display: flex; flex-direction: column;
+    justify-content: space-between; gap: 14px; cursor: pointer; transition: all .2s;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.03);
+  }
+  .pitfall-dossier:hover {
+    border-color: var(--alert-ruby); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.08);
+  }
+  .hazard-banner {
+    background: var(--alert-ruby-subtle); border-left: 3px solid var(--alert-ruby);
+    padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: #991B1B;
+  }
+  .crux-evidence { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+  .triumphant-verdict {
+    background: #ECFDF5; border: 1px solid #A7F3D0;
+    border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px; color: #065F46;
+    display: flex; align-items: center; gap: 8px; font-weight: 600;
+  }
+
+  /* 决策档案目录（Directory Matrix） */
+  .matrix-toolbar {
+    display: flex; align-items: center; gap: 12px; background: #FFFFFF;
+    border: 1px solid var(--border-normal); border-radius: var(--radius-sm); padding: 12px 18px; margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+  }
+  .matrix-toolbar select {
+    height: 34px; background: #F8FAFC; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); color: #0F172A; font-family: var(--font-mono); font-size: 12px;
+    padding: 0 12px; outline: none; cursor: pointer; font-weight: 500;
+  }
+  .matrix-board {
+    background: #FFFFFF; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-md); overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.02);
+  }
+  .matrix-row-head, .matrix-row-cell {
+    display: grid; grid-template-columns: 80px 110px 1fr 110px 120px 70px;
+    gap: 14px; align-items: center; padding: 0 24px;
+  }
+  .matrix-row-head {
+    height: 42px; background: #F8FAFC; font-family: var(--font-mono);
+    font-size: 11.5px; color: var(--text-secondary); border-bottom: 1px solid var(--border-normal);
+    font-weight: 600;
+  }
+  .matrix-row-cell {
+    min-height: 52px; border-bottom: 1px solid #F1F5F9;
+    cursor: pointer; transition: all .15s; font-size: 13.5px;
+  }
+  .matrix-row-cell:hover { background: #F8FAFC; }
+  .cell-index { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); font-weight: 500; }
+  .cell-title { font-weight: 600; color: #0F172A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cell-date { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+  .cell-cites { font-family: var(--font-mono); font-size: 12px; color: var(--brand-blue); text-align: right; font-weight: 700; }
+
+  /* 状态与分类战术徽章（瑞士精密标贴风格） */
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 3px; width: max-content;
+  }
+  .status-badge.st-implemented { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+  .status-badge.st-proposed { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+  .status-badge.st-rejected { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+  .status-badge.st-archived { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+
+  .class-badge {
+    font-family: var(--font-mono); font-size: 10.5px; padding: 2px 7px;
+    border-radius: 3px; font-weight: 600; width: max-content;
+  }
+  .cls-architecture { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+  .cls-feature { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+  .cls-bug-fix { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+  .cls-simplification { background: #F0FDFA; color: #0F766E; border: 1px solid #99F6E4; }
+  .cls-process { background: #FAF5FF; color: #7E22CE; border: 1px solid #E9D5FF; }
+  .cls-testing { background: #FDF2F8; color: #BE185D; border: 1px solid #FBCFE8; }
+
+  /* 结构化白皮书控制台抽屉（Dossier Drawer） */
+  #drawer-curtain {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px); z-index: 60; display: none;
+  }
+  #drawer-curtain.open { display: block; }
+  #drawer-console {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 70vw; max-width: 860px; min-width: 520px;
+    background: #FFFFFF; border-left: 1px solid var(--border-normal); z-index: 61;
+    transform: translateX(105%); transition: transform .28s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column; box-shadow: -16px 0 48px rgba(15, 23, 42, 0.15);
+  }
+  #drawer-console.open { transform: none; }
+
+  .console-header {
+    height: 64px; padding: 0 28px; border-bottom: 1px solid var(--border-normal);
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    background: #F8FAFC;
+  }
+  .console-exit {
+    background: #FFFFFF; border: 1px solid var(--border-normal); color: var(--text-secondary);
+    font-size: 16px; cursor: pointer; padding: 6px 10px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .console-exit:hover { color: #0F172A; border-color: #94A3B8; }
+
+  .console-body { flex: 1; overflow-y: auto; padding: 36px 44px 80px; }
+
+  /* 代码反向注释定位板 */
+  .anchor-terminal {
+    background: #F8FAFC; border: 1px dashed #BFDBFE;
+    border-radius: var(--radius-sm); padding: 12px 18px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .anchor-code {
+    font-family: var(--font-mono); font-size: 12.5px; color: #1D4ED8; font-weight: 500;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .btn-anchor-copy {
+    background: #EFF6FF; border: 1px solid var(--brand-blue);
+    color: var(--brand-blue); font-family: var(--font-mono); font-size: 11px; padding: 5px 12px;
+    border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; transition: all .15s;
+    font-weight: 600;
+  }
+  .btn-anchor-copy:hover { background: var(--brand-blue); color: #FFFFFF; box-shadow: 0 2px 6px rgba(29, 78, 216, 0.2); }
+
+  .console-headline {
+    font-family: var(--font-display); font-size: 24px; font-weight: 700;
+    color: #0F172A; line-height: 1.35; margin-bottom: 16px; letter-spacing: -0.3px;
+  }
+  .console-timestamp {
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary);
+    display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
+  }
+
+  .quad-section { margin-bottom: 32px; }
+  .quad-title {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
+    color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+    text-transform: uppercase;
+  }
+  .quad-title::after { content: ''; flex: 1; height: 1px; background: var(--border-normal); }
+  .quad-content { font-size: 14.5px; line-height: 1.8; color: #334155; }
+  .quad-content code { font-family: var(--font-mono); font-size: 13px; background: #F1F5F9; padding: 2px 6px; border-radius: 3px; color: #1D4ED8; }
+  .quad-content pre { background: #0F172A; border: 1px solid #1E293B; border-radius: var(--radius-sm); padding: 16px; overflow-x: auto; margin: 14px 0; }
+  .quad-content pre code { background: transparent; padding: 0; color: #F8FAFC; }
+
+  .lineage-nodes { display: flex; flex-direction: column; gap: 12px; }
+  .lineage-group-title { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; }
+  .lineage-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lineage-chip {
+    background: #F8FAFC; border: 1px solid var(--border-normal);
+    border-radius: var(--radius-sm); padding: 6px 12px; font-size: 12.5px; color: #0F172A;
+    cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 500;
+  }
+  .lineage-chip:hover { color: var(--brand-blue); border-color: var(--brand-blue); background: #EFF6FF; }
+
+  /* 引导开场台 */
+  .onboarding-deck {
+    background: #FFFFFF; border: 1px dashed var(--border-normal);
+    border-radius: var(--radius-md); padding: 56px 40px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    box-shadow: 0 4px 20px rgba(15,23,42,0.05);
+  }
+  .onboarding-deck h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #0F172A; }
+  .onboarding-deck p { color: var(--text-secondary); max-width: 620px; font-size: 14.5px; line-height: 1.7; }
+  .action-btn-primary {
+    background: var(--brand-blue); color: #FFFFFF; border: 0; border-radius: var(--radius-sm);
+    padding: 12px 24px; font-family: var(--font-display); font-size: 14px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25); transition: all .2s;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .action-btn-primary:hover { background: var(--brand-blue-hover); }
+  .action-btn-secondary {
+    background: #FFFFFF; border: 1px solid var(--border-normal); color: var(--text-secondary);
+    font-family: var(--font-mono); font-size: 13px; padding: 10px 18px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: all .15s; font-weight: 600;
+  }
+  .action-btn-secondary:hover { color: #0F172A; border-color: #94A3B8; }
+</style>
+</head>
+<body>
+
+<!-- 顶栏 HUD -->
+<header class="hud-topbar">
+  <div class="brand-group">
+    <div class="brand-logo"></div>
+    <div class="brand-text">
+      <span id="brand-project-title">项目决策看板</span>
+      <span class="telemetry-chip" id="chip-total-count">0 项</span>
+    </div>
+  </div>
+
+  <nav class="deck-tabs">
+    <button class="deck-tab active" data-view="baseline">🏛️ 架构基线</button>
+    <button class="deck-tab" data-view="timeline">⏱️ 演进时间线</button>
+    <button class="deck-tab" data-view="alternatives">🛡️ 避坑智库</button>
+    <button class="deck-tab" data-view="directory">📋 决策清单</button>
+  </nav>
+
+  <div class="hud-grow"></div>
+
+  <div class="hud-search">
+    <svg class="search-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="global-query" type="text" placeholder="快速搜索决策与避坑...">
+    <span class="shortcut-key">/</span>
+    <div class="search-popover" id="search-popover"></div>
+  </div>
+
+  <div class="sync-beacon" id="beacon-sync" title="点击选择本地 .agents/notes 目录开启纯本地热同步">
+    <span class="radar-dot" id="radar-indicator"></span>
+    <span id="beacon-status">连接本地目录</span>
+  </div>
+</header>
+
+<main class="mission-canvas">
+
+  <!-- 未装载引导 -->
+  <div class="onboarding-deck" id="deck-onboarding" style="display:none;">
+    <h2>工程决策看板</h2>
+    <p>当前尚未挂载笔记数据。本看板支持浏览器端直接授权读取本地 <code>.agents/notes</code> 目录，无需任何后端服务器与 Git 提交，本地新建或修改笔记切回浏览器即刻自动热更新。</p>
+    <div style="display:flex; gap:14px; margin-top:8px;">
+      <button class="action-btn-primary" id="btn-authorize-dir">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        选择本地 .agents/notes 文件夹
+      </button>
+      <button class="action-btn-secondary" id="btn-mount-demo">载入标准样例演示数据</button>
+    </div>
+  </div>
+
+  <!-- 1. 架构基线视图 -->
+  <section class="canvas-view active" id="view-baseline">
+    <div class="kpi-row" id="kpi-row"></div>
+
+    <div class="hud-panel" style="margin-bottom: 28px;">
+      <div class="panel-masthead">
+        <span class="panel-headline">
+          <span>🏛️</span>
+          <span>系统承重墙</span>
+        </span>
+        <span class="panel-annotation">基于交叉引用入度权重萃取的系统关键协议</span>
+      </div>
+      <div class="pillars-vault" id="pillars-vault"></div>
+    </div>
+
+    <div class="hud-panel">
+      <div class="panel-masthead">
+        <span class="panel-headline">
+          <span>🧩</span>
+          <span>领域架构分类阵列</span>
+        </span>
+        <span class="panel-annotation">现行生效的生产事实全景清单</span>
+      </div>
+      <div class="matrix-chambers" id="matrix-chambers"></div>
+    </div>
+  </section>
+
+  <!-- 2. 演进时间线视图 -->
+  <section class="canvas-view" id="view-timeline">
+    <div class="hud-panel">
+      <div class="panel-masthead">
+        <span class="panel-headline">
+          <span>⏱️</span>
+          <span>技术演进时间线</span>
+        </span>
+        <span class="panel-annotation">记录架构突破与代码裁撤里程碑</span>
+      </div>
+
+      <div class="timeline-toolbar">
+        <div class="filter-row">
+          <span class="filter-group-label">📅 月份切片:</span>
+          <div class="month-pills" id="timeline-month-pills"></div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-group-label">🏷️ 分类切片:</span>
+          <div class="class-pills" id="timeline-class-pills"></div>
+        </div>
+        <div class="filter-summary-bar">
+          <span id="timeline-filter-info"></span>
+          <button id="btn-reset-timeline-filter" style="background:none;border:0;color:var(--brand-blue);font-family:var(--font-mono);font-size:11px;cursor:pointer;font-weight:600;">重置时间线筛选</button>
+        </div>
+      </div>
+
+      <div class="chrono-track" id="chrono-track"></div>
+    </div>
+  </section>
+
+  <!-- 3. 避坑智库视图 -->
+  <section class="canvas-view" id="view-alternatives">
+    <div class="hud-panel">
+      <div class="panel-masthead">
+        <span class="panel-headline">
+          <span>🛡️</span>
+          <span>避坑与反思智库</span>
+        </span>
+        <span class="panel-annotation">记录「为什么放弃了方案 B」与被否决的提案，防止重复踩坑</span>
+      </div>
+      <div class="alt-controls">
+        <input type="text" class="alt-search-input" id="alt-query-input" placeholder="检索被否决方案关键字（如：SQLite、多进程、Redis...）">
+      </div>
+      <div class="pitfalls-grid" id="pitfalls-grid"></div>
+    </div>
+  </section>
+
+  <!-- 4. 决策清单视图 -->
+  <section class="canvas-view" id="view-directory">
+    <div class="matrix-toolbar">
+      <select id="select-status"><option value="">状态：全部</option></select>
+      <select id="select-class"><option value="">分类：全部</option></select>
+      <select id="select-sort">
+        <option value="new">排序：最新优先</option>
+        <option value="old">排序：最早优先</option>
+        <option value="cites">排序：引用最多</option>
+      </select>
+      <button id="btn-reset-matrix-filter" style="background:none;border:0;color:var(--brand-blue);font-family:var(--font-mono);font-size:11px;cursor:pointer;font-weight:600;" title="清空全部筛选条件">重置筛选</button>
+      <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); margin-left:auto;" id="matrix-matched-count"></span>
+    </div>
+
+    <div class="matrix-board">
+      <div class="matrix-row-head">
+        <span>编号</span>
+        <span>分类</span>
+        <span>标题</span>
+        <span>状态</span>
+        <span>日期</span>
+        <span style="text-align:right;">引用</span>
+      </div>
+      <div id="matrix-rows-stream"></div>
+    </div>
+  </section>
+
+  <footer style="margin-top: 24px; padding: 20px 0; border-top: 1px solid var(--border-normal); display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 11.5px; color: var(--text-tertiary); flex-wrap: wrap; gap: 12px;">
+    <div>Agent Notes · 工程决策看板 · 遵循 MIT 协议开源</div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <span>友情链接:</span>
+      <a href="https://linux.do" target="_blank" rel="noopener noreferrer" style="color: var(--brand-blue); text-decoration: none; font-weight: 600;">LinuxDo</a>
+    </div>
+  </footer>
+
+</main>
+
+<!-- 结构化控制台抽屉 -->
+<div id="drawer-curtain"></div>
+<aside id="drawer-console">
+  <div class="console-header">
+    <span class="status-badge" id="dr-status-badge"></span>
+    <span class="class-badge" id="dr-class-badge"></span>
+    <div style="flex:1;"></div>
+    <button class="console-exit" id="btn-console-close" title="退出 (Esc)">✕</button>
+  </div>
+  <div class="console-body">
+    <div class="anchor-terminal">
+      <span class="anchor-code" id="dr-anchor-code">// Note: 见 .agents/notes/...</span>
+      <button class="btn-anchor-copy" id="btn-anchor-copy">复制反向代码注释</button>
+    </div>
+
+    <h1 class="console-headline" id="dr-headline"></h1>
+    <div class="console-timestamp" id="dr-timestamp-bar"></div>
+
+    <div class="quad-section" id="quad-sec-problem">
+      <div class="quad-title">🎯 01. 背景与痛点</div>
+      <div class="quad-content" id="dr-body-problem"></div>
+    </div>
+
+    <div class="quad-section" id="quad-sec-decision">
+      <div class="quad-title">⚡ 02. 落地裁定事实</div>
+      <div class="quad-content" id="dr-body-decision"></div>
+    </div>
+
+    <div class="quad-section" id="quad-sec-alt">
+      <div class="quad-title">🚫 03. 审慎考虑并放弃的备选</div>
+      <div class="quad-content" id="dr-body-alt"></div>
+    </div>
+
+    <div class="quad-section" id="quad-sec-consequences">
+      <div class="quad-title">⚖️ 04. 收益与工程代价</div>
+      <div class="quad-content" id="dr-body-consequences"></div>
+    </div>
+
+    <div class="quad-section">
+      <div class="quad-title">🔗 05. 因果与血缘依赖链路</div>
+      <div class="lineage-nodes" id="dr-lineage-stream"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- 内联数据插槽 -->
+<script id="embedded-data">
+window.__INLINE_DATA__ = [{"id":"implemented/architecture/2026-10-07-admin-settings-boundary.md","slug":"2026-10-07-admin-settings-boundary","lifecycle":"implemented","cls":"architecture","date":"2026-10-07","title":"后台配色与设置渲染保留存储边界","status":"implemented","problem":"旧动态配色端点把颜色和用户CSS放进URL，长度与转义难以控制；主题设置CSS又覆盖WordPress通用控件。单纯视觉修补无法解决方案预览、旧配置和控件语义之间的长期耦合。","decision":"[functions.php](../../../../functions.php)在 admin_init 注册 sakura/custom，保留用户资料 admin_color 标识。两种配色共用[静态CSS](../../../../inc/css/dash-scheme.css)，主题版本使用 sv 参数；颜色和Custom规则由内联CSS承载，不再进入资源URL。已保存方案与预览共用 sakura_dash_scheme_css()。","alternatives":"- 保留动态PHP样式端点：沿用原接口改动较少，但用户CSS进入查询串会遇到长度、编码及暴露问题；采用静态文件加内联值。","consequences":"配置兼容、预览和正式样式共用实现，第三方后台控件受影响范围收窄；代价是仍需识别历史默认CSS并维护原框架。管理员附加CSS可改变默认效果，不能承诺所有自定义配色均通过完整无障碍审核；8px间距等局部数值不是本篇新增的跨模块门禁。","outLinks":["implemented/feature/2026-10-07-site-runtime-date.md","implemented/feature/2026-10-07-live2d-settings-tab.md","implemented/architecture/2026-10-07-core-resource-policy.md"],"rawBody":"# Agent Note: 后台配色与设置渲染保留存储边界\n\nStatus: implemented\n\n## Problem\n\n旧动态配色端点把颜色和用户CSS放进URL，长度与转义难以控制；主题设置CSS又覆盖WordPress通用控件。单纯视觉修补无法解决方案预览、旧配置和控件语义之间的长期耦合。\n\n## Decision\n\n[functions.php](../../../../functions.php)在 admin_init 注册 sakura/custom，保留用户资料 admin_color 标识。两种配色共用[静态CSS](../../../../inc/css/dash-scheme.css)，主题版本使用 sv 参数；颜色和Custom规则由内联CSS承载，不再进入资源URL。已保存方案与预览共用 sakura_dash_scheme_css()。\n\nCustom七个颜色读取旧设置键，经 sanitize_hex_color() 校验并回退统一预设；可读前景色按背景对比度计算。源码内置默认CSS始终加载，附加字段的空值、纯注释或精确历史默认值按空附加规则处理；其他自定义CSS经去HTML标签及已知资源URL映射后追加。该处理不是任意CSS安全沙箱。\n\n只映射已具备本地副本的旧樱花与Win10背景地址，分别指向 dash-sakura-bg.webp 和 Custom.jpg，覆盖HTTP、HTTPS及协议相对写法；不重写用户数据库。当前默认效果与附加覆盖分开维护，不把历史“保留失效外链”当作最终决定。\n\n[Options Framework](../../../../inc/options-interface.php)保留原字段 name/id/value 和选项存储，补齐标签、组关联、普通radio/multicheck独立包装及上传控件名称；[设置CSS](../../../../inc/css/optionsframework.css)以主题设置容器为作用域。普通radio保持一项一行，视觉选择器不混入普通radio规则。主题设置资源随主题版本失效。\n\n翻译调用使用 sakura 文本域；options_framework_theme 仍可作为旧存储后备键，不能全局替换。字段ID优先清理的具体日期契约见[建站日期](../feature/2026-10-07-site-runtime-date.md)。看板娘独立分组仍由[设置标签笔记](../feature/2026-10-07-live2d-settings-tab.md)维护。\n\n## Existing record audit\n\n创建前检索配色、Options Framework、存储及翻译，现有看板娘标签笔记只有分组契约，部分重叠并互链；[核心资源](2026-10-07-core-resource-policy.md)持有全站资源来源，本篇只负责后台渲染。原配色、语义化、国际化和早期radio修复归并到这里，间距微调保留历史。\n\n## Alternatives considered\n\n- 保留动态PHP样式端点：沿用原接口改动较少，但用户CSS进入查询串会遇到长度、编码及暴露问题；采用静态文件加内联值。\n- 直接改写数据库旧URL：可清理持久值，但破坏原始自定义配置与回退依据；采用渲染时精确映射。\n- 樱花背景同时分发PNG回退：覆盖更多旧浏览器，但旧计划权衡了包体积和后台目标环境，最终仅保留WebP，失败可退为纯色背景。\n- 全面替换Options Framework：旧计划明确不进入Customizer/Site Editor迁移，先修渲染和语义，保留存储契约。没有记录完整替代框架比选。\n\n## Consequences\n\n配置兼容、预览和正式样式共用实现，第三方后台控件受影响范围收窄；代价是仍需识别历史默认CSS并维护原框架。管理员附加CSS可改变默认效果，不能承诺所有自定义配色均通过完整无障碍审核；8px间距等局部数值不是本篇新增的跨模块门禁。\n\n## Verification\n\n2026-10-07按 `2a42534` 核对注册、变量/默认规则、映射、字段ID清理、标签与存储后备键。原dev.33记录有Sakura/Custom/核心配色切换及桌面/782px/390px验收，Beta.6有动态中文提示验证；本轮未切换后台配色或保存设置。成文日不代表原功能首次提出日。\n"},{"id":"implemented/architecture/2026-10-07-core-resource-policy.md","slug":"2026-10-07-core-resource-policy","lifecycle":"implemented","cls":"architecture","date":"2026-10-07","title":"核心资源本地默认与旧远程选项兼容","status":"implemented","problem":"主题核心 CSS/JS 曾通过上游仓库拼接维护版标签和不存在的压缩文件路径，造成默认配置下资源加载失败。PHP 入队和前端动态 CSS 如果分别拼接地址，还会产生来源与缓存版本不一致。维护时需要保留用户已保存的本地/远程选择，并区分核心资源、可选增强与用户自定义服务。","decision":"核心资源以主题包内文件为默认来源。[functions.php](../../../../functions.php) 的 `sakura_core_resource_is_local()` 将缺省值视为本地，仅把旧设置的明确关闭值 `false`、`0`、`'0'` 解释为远程。`jsdelivr_cdn_test` 与 `app_no_jsdelivr_cdn` 继续作为兼容输入，不通过迁移数据库反转用户选择。","alternatives":"- **主题仓库提供远程资源（采用）**：发布文件和版本在一个仓库中维护，无须第二套同步链路；代价是远程资源版本与主题发布耦合，必须维护可用的明确标签。","consequences":"本地核心文件减少对上游标签和失效图床的依赖，统一解析避免 PHP 与动态 CSS 分叉；代价是主题包需要携带资源副本，旧开关的反向语义继续存在。第三方许可、可选资源的失败表现和远程标签维护仍需分别处理，旧依赖整理不能擅自删除兼容读取。","outLinks":["implemented/architecture/2026-10-07-live2d-integration.md","implemented/architecture/2026-10-07-music-cache-contract.md","implemented/architecture/2026-10-07-admin-settings-boundary.md"],"rawBody":"# Agent Note: 核心资源本地默认与旧远程选项兼容\n\nStatus: implemented\n\n## Problem\n\n主题核心 CSS/JS 曾通过上游仓库拼接维护版标签和不存在的压缩文件路径，造成默认配置下资源加载失败。PHP 入队和前端动态 CSS 如果分别拼接地址，还会产生来源与缓存版本不一致。维护时需要保留用户已保存的本地/远程选择，并区分核心资源、可选增强与用户自定义服务。\n\n## Decision\n\n核心资源以主题包内文件为默认来源。[functions.php](../../../../functions.php) 的 `sakura_core_resource_is_local()` 将缺省值视为本地，仅把旧设置的明确关闭值 `false`、`0`、`'0'` 解释为远程。`jsdelivr_cdn_test` 与 `app_no_jsdelivr_cdn` 继续作为兼容输入，不通过迁移数据库反转用户选择。\n\n`sakura_core_resource_url()` 统一解析资源地址，`sakura_scripts()` 和 [inc/swicher.php](../../../../inc/swicher.php) 的 `font_end_js_control()` 共用它。缓存版本由 `sakura_frontend_cache_version()` 生成，即主题版本加 `cookie_version`；动态 CSS 与 PHP 入队共用这个来源。\n\n远程核心资源使用 `ADDGM/sakura` 的明确标签和实际存在的文件。当前 `SAKURA_REMOTE_RESOURCE_TAG` 默认值是 `v3.5.0`，不是早期资源冻结记录中的 `v3.5.0-beta.7`。`sakura_remote_resource_tag` 过滤器可覆盖标签，现有实现清理非法字符并对空值回退默认值；它不查询标签是否真实发布，不应被描述为发布存在性校验。\n\n## Network boundary\n\n本地默认只约束核心资源。Google Fonts、图标字体、APlayer 增强样式、头像和音乐平台仍可能发起网络请求；用户自定义背景、CDN 和上传 API 不属于主题自动镜像范围。核心解析器在用户明确选择远程后不会在网络失败时自动切回本地，因此不能把“默认本地”写成“远程请求失败自动重试本地”，也不承诺整站完全离线运行。\n\n## Existing record audit\n\n创建前检索核心资源、远程资源、旧设置和缓存，没有可承接此契约的活跃 Note。[Live2D 接入](2026-10-07-live2d-integration.md)复用这里的缓存与本地资源原则，属于部分重叠，互链保留模块职责。提交、发布及通知笔记不接管运行时资源地址解析。\n\n后续历史提炼的[播放器缓存](2026-10-07-music-cache-contract.md)与[后台设置边界](2026-10-07-admin-settings-boundary.md)部分重叠，分别持有音乐响应缓存和后台渲染/旧CSS映射，不扩大本篇的静态核心资源范围。\n\n## Alternatives considered\n\n- **主题仓库提供远程资源（采用）**：发布文件和版本在一个仓库中维护，无须第二套同步链路；代价是远程资源版本与主题发布耦合，必须维护可用的明确标签。\n- **独立资源仓库（保留为后续选择）**：资源可独立更新和发布，但当前需要额外维护仓库与同步流程。只有资源更新节奏与主题明显分离时才重新评估。\n\n这两个方案来自原资源治理记录。本篇不将所有旧外链都归为当时主动选择保留的方案，也不补造未记录的选型理由。\n\n## Consequences\n\n本地核心文件减少对上游标签和失效图床的依赖，统一解析避免 PHP 与动态 CSS 分叉；代价是主题包需要携带资源副本，旧开关的反向语义继续存在。第三方许可、可选资源的失败表现和远程标签维护仍需分别处理，旧依赖整理不能擅自删除兼容读取。\n\n## Verification\n\n2026-10-07 形成此维护记录并核对源码基线 `2a42534`：本地默认判定、统一 URL 解析、当前远程标签及动态 CSS 调用符合上述契约。原资源治理的 2026-09-12 Beta.7 记录包含正常网络、阻断第三方域名、缓存刷新和包内文件复核；这是该版本的历史验证，本轮没有重跑浏览器网络矩阵或断言当前所有第三方服务可用。\n\n历史日期与结果来自维护者核对的原始记录；原始执行资料未随仓库分发。\n"},{"id":"implemented/architecture/2026-10-07-live2d-integration.md","slug":"2026-10-07-live2d-integration","lifecycle":"implemented","cls":"architecture","date":"2026-10-07","title":"Live2D 原生接入与模型资源边界","status":"implemented","problem":"移植 H-Siren 的桌面看板娘时，直接复制页脚脚本注入会绕开 Sakura 的 WordPress 依赖、缓存和配置边界。旧 Cubism 模型与根目录的大型纹理集合也不能仅凭文件名判断兼容，维护时必须区分已接入能力与后续扩展。","decision":"[functions.php](../../../../functions.php) 通过 `sakura_scripts()` 入队样式、Cubism 2 运行时、交互和一个 loader，并用 `SakuraLive2D` 注入配置；[footer.php](../../../../footer.php)负责容器和 Canvas。缓存策略复用[核心资源契约](2026-10-07-core-resource-policy.md)，不恢复直接拼接配置的页脚脚本注入。","alternatives":"- **原样移植 H-Siren 页脚注入**：改动较少且最接近原主题，但依赖顺序、缓存和全局配置依靠脚本字符串组织，PJAX 提示绑定也不适配现有页面更新方式，因此未采用。","consequences":"依赖、配置和模型目录职责明确，可保留已有 Tia/Pio 资源与 WordPress 缓存机制；代价是旧运行时及模型格式仍限制扩展。素材来源和使用、分发条件尚未补齐，不能用主题 GPL 声明替代第三方许可依据。扩展服装或升级运行时前需要单独确定兼容性和许可依据。","outLinks":["implemented/architecture/2026-10-07-core-resource-policy.md","implemented/bug-fix/2026-10-07-live2d-player-layout.md","implemented/feature/2026-10-07-live2d-settings-tab.md","implemented/testing/2026-10-07-live2d-deployed-boundaries.md","implemented/process/2026-10-07-stable-release.md"],"rawBody":"# Agent Note: Live2D 原生接入与模型资源边界\n\nStatus: implemented\n\n## Problem\n\n移植 H-Siren 的桌面看板娘时，直接复制页脚脚本注入会绕开 Sakura 的 WordPress 依赖、缓存和配置边界。旧 Cubism 模型与根目录的大型纹理集合也不能仅凭文件名判断兼容，维护时必须区分已接入能力与后续扩展。\n\n## Decision\n\n[functions.php](../../../../functions.php) 通过 `sakura_scripts()` 入队样式、Cubism 2 运行时、交互和一个 loader，并用 `SakuraLive2D` 注入配置；[footer.php](../../../../footer.php)负责容器和 Canvas。缓存策略复用[核心资源契约](2026-10-07-core-resource-policy.md)，不恢复直接拼接配置的页脚脚本注入。\n\n基础模型固定为 Tia/Pio，保留 Cubism 2 的 `.moc` / `.mtn` 资源。[本地 loader](../../../../live2d/js/run_local.js)读取选定模型目录的 `model.json` 与 `textures.json`，沿用 `pioUrl` 清单字段；挑选并检查纹理条目后构造模型纹理地址。字段名不表示仅支持 Pio，也不意味着读取根目录的服装清单。\n\n远程模式必须同时满足远程开关开启和接口非空，才选择[远程 loader](../../../../live2d/js/run_field.js)；该 loader 读取同一模型配置并替换 PNG 地址。两个 loader 都在依赖不可用、配置缺失或不满足 `min-width: 861px` 时退出，模型请求发生在该守卫之后。这个入口判断不等于已经加载后的运行时会在缩窄窗口时被卸载。\n\n[.gitattributes](../../../../.gitattributes) 排除根目录 `live2d/textures/**` 与 `live2d/textures.json`，保留各模型最小纹理。大型服装须先建立模型—纹理映射并验证视觉兼容；Cubism 3/4/5 属于独立迁移评估，不纳入现有基础能力。\n\n## Interaction and failure boundary\n\n[message.js](../../../../live2d/js/message.js) 通过 document 委托和事件命名空间处理提示，`live2d_Tips()` 支持 PJAX 后重新初始化。提示配置保存翻译键，动态文本先转义再代入模板。拖动与播放器避让由[浮层位置契约](../bug-fix/2026-10-07-live2d-player-layout.md)负责；设置组织由[看板娘标签](../feature/2026-10-07-live2d-settings-tab.md)负责。\n\n资源请求失败会输出诊断；当前远程 PNG 路径没有失败后自动切回本地模型的机制。保留外部接口、CORS 与响应可用性的边界，不能把本地夹具中的模拟远程 PNG 验证说成真实第三方服务已验收。\n\n## Existing record audit\n\n看板娘标签笔记只负责四个配置项的分组与保存兼容，[部署边界验证](../testing/2026-10-07-live2d-deployed-boundaries.md)只负责测试策略；两者与本篇部分重叠，保留互链，不吸收其完整验证过程。[正式发布](../process/2026-10-07-stable-release.md)继续负责版本与交付，不作为模块接入规范。\n\n## Alternatives considered\n\n- **原样移植 H-Siren 页脚注入**：改动较少且最接近原主题，但依赖顺序、缓存和全局配置依靠脚本字符串组织，PJAX 提示绑定也不适配现有页面更新方式，因此未采用。\n- **按 Sakura 的 WordPress 结构接入（采用）**：复用运行时与模型，将 enqueue、配置和容器分开管理；代价是修改的接入文件更多，并继续承担 Cubism 2 兼容限制。\n\n以上来自原基础方案的明确比较。大型服装和新运行时是记录中的后续范围，不被改写为已经实现或已完成评估的选项。\n\n## Consequences\n\n依赖、配置和模型目录职责明确，可保留已有 Tia/Pio 资源与 WordPress 缓存机制；代价是旧运行时及模型格式仍限制扩展。素材来源和使用、分发条件尚未补齐，不能用主题 GPL 声明替代第三方许可依据。扩展服装或升级运行时前需要单独确定兼容性和许可依据。\n\n## Verification\n\n本篇于 2026-10-07 核对 `2a42534` 后形成。原生接入及服装范围决定在 2026-09-20 的项目事件中已有记录；本篇日期不表示功能首次提出或首次实现时间。本轮直接核对 enqueue 配置、两种 loader、提示委托及打包排除规则。\n\n历史证据分别覆盖 2026-09-22 的 Tia/Pio WebGL 和模拟 PNG、2026-09-28 的开关/模型切换与冷加载、2026-10-06 的构建74直接实站回归，以及[后续部署边界](../testing/2026-10-07-live2d-deployed-boundaries.md)。原基础计划中的早期保存超时和待部署状态已有后续证据覆盖；本轮不重跑服务器验收，不把各版本结果合并为当前版本全量测试。\n\n历史日期与结果来自维护者核对的原始记录；原始执行资料未随仓库分发。\n\n## Historical deployment evidence\n\n2026-09-23的dev.73/ec55e3f实站确认Pio渲染、提示、拖动保存/刷新、键盘与重置；PJAX文章跳转的performance.timeOrigin不变，模型与播放器各一个。Tia保存请求超时，落库与恢复结果当时未知，工具503不是主题故障；尝试860px却读到1274px也不是有效断点证据。这些状态于2026-09-28重新读取并完成验证后确认设置保存和真实视口，不遗留为当前待办。\n\n2026-09-28原部署实际完成Tia保存及模型/纹理/动作200，随后恢复开启/Pio/远程关闭/接口空并刷新核实；关闭总开关后独立前台无容器、配置和Live2D资源。冷加载实际innerWidth为860时模型请求0，861时可见并正常请求；没有将此前PJAX和全部拖动场景合并宣称重跑。该日站点健康确认PHP8.2.33；build-info中的PHP字段仅表示构建环境。\n\n初始化前点击异常由真实Pio纹理延迟复现：模型对象已创建，命中坐标尚未初始化，普通页面点击也会经全局mousedown进入hitTestSimpleCustom并读取undefined[0]。初始化标记与两组坐标保护修复此路径；测试路由须等待响应处理完成后移除，避免Route is already handled。临时脚本替换验证与之后c7ee80b正式部署分开记录，外部头像/图片超时不能被Live2D监听零异常掩盖。\n\n本节保留已核对的历史结论，原始截图和日志未随仓库分发；远程第三方换装服务、模型许可、大型服装和运行时升级仍未因此完成。\n"},{"id":"implemented/architecture/2026-10-07-music-cache-contract.md","slug":"2026-10-07-music-cache-contract","lifecycle":"implemented","cls":"architecture","date":"2026-10-07","title":"播放器站点签名、缓存与网易云音频协议","status":"implemented","problem":"访客登录状态变化会使旧歌单中的会话 nonce 失效；长缓存又可能保留失效音频地址。网易云返回的部分歌曲地址为空，强行改写协议也曾导致局域网音频无法播放。维护播放器时需要区分站点音乐配置、访客会话和上游资源可用性。","decision":"保留播放器设置键和 `/sakura/v1/meting/aplayer` 路径。[inc/api.php](../../../../inc/api.php) 使用站点级 `music_token`，以 HMAC 绑定版本、平台、类型、资源 ID、到期时间及音乐配置指纹。音乐 Cookie 只供服务端访问上游，公开 token 中是指纹；不得把 Cookie 明文写入页面、响应、日志或缓存键。","alternatives":"- 保留会话 nonce：兼容旧缓存、旧脚本和自定义 meting_api，但无法作为跨登录状态公共缓存的唯一协议；当前仅保留私有兼容入口。","consequences":"站点配置可供匿名与登录访客使用，旧客户端仍可过渡；代价是两套授权入口、token 过期与多层缓存需要共同维护。保留原协议不保证 HTTPS 页面接受 HTTP 音频，301与上游短效地址也可能引起个别播放失败；中文错误提示不代表上游权限或服务故障已修复。","outLinks":["implemented/bug-fix/2026-10-07-live2d-player-layout.md","implemented/architecture/2026-10-07-core-resource-policy.md"],"rawBody":"# Agent Note: 播放器站点签名、缓存与网易云音频协议\n\nStatus: implemented\n\n## Problem\n\n访客登录状态变化会使旧歌单中的会话 nonce 失效；长缓存又可能保留失效音频地址。网易云返回的部分歌曲地址为空，强行改写协议也曾导致局域网音频无法播放。维护播放器时需要区分站点音乐配置、访客会话和上游资源可用性。\n\n## Decision\n\n保留播放器设置键和 `/sakura/v1/meting/aplayer` 路径。[inc/api.php](../../../../inc/api.php) 使用站点级 `music_token`，以 HMAC 绑定版本、平台、类型、资源 ID、到期时间及音乐配置指纹。音乐 Cookie 只供服务端访问上游，公开 token 中是指纹；不得把 Cookie 明文写入页面、响应、日志或缓存键。\n\n只有有效 token 且没有旧 nonce 参数的请求进入公开缓存路径。出现 `meting_nonce`、`_wpnonce` 或 `X-WP-Nonce` 时必须通过旧校验，响应使用 private/no-store；同时带新旧参数也不升级为公开请求。403、502 使用不可缓存响应。旧路径目前仍存在，移除前需要独立评估旧客户端兼容性；历史版本目标不构成已经执行的删除决定。\n\n公开响应和 [Aplayer](../../../../inc/classes/Aplayer.php) Transient 的基础缓存时间分别为：歌单300秒、歌词1800秒、封面3600秒、音频15秒。公开响应还含 `stale-while-revalidate=60`，因此15秒不是所有中间缓存的绝对存活上限。token 有效期分别为7天、1天、1天、1小时，与缓存 TTL 不同；源站重新验证时配置指纹改变会使旧 token 失效，已缓存响应则仍受缓存策略约束。\n\n音频保持301重定向和上游直传。[Meting::netease_url](../../../../inc/classes/Meting.php) 仅在 `uf.url` 是有效 HTTP(S) 地址时采用它，否则保留有效的 `data.url`。网易云地址不强制改写协议或 CDN 主机；其他平台已有处理保留。缺少歌曲详情时按 trackIds 顺序补取缺项，不把歌单部分返回误判成仅有一首歌。\n\n## Existing record audit\n\n已检索播放器、token、缓存和网易云。[浮层位置](../bug-fix/2026-10-07-live2d-player-layout.md)只涉及前台遮挡；[核心资源](2026-10-07-core-resource-policy.md)只涉及静态文件来源。本篇与它们部分重叠并互链，不复制布局或资源版本决定。三个播放器专项和兼容性总计划相关段落合并于此。\n\n## Alternatives considered\n\n- 保留会话 nonce：兼容旧缓存、旧脚本和自定义 meting_api，但无法作为跨登录状态公共缓存的唯一协议；当前仅保留私有兼容入口。\n- 音频改为307加no-store并取消两层缓存：可减少短期过期地址滞留，但原音频错误计划明确将它移出批准范围，保留301与15秒缓存。历史未完整记载拒绝理由，不补造性能测量。\n- 强制网易云 HTTP 升级为 HTTPS：可避免浏览器混合内容，但曾破坏目标 CDN 的实际播放链路，故保留合法原协议。服务端音频代理未获实施批准。\n\n## Consequences\n\n站点配置可供匿名与登录访客使用，旧客户端仍可过渡；代价是两套授权入口、token 过期与多层缓存需要共同维护。保留原协议不保证 HTTPS 页面接受 HTTP 音频，301与上游短效地址也可能引起个别播放失败；中文错误提示不代表上游权限或服务故障已修复。\n\n## Verification\n\n2026-10-07按 `2a42534` 核对 token、请求分流、缓存头、Transient、URL选择和歌单补全源码。本篇日期是维护契约成文日，不推定原功能首次提出日。Beta.4原验收记录有匿名歌单、56条入口及真实播放证据；本轮未请求网易云、读取实际 Cookie或重跑播放测试。\n"},{"id":"implemented/bug-fix/2026-10-07-comment-form-initialization.md","slug":"2026-10-07-comment-form-initialization","lifecycle":"implemented","cls":"bug-fix","date":"2026-10-07","title":"评论登录态结构与 PJAX 上传控件幂等性","status":"implemented","problem":"WordPress登录后省略匿名字段，旧主题却依赖这些字段闭合容器，导致头像与提交按钮重叠；普通初始化和PJAX再次插入上传节点，又可能造成重复事件与重复请求。","decision":"[comments.php](../../../../comments.php)仅为匿名用户添加头像与隐藏QQ字段，随同这一组闭合容器；不依赖登录态会省略的url字段闭合。保留comment_form的字段名、提交参数和提示语义。","alternatives":"- 复用原动态字段拼接：结构变化少，但登录时字段省略会改变容器平衡；当前按登录状态明确组织匿名字段。","consequences":"重复初始化可重用当前控件，提交与选择图片的命中区域分离；代价是仍需维护旧jQuery/PJAX及comment_form扩展。这是当前单评论表单的实现，不代表任意多个表单的全页面幂等保证，也不证明第三方上传API可用。","outLinks":["implemented/testing/2026-10-07-compatibility-evidence.md","implemented/architecture/2026-10-07-admin-settings-boundary.md"],"rawBody":"# Agent Note: 评论登录态结构与 PJAX 上传控件幂等性\n\nStatus: implemented\n\n## Problem\n\nWordPress登录后省略匿名字段，旧主题却依赖这些字段闭合容器，导致头像与提交按钮重叠；普通初始化和PJAX再次插入上传节点，又可能造成重复事件与重复请求。\n\n## Decision\n\n[comments.php](../../../../comments.php)仅为匿名用户添加头像与隐藏QQ字段，随同这一组闭合容器；不依赖登录态会省略的url字段闭合。保留comment_form的字段名、提交参数和提示语义。\n\n[js/sakura-app.js](../../../../js/sakura-app.js)的 add_upload_tips()在当前首个提交区复用文件输入与提示节点、删除该区域的重复节点；可见按钮使用label关联文件输入。attach_image()采用document上的change.sakuraUpload命名空间委托，重绑前解除同名处理器，允许PJAX替换表单后再次初始化。\n\n提交按钮使用专用submit-comment-tips容器及提示样式；通用popup不能控制它的display布局。上传选择与主题既有接口保持原契约；本篇不将前端文件数量/大小限制视为服务端安全校验。\n\n## Existing record audit\n\n活跃笔记未覆盖评论表单初始化；三个评论修复计划按同一表单边界提炼。[兼容性验证](../testing/2026-10-07-compatibility-evidence.md)持有登录态和视口验证层级，[后台设置](../architecture/2026-10-07-admin-settings-boundary.md)承接原混合计划中的radio部分，本篇不复制它们。\n\n## Alternatives considered\n\n- 复用原动态字段拼接：结构变化少，但登录时字段省略会改变容器平衡；当前按登录状态明确组织匿名字段。\n- 用透明文件控件位移覆盖上传按钮：旧布局可触发选择，但点击区域与提交区互相覆盖；改为label和明确布局。\n- 提交提示继续使用通用popup类：可复用样式，但历史已证实后加载的inline-block覆盖flex；采用专用类。原记录未保留命名为“方案B”的完整正文，不补造。\n\n## Consequences\n\n重复初始化可重用当前控件，提交与选择图片的命中区域分离；代价是仍需维护旧jQuery/PJAX及comment_form扩展。这是当前单评论表单的实现，不代表任意多个表单的全页面幂等保证，也不证明第三方上传API可用。\n\n## Verification\n\n2026-10-07按 `2a42534` 核对匿名字段分组、专用提交容器、节点复用与事件委托。Beta.4记录有登录/匿名、桌面/390px和按钮区域复验；实际图床上传当时未测，仍需另行验证。本轮没有提交评论或上传文件，成文日不推定旧修复的首次提出日。\n"},{"id":"implemented/bug-fix/2026-10-07-live2d-player-layout.md","slug":"2026-10-07-live2d-player-layout","lifecycle":"implemented","cls":"bug-fix","date":"2026-10-07","title":"Live2D 保存位置与播放器可见区域避让","status":"implemented","problem":"固定播放器、列表和歌词会与 Live2D 交互区重叠。拖动控件还可能进入页头遮挡区；按整块透明歌词容器计算避让，则会在播放器收起后保留无必要的 40px 上移。必须区分用户保存的位置与临时显示偏移，避免布局修正改变用户选择。","decision":"[message.js](../../../../live2d/js/message.js) 将用户位置保存在 `sakura-live2d-position`，默认 `left=30`、`bottom=0`，另用 `playerOffset` 表示临时避让。`updatePlayerOffset()` 始终以保存位置和实际相交区域计算，`applyPosition()` 只应用显示边界与偏移，不把动画中的 CSS 值作为下一轮计算基准。","alternatives":"- **整块歌词容器作为障碍**：矩形计算直接简单，但原实现实测在自然收起后仍产生 40px 残余；透明容器覆盖视口不能代表文字实际覆盖，因此改为可见文字范围。","consequences":"用户保存位置与临时偏移分离，控件保持可达，歌词仍显示。有限视口可能无法容纳所有浮层，顶部边界优先于无限上移；不同字体和播放器尺寸仍需要实际页面验证。测试应等待动画结束，避免用重置、人工重算或隐藏歌词掩盖自然收起问题。","outLinks":["implemented/testing/2026-10-07-live2d-deployed-boundaries.md","implemented/architecture/2026-10-07-live2d-integration.md","implemented/feature/2026-10-07-live2d-settings-tab.md","implemented/architecture/2026-10-07-music-cache-contract.md","implemented/feature/2026-10-07-navigation-breakpoints.md"],"rawBody":"# Agent Note: Live2D 保存位置与播放器可见区域避让\n\nStatus: implemented\n\n## Problem\n\n固定播放器、列表和歌词会与 Live2D 交互区重叠。拖动控件还可能进入页头遮挡区；按整块透明歌词容器计算避让，则会在播放器收起后保留无必要的 40px 上移。必须区分用户保存的位置与临时显示偏移，避免布局修正改变用户选择。\n\n## Decision\n\n[message.js](../../../../live2d/js/message.js) 将用户位置保存在 `sakura-live2d-position`，默认 `left=30`、`bottom=0`，另用 `playerOffset` 表示临时避让。`updatePlayerOffset()` 始终以保存位置和实际相交区域计算，`applyPosition()` 只应用显示边界与偏移，不把动画中的 CSS 值作为下一轮计算基准。\n\n`getBounds()` 限制视口范围，并为可见 fixed/sticky 页头及 WordPress 管理栏预留顶部空间。拖动使用独立手柄，支持鼠标、触摸、键盘和重置，不占用模型点击区域；历史位置显示时限位，播放器展开收起不覆盖保存位置。\n\n`getPlayerRects()` 对播放器本体与列表使用可见矩形，对歌词使用 DOM Range 的文字矩形并裁切到歌词窗口，忽略空白、透明及窗口外文本。歌词容器横跨视口不代表整块区域都需要避让；收起后若可见文字确实仍与模型相交，继续避让是正确行为，不能把任意场景都断言为 `bottom=0`。\n\n[sakura-app.js](../../../../js/sakura-app.js) 复用 `notifyLive2DPlayerLayout()`，在点击、悬停、过渡结束，以及 `timeupdate`、`lrcshow`、`lrchide` 时通知更新；现有 350ms 延后重算覆盖过渡。使用已有事件和清理机制，不因这次修复增加观察器或持续轮询。\n\n## Existing record audit\n\n[部署后边界验证](../testing/2026-10-07-live2d-deployed-boundaries.md)部分重叠，继续持有多宽度连续操作与实际部署的验证边界；本篇提炼位置状态、可见文字和跨脚本通知契约，不复制该测试方案。[基础接入](../architecture/2026-10-07-live2d-integration.md)负责模型与加载边界，[设置标签](../feature/2026-10-07-live2d-settings-tab.md)负责配置组织，均保留互链。\n\n后续历史提炼的[播放器缓存](../architecture/2026-10-07-music-cache-contract.md)和[导航断点](../feature/2026-10-07-navigation-breakpoints.md)分别持有音频协议与导航状态；与本篇部分重叠，浮层仅按实际可见播放器和页头边界避让。\n\n## Alternatives considered\n\n- **整块歌词容器作为障碍**：矩形计算直接简单，但原实现实测在自然收起后仍产生 40px 残余；透明容器覆盖视口不能代表文字实际覆盖，因此改为可见文字范围。\n- **按文字范围计算（采用）**：保留歌词显示且能识别真实相交；代价是多一次文字矩形测量，并依赖字体、换行与过渡时序。\n\n原页头修复记录明确保留浮层层级、通过位置边界避让，但未给出完整的层级方案比较；本篇不补造其历史否决理由。早期测试中手动隐藏歌词/列表属于掩盖复现的夹具行为，不作为产品方案保留。\n\n## Consequences\n\n用户保存位置与临时偏移分离，控件保持可达，歌词仍显示。有限视口可能无法容纳所有浮层，顶部边界优先于无限上移；不同字体和播放器尺寸仍需要实际页面验证。测试应等待动画结束，避免用重置、人工重算或隐藏歌词掩盖自然收起问题。\n\n## Verification\n\n2026-10-07 对 `2a42534` 的 `getBounds()`、`applyPosition()`、`getPlayerRects()`、`updatePlayerOffset()` 及播放器通知事件逐项核对，形成此记录。原布局计划最早明确记载的继续实施日为 2026-09-22；本篇成文日期不冒充其首次提出日。\n\n2026-10-06 原报告记录失败回归 `40 !== 0`，修复后 26 项浏览器与 19 项 Node 检查通过。2026-10-07 构建75直接部署验证默认位置展开66px、自然收起0px，后续多宽度结果见[部署边界笔记](../testing/2026-10-07-live2d-deployed-boundaries.md)。这些是原版本的验证证据；本轮只提炼文档，不重新测量服务器或将历史测试数冒充本轮执行结果。\n\n历史日期与结果来自维护者核对的原始记录；原始执行资料未随仓库分发。\n\n## Historical regression evidence\n\n页头遮挡问题在1280×900保存left1000/bottom650时，模型top0，固定75px页头的searchbox截获控件点击。加入页头/管理栏边界后，本地含管理栏反例从top0变为107；实站临时替换脚本后top75，缩至900×400时left620/top75，触摸、隐藏、刷新和重置亦有对应结果。首次鼠标采样未发生移动不算通过，后续以is-dragging状态和坐标补齐。层级保持原样，修复证据不意味着当时已部署服务器。\n\n2026-10-06用户部署dev.74/c7ee80b后，六份关键JS/CSS与该提交一致（比较仅规范化换行），11项直接前台检查通过，包含边缘限位、PNG延迟、860/861冷加载，且未替换脚本或注入CSS。但收起后通过重置恢复默认，未验证自然收起；早期本地测试又人工隐藏歌词/列表，不能用这些通过记录否认随后发现的收起残余问题。\n\n收起残余问题在原部署自然收起750/1500ms仍为40px，手动重算也不恢复；本体已收回right18，剩余是宽1280、高30的透明歌词容器。移除隐藏/重算后回归先失败40 !== 0，修复后26项浏览器与19项Node通过。临时本地JS替换得到展开66、自然收起0，属于修复验证；用户部署dev.75/20dd904后才用服务器原脚本确认两轮收起750/1500/900ms均0，歌词仍可见且有文字，无替换、重置或人工重算。350ms仍在正常过渡，不作为失败。\n\n当时独立浏览器和路由均关闭；dev.74记录的外部MP3 ERR_ABORTED未被证明是播放器故障，也没有实际点击播放。上述版本限定的结论来自已核对的报告与before/after/deployed JSON，原始图像和脚本已经退役，当前可见文字真正相交时仍应避让。\n"},{"id":"implemented/feature/2026-10-07-live2d-settings-tab.md","slug":"2026-10-07-live2d-settings-tab","lifecycle":"implemented","cls":"feature","date":"2026-10-07","title":"Live2D 配置使用独立看板娘标签","status":"implemented","problem":"本次改动前，Live2D的总开关、模型、远程换装开关及接口地址夹在options.php的Others分组内，与图片加载、剪贴板和邮件等配置混排。用户认可独立「看板娘」标签。","decision":"在现有主题设置页标签栏末尾追加「看板娘」，使用稳定heading id `live2d`。将四个完整选项定义整体移动到此分组：`live2d_s`、`live2d_m`、`live2d_b`、`live2d_i`。保留其配置键、默认值、字段类型和保存入口；无需迁移数据库或修改前台加载逻辑。","alternatives":"- 在「其他」前插入新标签：分类顺序更符合「其他」收尾的惯例，但框架按遍历顺序生成options-group编号，可能让已记住的标签位置改变。选择追加末尾，保留现有标签编号。","consequences":"交付证据：用户单独确认修正已推送标题后，使用精确force-with-lease将e8ea664替换为66429c1fb474010d08f88b5654cf54c49dc32de1，两个提交树内容一致。本地及CI标题校验通过。旧WP7.1/PHP8.1任务重试成功，但不视为第三方安装可靠性永久修复。兼容性37568617753（构建77）和质量37568617735均success：三PHP构建、六组WP/PHP smoke全部成功。当次扫描快照有22条open告警，较构建75无新增，不表示零漏洞。公开构建来源为[兼容性运行](https://github.com/ADDGM/sakura/actions/runs/37568617753)及[质量运行](https://github.com/ADDGM/sakura/actions/runs/37568617735)；扫描数为当时快照。该改动已随构建78部署，后台验收见Verification。","outLinks":["implemented/testing/2026-10-07-live2d-deployed-boundaries.md","implemented/architecture/2026-10-07-live2d-integration.md","implemented/bug-fix/2026-10-07-live2d-player-layout.md","implemented/architecture/2026-10-07-admin-settings-boundary.md"],"rawBody":"# Agent Note: Live2D 配置使用独立看板娘标签\n\nStatus: implemented\n\n## Problem\n\n本次改动前，Live2D的总开关、模型、远程换装开关及接口地址夹在options.php的Others分组内，与图片加载、剪贴板和邮件等配置混排。用户认可独立「看板娘」标签。\n\n## Decision\n\n在现有主题设置页标签栏末尾追加「看板娘」，使用稳定heading id `live2d`。将四个完整选项定义整体移动到此分组：`live2d_s`、`live2d_m`、`live2d_b`、`live2d_i`。保留其配置键、默认值、字段类型和保存入口；无需迁移数据库或修改前台加载逻辑。\n\n组内依次展示总开关、Tia/Pio模型、远程换装开关和接口地址。使用现有info字段提供简短说明：屏幕宽度至少861px时加载，可用拖动手柄调整位置，并通过重置按钮恢复。远程换装继续使用已有说明，不新增联动隐藏、独立后台菜单、服装选择器或运行时升级选项。\n\n新增标签和说明同步POT、简繁中文、英文、日文PO/MO。标签中文显示「看板娘」，不修改前台现有「Live2D 看板娘」文案。复用现有Options Framework的heading和info，不引入新的界面组件或依赖。\n\n## Existing record audit\n\n活跃笔记检索命中[部署后边界补验](../../implemented/testing/2026-10-07-live2d-deployed-boundaries.md)，其运行时边界与本方案说明部分重叠，继续作为861px边界依据；没有现有设置标签决定可吸收。\n\n后续提炼的[基础接入](../architecture/2026-10-07-live2d-integration.md)和[浮层位置](../bug-fix/2026-10-07-live2d-player-layout.md)持有运行时契约，与本篇部分重叠；本篇继续维护标签组织和保存兼容，不复制模型与布局实现说明。\n\n后续提炼的[后台设置边界](../architecture/2026-10-07-admin-settings-boundary.md)负责配色、渲染语义和旧存储兼容；本篇继续只负责看板娘分组与该次保存验收，二者部分重叠并互链。\n\n## Alternatives considered\n\n- 在「其他」前插入新标签：分类顺序更符合「其他」收尾的惯例，但框架按遍历顺序生成options-group编号，可能让已记住的标签位置改变。选择追加末尾，保留现有标签编号。\n- 只在「其他」里增加小标题：改动更少，但仍需进入不相关的标签才能找到配置，不符合用户已认可的独立入口。\n- 新增WordPress后台菜单页：入口更突出，但四个设置不足以支持独立页面的维护成本；保留现有保存和权限机制。\n\n## Verification\n\n2026-10-07部署后补验：测试站build-info确认3.6.1-dev.78/source_sha 6b10d8529082f827b1ac9f558b76eac3800c8630/run37573963024。真实后台第9标签独立显示四项配置；切到「其他」后Live2D组隐藏，剪贴板与邮件仍在原组。390×844视口标签正常换行，第9标签占一行，无横向溢出；桌面布局正常。按既有临时切换授权执行Pio→Tia保存，看到「设置已保存」并刷新确认Tia，再保存Pio并刷新确认开启/Pio/远程关闭/接口空。此轮补齐真实保存验收，不宣称重跑前台WebGL与所有基础功能。视口覆盖已恢复，临时标签关闭；未修改源码、提交或部署。原截图仅本地保存，本段提供该次验收的结果与范围。后台更新检查显示GitHub API限流提示，本轮未重试外部检查，不属于标签故障。以下本地阶段与交付段中的待部署描述为历史状态，由本段验收更新。\n\n2026-10-07按用户确认实施。独立PHP夹具实际执行修改前后options定义：146字段完整定义完全一致，8个原heading顺序不变，追加第9标签；四个Live2D字段归属正确，其他字段分组不变。调用现有渲染函数验证标签目标、保存的Pio和两个开关，以及带查询参数接口地址的转义。\n\n独立夹具、结果和渲染HTML未随仓库分发。首次夹具缺wp_strip_all_tags桩导致中断，补齐后通过；该故障属于夹具，不是主题框架。\n\nPHP 8.2 lint、四语言PO/MO一致性、MO标签译文读取、19项Node回归和git diff --check通过。运行时和依赖未改，不重复无关的WebGL整套回归。本地夹具不连接WordPress数据库；真实后台验收已由本节部署后补验覆盖。\n\n## Consequences\n\n交付证据：用户单独确认修正已推送标题后，使用精确force-with-lease将e8ea664替换为66429c1fb474010d08f88b5654cf54c49dc32de1，两个提交树内容一致。本地及CI标题校验通过。旧WP7.1/PHP8.1任务重试成功，但不视为第三方安装可靠性永久修复。兼容性37568617753（构建77）和质量37568617735均success：三PHP构建、六组WP/PHP smoke全部成功。当次扫描快照有22条open告警，较构建75无新增，不表示零漏洞。公开构建来源为[兼容性运行](https://github.com/ADDGM/sakura/actions/runs/37568617753)及[质量运行](https://github.com/ADDGM/sakura/actions/runs/37568617735)；扫描数为当时快照。该改动已随构建78部署，后台验收见Verification。\n\n历史失败依据：e8ea664的兼容性37567663901整体失败。原因一为提交标题“改进”不在允许类型中（提交前未运行标题校验），之后经明确授权修正。原因二为WP7.1/PHP8.1安装时wp命令不存在，主题smoke未执行，之后单独重试成功。不得将构建76描述为全部验收通过。\n\n提交前复核：Semgrep以p/php规则集扫描options.php，50条PHP规则、约100%解析，0条发现；10个完整变更文件的敏感信息模式扫描未命中（启发式检查，不等于绝对无秘密）。没有依赖清单或运行时依赖变更，不宣称已完成全仓历史依赖漏洞清零。Semgrep原始JSON已经退役，本段保留当时摘要；本地范围扫描记录未随仓库分发，不将未命中解释为完整安全证明。\n\n采用原框架无需新增存储或迁移；代价是标签栏增加一项。前后定义及分组比较已确认剪贴板与邮件仍位于其他分组，新增翻译已编译；部署后的换行及点击检查通过。本次仅修改分组范围，不重构设置框架。\n"},{"id":"implemented/feature/2026-10-07-native-theme-updates.md","slug":"2026-10-07-native-theme-updates","lifecycle":"implemented","cls":"feature","date":"2026-10-07","title":"WordPress 原生主题更新的渠道与安装包边界","status":"implemented","problem":"仅展示 GitHub Release 状态不能让 WordPress 获得可安装的主题更新。接入原生更新后，主题必须提供正确候选和安装包，同时保留管理员对渠道及自动安装的控制，避免将源码归档当作主题交付包。","decision":"[style.css](../../../../style.css) 声明 `Update URI: https://github.com/ADDGM/sakura`。[release-info.php](../../../../inc/release-info.php) 通过 `update_themes_github.com` 接入，只处理匹配该 URI 的主题。主题提供候选元数据，版本比较、安装权限和安装执行继续由 WordPress 核心负责。","alternatives":"原计划明确批准 WordPress 官方 Update URI 机制，并明确排除自动源码包与默认开启自动更新，但没有保存完整的替代更新机制比较。因此本节保留资料缺口，不把“第三方更新库”或“自行实现安装器”编造为当时已经比较并否决的方案。","consequences":"用户通过 WordPress 原生入口查看和安装更新，主题无需维护第二套安装执行流程；代价是依赖 GitHub API、规范标签与准确的 Release 包命名，限流或缺包时不能提供更新候选。默认关闭自动更新保留管理员选择，但后台定时安装仍需要单独验收，不能由手动升级成功推定。","outLinks":["implemented/process/2026-10-07-stable-release.md"],"rawBody":"# Agent Note: WordPress 原生主题更新的渠道与安装包边界\n\nStatus: implemented\n\n## Problem\n\n仅展示 GitHub Release 状态不能让 WordPress 获得可安装的主题更新。接入原生更新后，主题必须提供正确候选和安装包，同时保留管理员对渠道及自动安装的控制，避免将源码归档当作主题交付包。\n\n## Decision\n\n[style.css](../../../../style.css) 声明 `Update URI: https://github.com/ADDGM/sakura`。[release-info.php](../../../../inc/release-info.php) 通过 `update_themes_github.com` 接入，只处理匹配该 URI 的主题。主题提供候选元数据，版本比较、安装权限和安装执行继续由 WordPress 核心负责。\n\n`sakura_release_update_candidate()` 在稳定渠道只考虑正式 Release；测试渠道同时考虑正式与预发布候选，选择版本更高且具有有效包的候选，排除草稿和标记不匹配的条目。没有有效候选时不返回可安装更新。旧 `tag`、`tag2`、`develop` 设置分别兼容到 stable/testing，未知渠道回退 stable。\n\n`sakura_release_installable_package()` 要求合法的 `vX.Y.Z` 或 `vX.Y.Z-beta.N` / `-rc.N` 标签，以及严格匹配 `sakura-{version}.zip` 的资产名和非空 URL。GitHub 自动源码 ZIP、校验文件及其他名字的压缩包不作为自动安装包。此函数不执行 SHA-256 下载校验，不应把独立发布验收中的双哈希核对描述成更新器的内置安全能力。\n\n## Administration and cache\n\n渠道修改和手动刷新要求 `manage_options`；刷新入口验证 nonce。保存渠道前的过滤器保留非管理员原值，合法渠道改变或手动刷新时清理发布缓存与 WordPress `update_themes` 缓存。发布查询正常缓存6小时，错误缓存15分钟，错误状态与限流时间用于提示，查询失败不伪造可用版本。\n\n更新 payload 返回 `autoupdate=false`，主题不主动开启站点自动安装。管理员可通过 WordPress 原生主题页面选择开启；这个默认值不等于禁止管理员启用自动更新。\n\n## Existing record audit\n\n[正式发布](../process/2026-10-07-stable-release.md)持有版本、构建来源、交付包与部署证据，本篇持有查询、渠道、安装包及权限契约，两者部分重叠并互链。构建来源展示独立于自动安装候选选择，不根据其显示正常推断服务器安装链路已经全部测试。现有提交规范、通知和 Live2D 笔记不覆盖此职责。\n\n## Alternatives considered\n\n原计划明确批准 WordPress 官方 Update URI 机制，并明确排除自动源码包与默认开启自动更新，但没有保存完整的替代更新机制比较。因此本节保留资料缺口，不把“第三方更新库”或“自行实现安装器”编造为当时已经比较并否决的方案。\n\n已知的实际变化是从 Release 信息展示扩展到原生可安装更新；原文没有记录继续只展示的完整利弊，不能补写成历史选型结论。日后改换更新机制时需要重新形成有证据的比较。\n\n## Consequences\n\n用户通过 WordPress 原生入口查看和安装更新，主题无需维护第二套安装执行流程；代价是依赖 GitHub API、规范标签与准确的 Release 包命名，限流或缺包时不能提供更新候选。默认关闭自动更新保留管理员选择，但后台定时安装仍需要单独验收，不能由手动升级成功推定。\n\n## Verification\n\n本篇于 2026-10-07 对 `2a42534` 的 Update URI、候选选择、严格包名、payload、渠道权限和刷新缓存源码进行核对。历史方案没有可证明的首次提出日期，本篇记录的是本次形成的维护契约，不采用归档文件时间推定原决策日期。\n\n2026-09-28 的历史 smoke 与隔离 WordPress 记录分别覆盖候选/权限断言和15项原生升级检查；2026-10-07 正式部署记录覆盖 v3.7.0 包来源、配置保留，以及用户确认“立即更新”路径后的直接版本核验。更新查询同日16:07恢复。手动升级证据不等同于独立抓取服务器 PHP 下载日志，后台定时自动更新仍未验收。本轮不访问服务器或重新执行安装。\n\n实际发布来源与升级后的核验结果见[正式发布笔记](../process/2026-10-07-stable-release.md)；原始执行记录未随仓库分发。\n\n## Historical installation evidence\n\n2026-09-28的ec55e3f测试站只验证开发来源展示、stable渠道、原生更新提示与管理员“立即检查”；“启用自动更新”按钮表示当时关闭，未点击安装。同期smoke覆盖渠道、严格包名、其他主题数据保留和非管理员分支，但没有执行真实HTTP伪造权限请求，不能把这些断言扩展成完整网络或安装验收。\n\n同日隔离WordPress通过真实 `wp_update_themes()` 和 `Theme_Upgrader::upgrade()` 完成15项检查：更新候选及 `autoupdate=false`、升级成功、激活状态和设置保留、maintenance清理、旧build-info移除、五个修改文件哈希及原交付ZIP保留。上游更新响应和Release候选由夹具提供，下载钩子返回本地副本，邮件/外部服务请求被阻断；因此没有覆盖GitHub下载网络、HTTP上传、FTP/服务器权限或定时自动安装。\n\n隔离安装夹具曾因目录层级错误导致末尾校验失败，升级本身已成功；下载钩子直接返回原交付ZIP还会使核心清理过程删除它。修正方式是返回隔离副本并验证原包仍在，不把夹具错误归因主题。来源HTML另测无元数据→Unknown且无提交/分支下载链接、合法标签→Release tag、非法分支/标签/SHA→未知；标签数据是本地夹具，直到后续正式部署才取得实站证据。\n\n这些历史摘要于2026-10-07从原生更新和隔离安装两份报告归并，原报告及附件按用户授权退役；当前手动升级与定时自动更新的边界仍以上述Verification为准，未重新执行安装。\n"},{"id":"implemented/feature/2026-10-07-navigation-breakpoints.md","slug":"2026-10-07-navigation-breakpoints","lifecycle":"implemented","cls":"feature","date":"2026-10-07","title":"导航三段断点与宽屏默认展开","status":"implemented","problem":"861至1200px仍显示桌面导航时，菜单可能挤压换行；原“展开导航菜单”内联强制显示还会绕过中等宽度的折叠行为，造成入口与可用空间不匹配。","decision":"保留三段行为：大于1200px使用桌面导航并受shownav默认展开设置控制；861至1200px默认收起顶部菜单，由按钮展开；不大于860px使用原左侧抽屉。","alternatives":"- 继续所有桌面宽度强制展开：可维持旧开关字面含义，但会破坏861至1200px折叠和空间边界；当前把开关限定为宽屏默认状态。","consequences":"设置语义与视口边界一致，桌面按钮始终可按断点接管；代价是三个断点区间及两类菜单结构仍需维护。超长自定义菜单和插件插入内容需要实测，不能由CSS存在性推导所有菜单都不会溢出。","outLinks":["implemented/bug-fix/2026-10-07-live2d-player-layout.md"],"rawBody":"# Agent Note: 导航三段断点与宽屏默认展开\n\nStatus: implemented\n\n## Problem\n\n861至1200px仍显示桌面导航时，菜单可能挤压换行；原“展开导航菜单”内联强制显示还会绕过中等宽度的折叠行为，造成入口与可用空间不匹配。\n\n## Decision\n\n保留三段行为：大于1200px使用桌面导航并受shownav默认展开设置控制；861至1200px默认收起顶部菜单，由按钮展开；不大于860px使用原左侧抽屉。\n\n[header.php](../../../../header.php)始终输出桌面折叠按钮，以nav-default-open表达设置；[style.css](../../../../style.css)在中等断点覆盖默认展开，交互使用navbar状态。顶级菜单保持单行，限制可用宽度，并分别处理顶级透明背景和下拉子菜单背景。设置不通过全局内联important跨断点强制显示。\n\n## Existing record audit\n\n检索导航、断点和shownav，现有[Live2D布局](../bug-fix/2026-10-07-live2d-player-layout.md)仅使用可见页头边界，部分重叠并互链；本篇持有导航显示规则。原导航、Beta.4登录移动修复及混合修复中的相关段落归于此。\n\n## Alternatives considered\n\n- 继续所有桌面宽度强制展开：可维持旧开关字面含义，但会破坏861至1200px折叠和空间边界；当前把开关限定为宽屏默认状态。\n- 保留原三段导航并修复状态/布局（采用）：维持已有抽屉及菜单行为。原记录只给出方案A，没有完整替代导航设计，不补造统一抽屉等比选。\n\n## Consequences\n\n设置语义与视口边界一致，桌面按钮始终可按断点接管；代价是三个断点区间及两类菜单结构仍需维护。超长自定义菜单和插件插入内容需要实测，不能由CSS存在性推导所有菜单都不会溢出。\n\n## Verification\n\n2026-10-07按 `2a42534` 核对header状态类和style断点。历史Beta.4有860/861与1200/1201边界、登录头像及窄屏复验；本轮没有新的浏览器尺寸验收。文件日期为维护契约成文日，不冒充原功能首次提出日。\n"},{"id":"implemented/feature/2026-10-07-site-runtime-date.md","slug":"2026-10-07-site-runtime-date","lifecycle":"implemented","cls":"feature","date":"2026-10-07","title":"建站日期的保存校验与自然日语义","status":"implemented","problem":"建站时间为空、格式含糊或位于未来时，页脚可能显示错误天数。只增加清理函数而未接入 text 字段的保存路径，曾让未来日期绕过校验。","decision":"继续使用 `site_start_date` 文本字段，默认空值；placeholder 只是格式示例，不是默认日期。[sakura_parse_site_start_date](../../../../functions.php) 严格检查 YYYY-MM-DD、真实日历日期及不晚于网站今天，采用 WordPress 时区；缺少相关 WordPress 时间函数时回退 UTC。","alternatives":"- 文本输入加服务端校验（采用）：沿用现有框架，同时明确格式和错误回退。","consequences":"保存和显示共用日期语义，空值可关闭；代价是用户需要按指定格式输入。站点时区变化可能改变“今天”及显示天数，这是网站时间语义的结果。保存失败回退的旧值仍由渲染端校验，不能断言历史数据都已清洗。","outLinks":["implemented/architecture/2026-10-07-admin-settings-boundary.md","implemented/feature/2026-10-07-test-mail-boundary.md"],"rawBody":"# Agent Note: 建站日期的保存校验与自然日语义\n\nStatus: implemented\n\n## Problem\n\n建站时间为空、格式含糊或位于未来时，页脚可能显示错误天数。只增加清理函数而未接入 text 字段的保存路径，曾让未来日期绕过校验。\n\n## Decision\n\n继续使用 `site_start_date` 文本字段，默认空值；placeholder 只是格式示例，不是默认日期。[sakura_parse_site_start_date](../../../../functions.php) 严格检查 YYYY-MM-DD、真实日历日期及不晚于网站今天，采用 WordPress 时区；缺少相关 WordPress 时间函数时回退 UTC。\n\n[of_sanitize_site_start_date](../../../../inc/options-sanitize.php) 接受空值以关闭显示；非法非空输入提示错误并返回已有保存值。渲染再次校验，非法历史值不显示天数。[optionsframework_validate](../../../../inc/options-framework.php) 和默认值处理优先按字段 ID 查找清理器，再回退类型清理器，防止 text 通用清理掩盖日期规则。\n\n`sakura_get_site_runtime_days()` 计算两日期的自然日差；[footer.php](../../../../footer.php) 输出合法结果，建站当天为0。不按浏览器时区或经过的秒数除以86400计算，避免网站时区和夏令时边界产生歧义。\n\n## Existing record audit\n\n活跃笔记无建站日期决定。[后台设置边界](../architecture/2026-10-07-admin-settings-boundary.md)部分重叠，持有通用渲染和存储约定，本篇持有字段校验。原建站时间与邮件混合计划拆分为本篇和[测试邮件](2026-10-07-test-mail-boundary.md)。\n\n## Alternatives considered\n\n- 文本输入加服务端校验（采用）：沿用现有框架，同时明确格式和错误回退。\n- 独立 HTML5 date 字段：提供浏览器日期选择能力，但原计划明确不扩展新字段类型；保留文本方案。历史没有更完整的浏览器比选记录。\n- placeholder扩展若不兼容，原计划允许退回普通空文本框加说明；这是回退方案，不表示删除合法保存值或关闭服务端校验。\n\n## Consequences\n\n保存和显示共用日期语义，空值可关闭；代价是用户需要按指定格式输入。站点时区变化可能改变“今天”及显示天数，这是网站时间语义的结果。保存失败回退的旧值仍由渲染端校验，不能断言历史数据都已清洗。\n\n## Verification\n\n2026-10-07按 `2a42534` 核对日期辅助函数、专用清理器及字段ID优先分派；现有 smoke 有闰日、非法日期、未来日期和保存回退检查。原Beta.5/Beta.6记录有日期保存、空值及未来值回归，本轮只复核源码和记录，没有修改站点日期或时区。成文日期不代表原功能首次提出日。\n"},{"id":"implemented/feature/2026-10-07-test-mail-boundary.md","slug":"2026-10-07-test-mail-boundary","lifecycle":"implemented","cls":"feature","date":"2026-10-07","title":"测试邮件复用 WordPress 投递与已保存配置","status":"implemented","problem":"维护者需要检查主题与邮件插件的连接，但主题不应另建SMTP配置，也不能将“请求已接受”误报成“收件成功”。内网站点地址还可能生成无效发件域名。","decision":"[设置渲染器](../../../../inc/options-interface.php)通过按钮的 formaction/formmethod 提交到 admin-post.php，避免嵌套表单和额外AJAX链路。[sakura_handle_test_email](../../../../inc/mail.php)要求 edit_theme_options 和独立 nonce，收件人固定读取 admin_email，发件前缀只读取已保存设置。","alternatives":"- 复用 wp_mail() 和 Easy WP SMTP（采用）：主题只构造邮件，SMTP连接与认证仍由已配置插件负责。","consequences":"测试与评论邮件共享格式和发送能力，配置职责明确；代价是功能可用性仍取决于 WordPress及传输插件。邮件服务商可能覆盖From，最终送达需另有收件证据。测试邮件成功不能替代评论通知条件、第三方反垃圾和生产送达的验证。","outLinks":["implemented/feature/2026-10-07-site-runtime-date.md","implemented/architecture/2026-10-07-admin-settings-boundary.md"],"rawBody":"# Agent Note: 测试邮件复用 WordPress 投递与已保存配置\n\nStatus: implemented\n\n## Problem\n\n维护者需要检查主题与邮件插件的连接，但主题不应另建SMTP配置，也不能将“请求已接受”误报成“收件成功”。内网站点地址还可能生成无效发件域名。\n\n## Decision\n\n[设置渲染器](../../../../inc/options-interface.php)通过按钮的 formaction/formmethod 提交到 admin-post.php，避免嵌套表单和额外AJAX链路。[sakura_handle_test_email](../../../../inc/mail.php)要求 edit_theme_options 和独立 nonce，收件人固定读取 admin_email，发件前缀只读取已保存设置。\n\n按钮随主表单提交时可能携带未保存字段，但处理器不将它们保存或用于发送；“只使用已保存值”不等于浏览器完全不发送这些字段。主题不读取邮件插件的SMTP密码或内部选项，投递继续由 wp_mail() 与插件负责。\n\n评论通知和测试邮件共用发件地址、headers和HTML外框；评论通知条件仍留在 [comment_mail_notify](../../../../functions.php)。站点主机是IP、localhost或无效域名时回退管理员邮箱的合法域名，无法生成有效发件地址则不发送。模板按内容上下文转义并限制HTML。\n\n发送辅助函数监听 wp_mail_failed 并返回错误信息。后台成功文案仅表示 wp_mail()/插件接受请求，不证明最终送达。结果保存在按用户及随机token区分的一分钟Transient内，再固定安全重定向回设置页，避免刷新重复发送和任意跳转。\n\n## Existing record audit\n\n活跃笔记无测试邮件契约。与[建站日期](2026-10-07-site-runtime-date.md)共用一份旧计划，但业务无依赖，分别提炼；与[后台设置边界](../architecture/2026-10-07-admin-settings-boundary.md)仅共享渲染入口。\n\n## Alternatives considered\n\n- 复用 wp_mail() 和 Easy WP SMTP（采用）：主题只构造邮件，SMTP连接与认证仍由已配置插件负责。\n- 主题新增SMTP设置或读取插件内部配置：原记录明确排除此扩展，避免重复配置及依赖插件内部存储；没有独立SMTP库选型过程可追溯。\n- 原计划预留设置页独立按钮入口作为表单兼容回退，保留admin-post处理器；未将该回退描述为实际部署方案。\n\n## Consequences\n\n测试与评论邮件共享格式和发送能力，配置职责明确；代价是功能可用性仍取决于 WordPress及传输插件。邮件服务商可能覆盖From，最终送达需另有收件证据。测试邮件成功不能替代评论通知条件、第三方反垃圾和生产送达的验证。\n\n## Verification\n\n2026-10-07按 `2a42534` 核对表单动作、权限/nonce、固定收件人、已保存值、域名回退、公共发送和安全重定向。历史Beta.6记录包含Easy WP SMTP实际收件，本轮没有发送邮件、改SMTP或验证当前投递。本篇日期为维护契约成文日。\n"},{"id":"implemented/process/2026-10-07-ci-notification-summary.md","slug":"2026-10-07-ci-notification-summary","lifecycle":"implemented","cls":"process","date":"2026-10-07","title":"Telegram 汇总当前兼容性工作流","status":"implemented","problem":"Telegram通知原先只依赖build，提交检查或WordPress烟雾测试失败时仍可能报告构建成功。用户要求汇总当前工作流，避免将打包成功误解为整轮CI通过。","decision":"notify依赖build、commit-message和wordpress-smoke，保留always()；消息分别展示三组结果。整体状态按失败、取消、跳过、全部成功、未知的顺序判断。仅三组均success时显示CI全部通过。","alternatives":"- 保留只通知build：能更早获得打包结果，但不能体现当前工作流的验收结论。","consequences":"通知更晚发出，但状态与当前工作流三组检查一致。各矩阵显示组级结果，具体失败组合仍通过工作流链接查看。通知发送失败继续不影响测试结果。","outLinks":["implemented/process/2026-10-07-commit-policy.md","implemented/process/2026-10-07-quality-workflow-boundary.md"],"rawBody":"# Agent Note: Telegram 汇总当前兼容性工作流\n\nStatus: implemented\n\n## Problem\n\nTelegram通知原先只依赖build，提交检查或WordPress烟雾测试失败时仍可能报告构建成功。用户要求汇总当前工作流，避免将打包成功误解为整轮CI通过。\n\n## Decision\n\nnotify依赖build、commit-message和wordpress-smoke，保留always()；消息分别展示三组结果。整体状态按失败、取消、跳过、全部成功、未知的顺序判断。仅三组均success时显示CI全部通过。\n\n消息明确范围为当前兼容性工作流，不包括独立质量工作流。保留通知错误不阻塞CI，以及未配置凭据时跳过并写入job summary的行为。\n\n## Existing record audit\n\n[提交策略](2026-10-07-commit-policy.md)涉及同一工作流的提交检查，部分重叠；本笔记只负责通知依赖及状态呈现，不改变提交规则。既有活跃笔记未定义Telegram汇总策略。\n\n后续提炼的[质量工作流](2026-10-07-quality-workflow-boundary.md)与本篇部分重叠，明确独立job、扫描发现及SARIF结果边界；质量流程仍不纳入当前通知汇总。\n\n## Alternatives considered\n\n- 保留只通知build：能更早获得打包结果，但不能体现当前工作流的验收结论。\n- 合并独立质量工作流：信息更全面，但需要跨工作流协调和关联同一提交；超出用户本轮要求。\n\n## Consequences\n\n通知更晚发出，但状态与当前工作流三组检查一致。各矩阵显示组级结果，具体失败组合仍通过工作流链接查看。通知发送失败继续不影响测试结果。\n\n## Verification\n\nYAML结构、三项needs、always()和continue-on-error均已检查。读取实际消息表达式并在本地等价求值，success/failure/cancelled/skipped的64种组合全部符合优先级；原检查JSON仅本地保存。git diff --check通过。\n\n6b10d85获授权提交推送后，构建78（37573963024）整体success。Telegram任务在全部前置任务完成后启动，Send Telegram notification步骤success，未配置跳过步骤为skipped；时序及步骤可按[构建78运行](https://github.com/ADDGM/sakura/actions/runs/37573963024)追溯。这证明发送步骤正常执行，不等于确认用户已阅读；失败/取消/跳过组合仍为本地验证，未故意制造远端失败或额外测试消息。\n"},{"id":"implemented/process/2026-10-07-commit-policy.md","slug":"2026-10-07-commit-policy","lifecycle":"implemented","cls":"process","date":"2026-10-07","title":"提交类型与本地及CI校验统一","status":"implemented","problem":"提交e8ea664使用了仓库不允许的中文类型“改进”，本地缺少commit-msg钩子，直到CI才失败。提交格式需要由同一校验器在本地与CI执行，避免规则仅靠说明文字传达。","decision":"使用feat、fix、docs、style、refactor、perf、test、build、ci、chore、revert和可选扩展init。范围可选、摘要必须含中文，英文冒号后有空格，支持!。perf仅用于性能，依赖/构建归build，流水线归ci，chore为其他维护。","alternatives":"- 永久允许中英文类型：迁移容易，但本地规则继续含糊；只允许发布解析兼容历史。","consequences":"当前工作流的Telegram汇总属于后续补充，依赖与展示规则见[通知汇总](2026-10-07-ci-notification-summary.md)，提交规范不因此改变。","outLinks":["implemented/testing/2026-10-07-compatibility-evidence.md","implemented/feature/2026-10-07-live2d-settings-tab.md","implemented/process/2026-10-07-ci-notification-summary.md"],"rawBody":"# Agent Note: 提交类型与本地及CI校验统一\n\nStatus: implemented\n\n## Problem\n\n提交e8ea664使用了仓库不允许的中文类型“改进”，本地缺少commit-msg钩子，直到CI才失败。提交格式需要由同一校验器在本地与CI执行，避免规则仅靠说明文字传达。\n\n## Decision\n\n使用feat、fix、docs、style、refactor、perf、test、build、ci、chore、revert和可选扩展init。范围可选、摘要必须含中文，英文冒号后有空格，支持!。perf仅用于性能，依赖/构建归build，流水线归ci，chore为其他维护。\n\n校验脚本提供title、message-file和range入口。范围入口排除固定迁移边界66429c1及其祖先，提交消息入口始终执行新规范；发布说明保留历史中文解析并增加英文分组。不重写历史，不放宽新提交。\n\n新增可重复运行且拒绝覆盖非本工具钩子的安装器，仅安装commit-msg，不改core.hooksPath和其他已有钩子。提交前使用[scripts/validate-commit-messages.php](../../../../scripts/validate-commit-messages.php)检查候选标题；使用[scripts/install-commit-hook.php](../../../../scripts/install-commit-hook.php)安装仓库钩子。\n\n后续提炼的[兼容性验证](../testing/2026-10-07-compatibility-evidence.md)与本篇部分重叠；旧兼容性总计划中的中文提交类型仅是历史背景，新提交继续以本篇已落地规范为准。\n\n## Alternatives considered\n\n- 永久允许中英文类型：迁移容易，但本地规则继续含糊；只允许发布解析兼容历史。\n- 重写旧中文提交：历史整齐，但破坏协作且无必要；采用固定祖先边界。\n- 用core.hooksPath替换全部钩子：便于版本控制，但可能绕过其他已有钩子；选择单个安全安装器。\n\n## Existing record audit\n\n[看板娘标签](../../implemented/feature/2026-10-07-live2d-settings-tab.md)包含本次失败的历史证据，部分重叠，仅链接不覆盖旧事实。\n\n## Verification\n\n27项隔离命令检查通过：新类型正反例、中文摘要、范围及!、消息文件CRLF/正文/空文件、历史边界和缺失对象、合法提交成功/非法提交不产生新SHA、已有钩子拒绝覆盖、重复安装一致、空/非空hooksPath拒绝。临时仓库自动清理。\n\n仓库实际commit-msg通过git hook run验证合法标题exit0、非法类型exit1；原pre-commit/post-commit/post-merge哈希不变。安装检查原件仅本地保存。首次隔离测试暴露空hooksPath误判，修正后通过。\n\nPHP语法、历史和英文混合Release分组及破坏性标记自测、50条PHP Semgrep规则扫描（三文件0发现）、git diff --check通过。CI YAML已解析并接入集成测试；6b10d85已获授权提交推送，兼容性37573963024（构建78）与质量37573963055全部成功，新提交规范和钩子迁移集成步骤通过。公开来源见[兼容性运行](https://github.com/ADDGM/sakura/actions/runs/37573963024)和[质量运行](https://github.com/ADDGM/sakura/actions/runs/37573963055)；本段为历史验收摘要。\n\n## Consequences\n\n当前工作流的Telegram汇总属于后续补充，依赖与展示规则见[通知汇总](2026-10-07-ci-notification-summary.md)，提交规范不因此改变。\n\n新提交在本地被拦截，CI与本地共享规则，发布说明仍能识别历史中文。代价是每次克隆需安装钩子；本地钩子依赖安装时PHP路径，解释器移动后需重新接入，缺失时拒绝提交。固定边界要求完整历史，缺失对象报错，不能仅靠浅克隆完成范围检查。CI略过合并提交，手动合并/回退及临时fixup提交需按README提供合规标题。Git只分发安装器，不分发已安装的本地钩子；克隆后需在本机安装。\n"},{"id":"implemented/process/2026-10-07-quality-workflow-boundary.md","slug":"2026-10-07-quality-workflow-boundary","lifecycle":"implemented","cls":"process","date":"2026-10-07","title":"独立质量工作流与扫描结果边界","status":"implemented","problem":"工作流语法和安全扫描分散运行增加Actions列表条目，但合并时不能混淆检查权限、结果或重跑范围。扫描流程成功也容易被误读为没有安全告警。","decision":"[quality.yml](../../../../.github/workflows/quality.yml)聚合 actionlint 与 semgrep 两个独立并行job；没有彼此的needs依赖，仍与兼容性ci.yml分开。actionlint使用contents:read，Semgrep额外具有security-events:write以上传SARIF。","alternatives":"- 保留两个工作流：列表和运行相互独立，但普通推送会增加运行条目；原计划采用一个工作流保留两个job。","consequences":"检查结构集中，权限和失败仍可区分；代价是标签引用和暂缓vendor升级仍需后续维护。历史“剩余15条”只是当时快照，现有Notes已有其他告警记录，不能把它写成当前总数。评估剩余项需要重新读取对应提交的扫描结果，并单独调查旧依赖。","outLinks":["implemented/process/2026-10-07-ci-notification-summary.md","implemented/testing/2026-10-07-live2d-deployed-boundaries.md"],"rawBody":"# Agent Note: 独立质量工作流与扫描结果边界\n\nStatus: implemented\n\n## Problem\n\n工作流语法和安全扫描分散运行增加Actions列表条目，但合并时不能混淆检查权限、结果或重跑范围。扫描流程成功也容易被误读为没有安全告警。\n\n## Decision\n\n[quality.yml](../../../../.github/workflows/quality.yml)聚合 actionlint 与 semgrep 两个独立并行job；没有彼此的needs依赖，仍与兼容性ci.yml分开。actionlint使用contents:read，Semgrep额外具有security-events:write以上传SARIF。\n\n当前job显示名是“检查 GitHub Actions 工作流”和“Semgrep 安全扫描”，后者与旧计划的“Semgrep 扫描”不同；本轮只记录差异，没有检查或更改远端分支保护。actionlint下载校验SHA-256，Semgrep容器固定版本，Action仍采用版本标签。\n\n[.semgrepignore](../../../../.semgrepignore)当前精确排除四个vendor源文件：jquery、APlayer、hls和iris。旧计划曾列入highlight.js，当前排除文件已不含它；不得复制旧五文件名单或用宽泛目录替代。vendor升级和应用代码修复分开评估。\n\nSemgrep命令为 scan --config auto，工作流没有额外的“发现即失败”参数；SARIF上传还使用continue-on-error。必须分别查看扫描发现、执行失败和上传结果，job成功不等于零告警或上传必然成功。\n\n## Existing record audit\n\n与[通知汇总](2026-10-07-ci-notification-summary.md)部分重叠：通知只汇总兼容性工作流，本篇不扩大其范围。与[Live2D验证边界](../testing/2026-10-07-live2d-deployed-boundaries.md)的单条告警分析部分重叠，不把该分析扩展成全库安全结论。原质量工作流合并与扫描修复的结论已按这些职责归并。\n\n## Alternatives considered\n\n- 保留两个工作流：列表和运行相互独立，但普通推送会增加运行条目；原计划采用一个工作流保留两个job。\n- 改用Action提交SHA：固定内容更明确，但原安全计划记录用户选择保留版本标签；本轮不改变该选择，也不把标签称为不可变固定。\n- vendor立即整体升级：可一并处理依赖问题，但原记录暂缓并精确排除指定文件；排除不等于已经修复或没有风险。\n\n## Consequences\n\n检查结构集中，权限和失败仍可区分；代价是标签引用和暂缓vendor升级仍需后续维护。历史“剩余15条”只是当时快照，现有Notes已有其他告警记录，不能把它写成当前总数。评估剩余项需要重新读取对应提交的扫描结果，并单独调查旧依赖。\n\n## Verification\n\n2026-10-07直接核对当前YAML、权限、并行结构、扫描命令与精确排除文件。历史34624177433/34683951794及v3.7.0发布证据记录对应版本的质量执行成功；本轮未重跑扫描、查询GitHub告警或修改CI。成文日不推定历史决定最初日期。\n\n## Historical scan interpretation\n\n旧报告的告警计数仅属于对应轮次：2026-09-23本地Semgrep1.176.0列8个目标，1条只读属性遍历提示经该调用路径复核无原型写入，另有1条Windows临时模式权限错误和16条Pro-only错误；2026-09-30版本1.178.0以434规则扫描4文件，2条既有提示，9条Pro-only错误及1处PartialParsing；2026-10-06播放器修复为3文件/370规则，仍有只读遍历提示及9条Pro-only限制。敏感模式未命中和没有新增依赖，都不代表全库秘密或依赖漏洞已清零。\n\nec55e3f/c7ee80b的Linux日志为289文件/516规则、19条提示，GitHub分析接口为22条结果，两者口径不同；当时告警身份记录无新增，不是完整SARIF指纹比较（下载曾HTTP/2 CANCEL）。到20dd904出现第28号unsafe-formatstring、历史快照23条open，不能延用上一轮“无新增”。该第三方运行时日志辅助函数未因播放器修复改变，仍无充分可控输入证据，不关闭、不认定已修复；具体调用追查由[部署边界笔记](../testing/2026-10-07-live2d-deployed-boundaries.md)保留。原JSON/日志和旧报告清理后，本节保存解释边界，未查询当前远端告警数。\n"},{"id":"implemented/process/2026-10-07-stable-release.md","slug":"2026-10-07-stable-release","lifecycle":"implemented","cls":"process","date":"2026-10-07","title":"Live2D 基础功能正式发布","status":"implemented","problem":"用户要求将已验收的Live2D基础功能正式发布。此前正式版v3.6.1对应99f3c11，develop的6b10d85包含其后10笔提交；构建78和后台、前台补验已完成，需要将这些变更交付为新的正式Release。","decision":"正式版本采用用户确认的v3.7.0，以次版本号表达新增可选Live2D基础功能与独立设置标签。发布准备仅调整style.css源码基准，不扩展功能。先提交版本准备并推送develop，等待该提交的兼容性与质量CI成功；再对同一SHA创建新标签并推送，由现有Release工作流生成安装包、校验文件与中文更新记录。该顺序只说明发布规则，后续提交、推送和标签发布仍需各自获得授权。","alternatives":"- v3.6.2：可以表示维护发布，但难以反映相对正式版新增的完整可选模块，推荐v3.7.0。","consequences":"GitHub Git连接曾出现连接重置，读取引用可用REST复核，推送失败须核对远端状态后处理。旧Cubism 2与Tia/Pio资源的来源及明确再分发许可仍未核对，不将主题GPL声明视为已解决第三方授权。既有扫描告警尚未清零。正式发布不会自动补齐测试服务器PHP下载与原生安装执行证据；保留这些边界。","outLinks":["implemented/feature/2026-10-07-live2d-settings-tab.md","implemented/process/2026-10-07-commit-policy.md","implemented/process/2026-10-07-ci-notification-summary.md","implemented/feature/2026-10-07-native-theme-updates.md","implemented/architecture/2026-10-07-live2d-integration.md","implemented/testing/2026-10-07-compatibility-evidence.md"],"rawBody":"# Agent Note: Live2D 基础功能正式发布\n\nStatus: implemented\n\n## Problem\n\n用户要求将已验收的Live2D基础功能正式发布。此前正式版v3.6.1对应99f3c11，develop的6b10d85包含其后10笔提交；构建78和后台、前台补验已完成，需要将这些变更交付为新的正式Release。\n\n## Decision\n\n正式版本采用用户确认的v3.7.0，以次版本号表达新增可选Live2D基础功能与独立设置标签。发布准备仅调整style.css源码基准，不扩展功能。先提交版本准备并推送develop，等待该提交的兼容性与质量CI成功；再对同一SHA创建新标签并推送，由现有Release工作流生成安装包、校验文件与中文更新记录。该顺序只说明发布规则，后续提交、推送和标签发布仍需各自获得授权。\n\n推送标签会直接创建公开正式Release并触发既有TG发布通知，不是草稿操作。构建78的成功不能代替版本提交CI，Release工作流自身不运行完整WordPress矩阵。发布后核对标签SHA、工作流、资产下载、校验和、包版本与build-info；测试站仍由用户部署。\n\n## Existing record audit\n\n[看板娘标签](../../implemented/feature/2026-10-07-live2d-settings-tab.md)、[提交规范](../../implemented/process/2026-10-07-commit-policy.md)及[通知汇总](../../implemented/process/2026-10-07-ci-notification-summary.md)提供功能和工具验证依据，部分重叠但不负责本次正式发布。旧正式版包检查仅作历史背景；本笔记维护发布选择、交付来源与验证范围。\n\n后续提炼的[原生更新契约](../feature/2026-10-07-native-theme-updates.md)与[Live2D 接入契约](../architecture/2026-10-07-live2d-integration.md)部分重叠，分别负责安装候选/权限和模型接入；本篇继续保存正式版本的交付与部署证据，不重复这些运行时规则。\n\n后续提炼的[兼容性证据边界](../testing/2026-10-07-compatibility-evidence.md)与本篇部分重叠，持有通用矩阵和夹具边界；本篇保留v3.7.0正式交付及部署证据，不将历史Beta/RC验收称为此次重测。\n\n## Alternatives considered\n\n- v3.6.2：可以表示维护发布，但难以反映相对正式版新增的完整可选模块，推荐v3.7.0。\n- 直接在现有6b10d85上推v3.7.0标签：无需版本提交，但源码Version仍为3.6.1，现有发布基准检查会拒绝，不能采用。\n- 重新发布v3.6.1：无需新版本号，但覆盖已发布资产会混淆版本身份和用户更新判断，采用全新标签。\n\n## Verification\n\n2026-10-07 16:07（北京时间）实站更新查询恢复：稳定版v3.7.0显示已是最新、下载指向正确Release资产，测试版无预发布版本，页面检查时间更新且限流提示消失。未重复点击刷新或更改通道/自动更新开关；原截图和逐步验收记录仅本地保存，本篇保留结论及时间。\n\n用户明确确认v3.7.0通过WordPress“立即更新”安装；本轮原生主题详情显示已启用、版本3.7.0。结合正式包来源和设置保留检查，手动原生升级验收通过。依据为用户确认的路径和直接核实的安装后状态，不等同于独立下载日志或后台定时自动更新验证。\n\n用户再次部署后，2026-10-07确认实站为v3.7.0/stable/标签v3.7.0/2a42534/run37585199705，覆盖此前误装dev.79的待验状态。Pio渲染、播放器66→0px避让、独立标签与原配置保留通过；更新查询仍受GitHub API限流影响，原生下载及自动安装过程未见证。这些是该次部署观察；后续手动升级和查询恢复结果见本节前两段。\n\n2026-10-07按授权提交2a4253407fdc9d1d71b4f9b0018c8afe8969785e并推送develop，仅style.css一行版本修改。该SHA兼容性37584509759的三PHP、六WP/PHP smoke、提交规范全部success；质量37584510034的工作流检查与Semgrep任务success。随后推送指向同一SHA的annotated tag v3.7.0。发布37585199705成功，正式Release非草稿、非预发布，latest为v3.7.0，TG发布通知发送步骤success。\n\n真实下载15,629,333字节ZIP，SHA-256为a6d70bb0c458ff5bc0797c79a98b5ad8aa1b50c8923ebf4b6706399bf5b80b4f，同时匹配校验文件和GitHub digest。全部条目CRC、单根目录、路径、style.css 3.7.0与build-info稳定渠道/标签/源码SHA通过，发布说明摘要匹配。初次排除断言将空目录误判，第二次ZIP检查确认仅保留零字节live2d/textures/目录，无大型服装文件或本地记录；修正验证口径且保留说明。ZIP只在内存读取，无本地临时包或环境。发布来源见[v3.7.0 Release](https://github.com/ADDGM/sakura/releases/tag/v3.7.0)及[发布运行](https://github.com/ADDGM/sakura/actions/runs/37585199705)。原始本地验收JSON未随仓库分发。\n\n## Preparation evidence\n\n旧交付记录于2026-10-07归并时，保留以下来源链路：ec55e3f的兼容性35811939811/质量35811939820，c7ee80b的36708618681/36708618653，20dd904的37561224762/37561224765分别成功；它们各自只证明对应提交，不证明随后工作区修复或当前版本全量复测。旧中文提交标题仅作历史标识，当前规则见提交规范笔记。\n\n构建74的外层Artifact包含可安装主题ZIP及校验文件，三个PHP产物是同一通用主题在不同环境的构建记录。历史下载曾两次超时，只有GitHub元数据摘要，没有完成本地ZIP哈希/build-info核验；记录中的到期时间为2026-10-07 19:27:28北京时间，不能再把旧“未过期”当当前可下载保证。先前r1/r2工作区复核包版本仍3.6.1、无CI build-info，虽低于当时50MB上传上限，也不是HTTP上传成功或正式CI来源证明；当前交付继续以上述v3.7.0正式证据为准。\n\n发布前元数据基准与版本检查、三个发布脚本自测、候选标题`chore(release): 准备 3.7.0 正式发布`及diff空白检查通过。正式更新说明由GitHub标签工作流生成，本地草稿不作为交付来源。\n\n## Consequences\n\nGitHub Git连接曾出现连接重置，读取引用可用REST复核，推送失败须核对远端状态后处理。旧Cubism 2与Tia/Pio资源的来源及明确再分发许可仍未核对，不将主题GPL声明视为已解决第三方授权。既有扫描告警尚未清零。正式发布不会自动补齐测试服务器PHP下载与原生安装执行证据；保留这些边界。\n\n本地可选工具的环境故障需要单独定位；它们的检查结果不能替代仓库脚本与对应提交的CI，也不改变本篇的发布来源判定。\n"},{"id":"implemented/testing/2026-10-07-compatibility-evidence.md","slug":"2026-10-07-compatibility-evidence","lifecycle":"implemented","cls":"testing","date":"2026-10-07","title":"兼容性桥接的分层验证与证据范围","status":"implemented","problem":"旧主题跨到新版WordPress/PHP后，语法通过仍可能在登录态、外部API、页面替换或真实部署中失败。烟雾测试自身也曾因字符串插值、换行及过期源码断言失败，需要区分测试夹具故障和主题缺陷。","decision":"沿用兼容性桥接：保留设置键、主题模板和REST入口，以边界保护及局部修复维持既有行为；不将兼容升级扩大为主题重写。当前[ci.yml](../../../../.github/workflows/ci.yml)同时保留PHP8.0/8.1/8.2构建与WordPress7.0/7.1乘三PHP版本的六组smoke。","alternatives":"- 完整现代化重写：可以系统清理旧架构，但原计划选择桥接以保留设置和外部接口，先验证已确认的兼容风险。","consequences":"失败可按层定位，旧配置和部署证据可追溯；代价是矩阵与实站检查的维护成本。源码契约仍会随实现变化而漂移，stub不会证明外部服务健康，目标版本矩阵也不代表所有插件组合受支持。","outLinks":["implemented/testing/2026-10-07-live2d-deployed-boundaries.md","implemented/process/2026-10-07-stable-release.md","implemented/process/2026-10-07-commit-policy.md","implemented/feature/2026-10-07-native-theme-updates.md"],"rawBody":"# Agent Note: 兼容性桥接的分层验证与证据范围\n\nStatus: implemented\n\n## Problem\n\n旧主题跨到新版WordPress/PHP后，语法通过仍可能在登录态、外部API、页面替换或真实部署中失败。烟雾测试自身也曾因字符串插值、换行及过期源码断言失败，需要区分测试夹具故障和主题缺陷。\n\n## Decision\n\n沿用兼容性桥接：保留设置键、主题模板和REST入口，以边界保护及局部修复维持既有行为；不将兼容升级扩大为主题重写。当前[ci.yml](../../../../.github/workflows/ci.yml)同时保留PHP8.0/8.1/8.2构建与WordPress7.0/7.1乘三PHP版本的六组smoke。\n\n[scripts/wordpress-smoke.php](../../../../scripts/wordpress-smoke.php)组合源码契约与已加载WordPress的运行时检查。PHP lint、脚本自测、静态字符串存在性、模拟上游响应、真实站点浏览器验收是不同证据：不能由源码标记或模拟成功推导实际第三方可用、邮件送达、图床上传或WebGL渲染成功。\n\n需要字面匹配的PHP变量保留字面量；源码检查时规范化CRLF，真实文件不因检查改写。实现契约变化时同步旧断言，先定位失败归属，不能为消除红灯直接删除保护。\n\n翻译PO是编辑入口，MO由[仓库PHP编译器](../../../../scripts/compile-translations.php)生成，CI同时运行 --self-test 和 --check。编译支持上下文/复数，跳过fuzzy、obsolete及空翻译，空译文回退原文；不能仅凭MO可读取就认定它与PO及当前编译器一致。\n\n部署回归需写清版本、入口、登录状态、视口及网络条件。动态漂亮链接落到Nginx错误页时先区分服务器路由和主题404；实际图片上传需要独立验证，不能由前端布局或模拟接口通过来推定。\n\n## Existing record audit\n\n与[Live2D边界验证](2026-10-07-live2d-deployed-boundaries.md)、[正式发布](../process/2026-10-07-stable-release.md)部分重叠，保留各自模块/版本证据；本篇提炼通用验证边界。旧中文提交类型已由[提交规范](../process/2026-10-07-commit-policy.md)替代，不沿用总计划的旧格式。历史smoke与MO故障、Beta/RC验收在本篇保留结论和覆盖范围。\n\n## Alternatives considered\n\n- 完整现代化重写：可以系统清理旧架构，但原计划选择桥接以保留设置和外部接口，先验证已确认的兼容风险。\n- 只做PHP8.2静态检查：原草稿范围较小、执行成本低，但覆盖不到其他目标PHP和WordPress运行时；当前采用三PHP、六组WordPress矩阵，再按变更补实际场景。\n- 复用任何工具生成的MO：历史出现“文件可反编译但二进制不一致”的失败，当前要求使用仓库编译器及同步检查。\n\n## Consequences\n\n失败可按层定位，旧配置和部署证据可追溯；代价是矩阵与实站检查的维护成本。源码契约仍会随实现变化而漂移，stub不会证明外部服务健康，目标版本矩阵也不代表所有插件组合受支持。\n\n## Verification\n\n2026-10-07按 `2a42534` 核对CI矩阵、翻译编译逻辑及smoke的日期、音乐、邮件、CRLF和字面变量检查。Beta.4、RC.1、v3.5.0的历史摘要与v3.7.0验收记录保留各自范围；已退役的原报告不再作为可获取附件。本轮为文档核对，未搭建WordPress、重跑业务测试或取得新部署证据。成文日不代表兼容升级首次提出日。\n\n## Historical fixture lessons\n\n2026-09-28隔离环境为WordPress7.1.2、PHP8.2.33、SQLite Database Integration3.0.2/SQLite3.53.2，仅含测试数据；扩展通过PHP进程参数启用，没有复制用户数据库或修改全局PHP。实际核心升级不等于真实上游网络验证，夹具替换响应的范围见[原生更新笔记](../feature/2026-10-07-native-theme-updates.md)。核心、数据库和下载包已于2026-10-06清除，本次不恢复环境。\n\n换行误报中的三项源码契约失败来自安装包CRLF与固定LF多行字符串不匹配，源码实际存在；只规范化读取字符串后，CRLF和LF正例均通过，故意移除enqueue标记的负例仍失败，r2安装后的完整smoke也通过。不能为了处理这种误报修改主题默认设置、真实文件或删除断言。\n\n2026-09-23记录19项Node/19项浏览器及四份MO一致性通过；2026-09-28扩到23项浏览器，2026-09-30提交前复用该证据并核对五文件与r2包一致，未冒称全部重跑。历史翻译工具的38条提示和14条标签已落入正式message/PO/MO；现行编译入口仍是仓库PHP编译器。\n"},{"id":"implemented/testing/2026-10-07-live2d-deployed-boundaries.md","slug":"2026-10-07-live2d-deployed-boundaries","lifecycle":"implemented","cls":"testing","date":"2026-10-07","title":"Live2D 部署后的边界与连续收起验证","status":"implemented","problem":"播放器收起残余40px的问题已修复，但此前默认桌面宽度的两轮验收不能证明861px桌面边界和连续操作同样稳定。用户要求继续检查现有基础功能。","decision":"补验直接访问测试站的已部署脚本，在860、861、900、1280px各创建独立浏览器上下文。860px检查隐藏及零模型请求；其他宽度各连续展开收起5次，等待动画结束，断言展开避让、收起恢复0px和保存位置未被写入。不开启后台配置修改，不覆盖服务器，不注入本地修复脚本。","alternatives":"- 只重跑本地26项夹具：覆盖更全面且稳定，但不能证明服务器实际脚本在各宽度下运行，因此沿用已有通过结果，本次补做直接实站检查。","consequences":"直接实站测试可发现部署与整站样式问题，但受网络、音频资源与浏览器计时影响。每轮等待动画结束，不用强制重算或重置掩盖残余位置。本次没有重跑Tia后台切换、PJAX、触摸与长歌词所有组合，不将此前通过结果冒称为本轮测试。","outLinks":["implemented/bug-fix/2026-10-07-live2d-player-layout.md","implemented/architecture/2026-10-07-live2d-integration.md","implemented/testing/2026-10-07-compatibility-evidence.md","implemented/process/2026-10-07-quality-workflow-boundary.md"],"rawBody":"# Agent Note: Live2D 部署后的边界与连续收起验证\n\nStatus: implemented\n\n## Problem\n\n播放器收起残余40px的问题已修复，但此前默认桌面宽度的两轮验收不能证明861px桌面边界和连续操作同样稳定。用户要求继续检查现有基础功能。\n\n## Decision\n\n补验直接访问测试站的已部署脚本，在860、861、900、1280px各创建独立浏览器上下文。860px检查隐藏及零模型请求；其他宽度各连续展开收起5次，等待动画结束，断言展开避让、收起恢复0px和保存位置未被写入。不开启后台配置修改，不覆盖服务器，不注入本地修复脚本。\n\n## Existing record audit\n\n创建时检索Live2D、Semgrep、日志及Cubism没有命中，不存在可复用的模块笔记。旧收起修复报告与本篇部分重叠，其根因、26项浏览器/19项Node和构建75部署证据现已归并到[浮层位置笔记](../bug-fix/2026-10-07-live2d-player-layout.md)，旧报告按用户授权退役；本笔记继续负责多宽度重复交互。\n\n后续历史提炼形成[基础接入契约](../architecture/2026-10-07-live2d-integration.md)与[浮层位置契约](../bug-fix/2026-10-07-live2d-player-layout.md)，两者与本篇部分重叠，负责运行时行为，本篇继续负责验证策略与覆盖边界。\n\n后续提炼的[兼容性证据](2026-10-07-compatibility-evidence.md)及[质量工作流](../process/2026-10-07-quality-workflow-boundary.md)与本篇部分重叠，分别说明通用证据层级与扫描配置；本篇保留Live2D实站结果和未关闭告警的具体范围。\n\n## Alternatives considered\n\n- 只重跑本地26项夹具：覆盖更全面且稳定，但不能证明服务器实际脚本在各宽度下运行，因此沿用已有通过结果，本次补做直接实站检查。\n- 沿用1280px两轮部署结果：已有有效证据且无需新增运行，但不足以覆盖桌面阈值与重复操作；新增三组桌面宽度各五轮，限制测试规模。\n\n## Consequences\n\n直接实站测试可发现部署与整站样式问题，但受网络、音频资源与浏览器计时影响。每轮等待动画结束，不用强制重算或重置掩盖残余位置。本次没有重跑Tia后台切换、PJAX、触摸与长歌词所有组合，不将此前通过结果冒称为本轮测试。\n\n## Verification\n\n构建78补验（2026-10-07）：通过Codex浏览器直接检查测试站，页面实际加载dev.78的Live2D脚本。桌面Pio可见，音乐控件自然展开后bottom为66px，收起后恢复0px；860px刷新后隐藏，861px刷新后可见且截图确认模型渲染。点击首页「Sakura 前端兼容性测试」进入文章页后，看板娘容器与Canvas各一个、bottom为0px，模型仍显示，浏览器捕获的error日志为空。此轮未统计网络请求、未证明零模型请求，未重跑历史五轮矩阵、拖动及模型点击；不将浏览器error日志为空等同于全量异常监听。初次导航工具超时后实际页面已加载，接续同一标签完成验证。视口恢复、临时标签关闭，无后台配置或源码修改。本段保留人工验收摘要；原截图仅本地保存，未随仓库分发。\n\n2026-10-07核对服务器为3.6.1-dev.75 / 20dd904 / 构建37561224762。当时的浏览器探针记录：860px隐藏、模型请求0；861/900/1280px各5轮展开66px、收起0px，保存位置均null，每组模型请求16；pageerror为0，browserClosed为true。测试浏览器关闭，无临时服务或依赖安装。探针和原始JSON仅本地保存；共享验证策略见本篇Decision，现行回归入口见[scripts/tests](../../../../scripts/tests)。\n\n## Runtime audit boundary\n\n另对Semgrep告警28作只读追查：压缩运行时的`n._$li`存在17处显式点调用，大部分使用固定格式字符串；动态路径包含动作队列捕获异常、createCanvas错误值、版本数字及iPad设备信息错误分支。`n._$li`只接收两个参数，后两类动态字符串调用未传第二实参。当前未证明攻击者可控制第二格式参数或造成代码执行；告警仍保持open，不标为已修复或误报。CodeGraph未索引此混淆符号，使用定点文本检查，未完成所有动态属性访问的数据流证明。没有为此新增或修改第三方运行时代码。\n"}];
+</script>
+
+<script>
+'use strict';
+
+const LIFECYCLES = ['implemented', 'proposed', 'rejected', 'archived'];
+const STATUS_LABELS = { implemented: '已落地', proposed: '待评审', rejected: '已否决', archived: '已归档' };
+
+const CLASSES = ['architecture', 'feature', 'bug-fix', 'simplification', 'process', 'testing'];
+const CLASS_LABELS = {
+  architecture: '架构设计',
+  feature: '功能特性',
+  'bug-fix': '缺陷修复',
+  simplification: '化简裁撤',
+  process: '流程规范',
+  testing: '测试基建'
+};
+
+const DB_NAME = 'AgentNotesBoardDB';
+const STORE_NAME = 'handles';
+
+const Core = {
+  nodes: [],
+  byId: new Map(),
+  inCount: new Map(),
+  outMap: new Map(),
+  activeTab: 'baseline',
+  dirHandle: null,
+  lastSyncTime: 0,
+  filterQuery: '',
+  stFilter: '',
+  clsFilter: '',
+  sortMode: 'new',
+  altQuery: '',
+  timelineMonth: '',
+  timelineClass: '',
+  drawerId: null,
+};
+
+function getDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveDirHandle(handle) {
+  try {
+    const db = await getDB();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put(handle, 'notesDirHandle');
+    await new Promise(r => tx.oncomplete = r);
+  } catch (e) { console.warn('Cannot persist dir handle', e); }
+}
+
+async function loadSavedDirHandle() {
+  try {
+    const db = await getDB();
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).get('notesDirHandle');
+    return new Promise(resolve => {
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  } catch { return null; }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function parseMarkdown(text) {
+  if (!text) return '';
+  let s = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  s = s.replace(/```([\s\S]*?)```/g, (m, c) => `<pre><code>${c.trim()}</code></pre>`);
+  s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, href) => {
+    const cleanHref = href.trim();
+    if (/^(?:javascript|data|vbscript):/i.test(cleanHref)) {
+      return linkText;
+    }
+    const safeHref = escapeHtml(cleanHref);
+    return `<a href="javascript:void(0)" class="md-deep-link" data-deep-link="${safeHref}" style="color:var(--brand-cyan);text-decoration:underline;">${linkText}</a>`;
+  });
+  s = s.replace(/^- (.*)$/gm, '• $1');
+  return s.split(/\n{2,}/).map(p => {
+    p = p.trim();
+    if (!p) return '';
+    if (p.startsWith('<pre>')) return p;
+    return `<p style="margin-bottom:10px;">${p.replace(/\n/g, '<br>')}</p>`;
+  }).join('');
+}
+
+function parseNote(raw, relPath, slugToId = new Map()) {
+  const slug = relPath.split('/').pop().replace(/\.md$/, '');
+  const parts = relPath.split('/');
+  const lifecycle = parts[0];
+  const cls = parts[1] || 'architecture';
+
+  let title = slug;
+  let status = lifecycle;
+  let date = '';
+
+  const dMatch = /^(\d{4}-\d{2}-\d{2})/.exec(slug);
+  if (dMatch) date = dMatch[1];
+
+  const h1Match = /^# Agent Note[^:：]*[:：]\s*(.*)$/m.exec(raw);
+  if (h1Match) title = h1Match[1].trim();
+
+  function extractSection(pattern) {
+    const re = new RegExp(`^## (?:${pattern})\\s*\\n+([\\s\\S]*?)(?=^## |\\s*$)`, 'm');
+    const m = re.exec(raw);
+    return m ? m[1].trim() : '';
+  }
+
+  const problem = extractSection('Problem|问题');
+  const decision = extractSection('Decision|Proposal|决策|提案');
+  const alternatives = extractSection('Alternatives considered|曾考虑的替代方案|曾考虑的备选');
+  const consequences = extractSection('Consequences|后果');
+
+  const links = [];
+  for (const m of raw.matchAll(/\]\(([^)]+\.md)\)/g)) {
+    let targetHref = m[1].split('#')[0].trim();
+    if (targetHref.includes('://')) continue;
+    targetHref = targetHref.replace(/\.zh\.md$/, '.md');
+    const segs = `${lifecycle}/${cls}/${targetHref}`.split('/');
+    const resolved = [];
+    for (const s of segs) {
+      if (!s || s === '.') continue;
+      if (s === '..') resolved.pop();
+      else resolved.push(s);
+    }
+    const cleanTarget = resolved.join('/');
+
+    let finalTarget = '';
+    if (slugToId.has(cleanTarget)) {
+      finalTarget = slugToId.get(cleanTarget);
+    } else {
+      const targetSlug = targetHref.split('/').pop().replace(/\.md$/, '');
+      if (slugToId.has(targetSlug)) {
+        finalTarget = slugToId.get(targetSlug);
+      }
+    }
+    if (finalTarget && finalTarget !== relPath) {
+      links.push(finalTarget);
+    }
+  }
+
+  return {
+    id: relPath,
+    slug,
+    lifecycle,
+    cls,
+    date,
+    title,
+    status,
+    problem,
+    decision,
+    alternatives,
+    consequences,
+    outLinks: [...new Set(links)],
+    rawBody: raw,
+  };
+}
+
+async function scanDirectory(rootHandle) {
+  const notesMap = new Map();
+  async function walk(dirHandle, currentPath = '') {
+    for await (const entry of dirHandle.values()) {
+      if (entry.name.startsWith('.')) continue;
+      const subPath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
+      if (entry.kind === 'directory') {
+        await walk(entry, subPath);
+      } else if (entry.kind === 'file' && entry.name.endsWith('.md')) {
+        const isZh = entry.name.endsWith('.zh.md');
+        const cleanRel = isZh ? subPath.replace(/\.zh\.md$/, '.md') : subPath;
+        const parts = cleanRel.split('/');
+        if (parts.length >= 3 && LIFECYCLES.includes(parts[0])) {
+          try {
+            const file = await entry.getFile();
+            const text = await file.text();
+            if (!notesMap.has(cleanRel) || isZh) {
+              notesMap.set(cleanRel, text);
+            }
+          } catch (err) {
+            console.warn('Read note error:', subPath, err);
+          }
+        }
+      }
+    }
+  }
+
+  let targetHandle = rootHandle;
+  try {
+    const agentsDir = await rootHandle.getDirectoryHandle('.agents');
+    targetHandle = await agentsDir.getDirectoryHandle('notes');
+  } catch {}
+
+  await walk(targetHandle);
+
+  const slugToId = new Map();
+  for (const rel of notesMap.keys()) {
+    const slug = rel.split('/').pop().replace(/\.md$/, '');
+    slugToId.set(slug, rel);
+    slugToId.set(rel, rel);
+  }
+
+  const notes = [];
+  for (const [cleanRel, text] of notesMap.entries()) {
+    notes.push(parseNote(text, cleanRel, slugToId));
+  }
+  return notes;
+}
+
+function ingestDataset(notes) {
+  Core.nodes = notes;
+  Core.byId.clear();
+  Core.inCount.clear();
+  Core.outMap.clear();
+
+  notes.forEach(n => {
+    Core.byId.set(n.id, n);
+    Core.outMap.set(n.id, n.outLinks);
+  });
+
+  notes.forEach(n => {
+    n.outLinks.forEach(target => {
+      if (Core.byId.has(target)) {
+        Core.inCount.set(target, (Core.inCount.get(target) || 0) + 1);
+      }
+    });
+  });
+
+  Core.nodes.sort((a, b) => (b.date || '0000').localeCompare(a.date || '0000'));
+
+  document.getElementById('chip-total-count').textContent = `${notes.length} 项`;
+  document.getElementById('deck-onboarding').style.display = notes.length ? 'none' : 'flex';
+
+  renderInterface();
+}
+
+function renderInterface() {
+  renderBaseline();
+  renderTimeline();
+  renderAlternatives();
+  renderDirectory();
+}
+
+function renderBaseline() {
+  const nodes = Core.nodes;
+  const implemented = nodes.filter(n => n.lifecycle === 'implemented');
+  const proposed = nodes.filter(n => n.lifecycle === 'proposed');
+  const rejected = nodes.filter(n => n.lifecycle === 'rejected');
+  const simplifications = nodes.filter(n => n.cls === 'simplification');
+
+  const kpis = [
+    { label: '现行落地', count: implemented.length, desc: '生产已交付生效', color: '#10B981', filter: 'implemented' },
+    { label: '待评审提案', count: proposed.length, desc: '待团队确认', color: '#F59E0B', filter: 'proposed' },
+    { label: '避坑否决', count: rejected.length, desc: '防重犯事实存档', color: '#FF3366', filter: 'rejected' },
+    { label: '化简裁撤', count: simplifications.length, desc: '代码只减不增', color: '#14B8A6', filter: 'simplification' },
+  ];
+
+  document.getElementById('kpi-row').innerHTML = kpis.map(k => `
+    <div class="kpi-instrument" onclick="routeToListFilter('${escapeHtml(k.filter)}')">
+      <div class="kpi-tag">
+        <span>${escapeHtml(k.label)}</span>
+        <span style="width:6px;height:6px;border-radius:50%;background:${k.color}"></span>
+      </div>
+      <div class="kpi-num">${k.count}</div>
+      <div class="kpi-caption">${escapeHtml(k.desc)}</div>
+      <div class="kpi-accent-bar" style="background:${k.color}"></div>
+    </div>
+  `).join('');
+
+  const pillars = [...nodes]
+    .filter(n => n.lifecycle === 'implemented')
+    .sort((a, b) => (Core.inCount.get(b.id) || 0) - (Core.inCount.get(a.id) || 0))
+    .slice(0, 6);
+
+  document.getElementById('pillars-vault').innerHTML = pillars.map(n => {
+    const cites = Core.inCount.get(n.id) || 0;
+    const title = escapeHtml(n.title);
+    const plain = (n.decision || n.problem || '系统核心架构协议')
+      .replace(/<[^>]+>/g, '')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/\[(.*?)\]\([^)]*\)/g, '$1')
+      .replace(/[*`>]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const desc = escapeHtml(plain);
+    const safeCls = escapeHtml(n.cls);
+    const clsLabel = escapeHtml(CLASS_LABELS[n.cls] || n.cls);
+    const safeDate = escapeHtml(n.date || '进行中');
+    const safeSlug = escapeHtml(n.slug);
+    const safeId = escapeHtml(n.id);
+    return `
+      <div class="pillar-specimen" data-node-id="${safeId}">
+        <div>
+          <div class="pillar-meta">
+            <span class="class-badge cls-${safeCls}">${clsLabel}</span>
+            <span class="weight-gauge">被引用 × ${cites}</span>
+          </div>
+          <div class="pillar-core-title">${title}</div>
+          <div class="pillar-abstract">${desc}</div>
+        </div>
+        <div class="pillar-telemetry">
+          <span>${safeDate}</span>
+          <span>#${safeSlug}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const activeNodes = nodes.filter(n => n.lifecycle === 'implemented' || n.lifecycle === 'proposed');
+  document.getElementById('matrix-chambers').innerHTML = CLASSES.map(c => {
+    const colNodes = activeNodes.filter(n => n.cls === c);
+    const clsLabel = escapeHtml(CLASS_LABELS[c] || c);
+    return `
+      <div class="chamber-pod">
+        <div class="chamber-header">
+          <span class="chamber-name">
+            <span style="width:6px;height:6px;background:var(--brand-cyan);border-radius:1px;"></span>
+            ${clsLabel}
+          </span>
+          <span class="chamber-count">${colNodes.length}</span>
+        </div>
+        <div class="chamber-stream">
+          ${colNodes.length ? colNodes.map(n => `
+            <div class="specimen-row" data-node-id="${escapeHtml(n.id)}">
+              <div class="specimen-title">${escapeHtml(n.title)}</div>
+              <div class="specimen-info">
+                <span>${escapeHtml(n.date || '—')}</span>
+                ${(Core.inCount.get(n.id) || 0) ? `<span style="color:var(--brand-blue)">↗${Core.inCount.get(n.id)}</span>` : ''}
+              </div>
+            </div>
+          `).join('') : '<div style="color:var(--text-tertiary);font-family:var(--font-mono);font-size:11px;padding:8px;">// 暂无该类活跃决策</div>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTimeline() {
+  const allDatedNodes = [...Core.nodes].filter(n => n.date).sort((a, b) => b.date.localeCompare(a.date));
+
+  // 1. 统计全部月份
+  const monthsMap = new Map();
+  allDatedNodes.forEach(n => {
+    const mo = n.date.slice(0, 7);
+    if (!monthsMap.has(mo)) monthsMap.set(mo, []);
+    monthsMap.get(mo).push(n);
+  });
+
+  // 2. 渲染月份筛选胶囊
+  const monthPillsContainer = document.getElementById('timeline-month-pills');
+  if (monthPillsContainer) {
+    const allPill = `<button class="month-pill ${!Core.timelineMonth ? 'active' : ''}" data-mo="">全部 (${allDatedNodes.length})</button>`;
+    const moPills = [...monthsMap.entries()].map(([mo, items]) => `
+      <button class="month-pill ${Core.timelineMonth === mo ? 'active' : ''}" data-mo="${mo}">${mo} (${items.length})</button>
+    `).join('');
+    monthPillsContainer.innerHTML = allPill + moPills;
+
+    monthPillsContainer.querySelectorAll('.month-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Core.timelineMonth = btn.dataset.mo;
+        renderTimeline();
+      });
+    });
+  }
+
+  // 3. 渲染大类分类筛选胶囊
+  const classPillsContainer = document.getElementById('timeline-class-pills');
+  if (classPillsContainer) {
+    const allClsPill = `<button class="class-pill ${!Core.timelineClass ? 'active' : ''}" data-cls="">全部分类 (${allDatedNodes.length})</button>`;
+    const clsPills = CLASSES.map(c => {
+      const cnt = allDatedNodes.filter(n => n.cls === c).length;
+      return `<button class="class-pill ${Core.timelineClass === c ? 'active' : ''}" data-cls="${c}">${CLASS_LABELS[c]} (${cnt})</button>`;
+    }).join('');
+    classPillsContainer.innerHTML = allClsPill + clsPills;
+
+    classPillsContainer.querySelectorAll('.class-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Core.timelineClass = btn.dataset.cls;
+        renderTimeline();
+      });
+    });
+  }
+
+  // 4. 重置筛选按钮
+  const btnReset = document.getElementById('btn-reset-timeline-filter');
+  if (btnReset) {
+    btnReset.onclick = () => {
+      Core.timelineMonth = '';
+      Core.timelineClass = '';
+      renderTimeline();
+    };
+  }
+
+  // 5. 正交组合过滤
+  let filteredNodes = allDatedNodes;
+  if (Core.timelineMonth) {
+    filteredNodes = filteredNodes.filter(n => n.date.startsWith(Core.timelineMonth));
+  }
+  if (Core.timelineClass) {
+    filteredNodes = filteredNodes.filter(n => n.cls === Core.timelineClass);
+  }
+
+  // 6. 更新信息条
+  const infoEl = document.getElementById('timeline-filter-info');
+  if (infoEl) {
+    const parts = [];
+    if (Core.timelineMonth) parts.push(Core.timelineMonth);
+    if (Core.timelineClass) parts.push(CLASS_LABELS[Core.timelineClass] || Core.timelineClass);
+    infoEl.textContent = parts.length
+      ? `已切片 [${parts.join(' · ')}] 对应 ${filteredNodes.length} 条记录`
+      : `全周期全分类共 ${filteredNodes.length} 条演化记录`;
+  }
+
+  // 7. 按月份分组展示
+  const filteredMonthsMap = new Map();
+  filteredNodes.forEach(n => {
+    const mo = n.date.slice(0, 7);
+    if (!filteredMonthsMap.has(mo)) filteredMonthsMap.set(mo, []);
+    filteredMonthsMap.get(mo).push(n);
+  });
+
+  let html = '';
+  for (const [mo, items] of filteredMonthsMap.entries()) {
+    html += `
+      <div class="chrono-node-epoch">
+        <div class="chrono-epoch-badge">${escapeHtml(mo)} · ${items.length} 条</div>
+        <div class="chrono-cards">
+          ${items.map(n => `
+            <div class="chrono-card" data-node-id="${escapeHtml(n.id)}">
+              <div class="chrono-pulse"></div>
+              <div class="chrono-meta-row">
+                <span class="chrono-date-badge">📅 ${escapeHtml(n.date || '进行中')}</span>
+                <span class="class-badge cls-${escapeHtml(n.cls)}">${escapeHtml(CLASS_LABELS[n.cls] || n.cls)}</span>
+                <span class="status-badge st-${escapeHtml(n.lifecycle)}">${escapeHtml(STATUS_LABELS[n.lifecycle] || n.lifecycle)}</span>
+                <span class="chrono-heading">${escapeHtml(n.title)}</span>
+              </div>
+              <div class="chrono-body">${escapeHtml((n.problem || n.decision || '').slice(0, 180))}...</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('chrono-track').innerHTML = html || '<div style="color:var(--text-tertiary);padding:36px;font-family:var(--font-mono);text-align:center;">// 未找到符合此切片组合的演化记录</div>';
+}
+
+function renderAlternatives() {
+  const q = (Core.altQuery || '').toLowerCase();
+  const altItems = [];
+
+  Core.nodes.forEach(n => {
+    const title = n.title;
+    const altContent = n.alternatives;
+
+    if (n.lifecycle === 'rejected') {
+      const crux = (n.rawBody || '').split('\n')[2]?.replace(/Status:\s*rejected\s*[—–-]/, '').trim() || n.problem || '审慎否决，防止重犯。';
+      altItems.push({
+        nodeId: n.id,
+        title,
+        cls: n.cls,
+        discarded: `[已否决提案] ${title}`,
+        crux,
+        winner: '提案直接否决'
+      });
+    }
+    if (altContent) {
+      const parts = altContent.split(/\n(?=###? |- )/);
+      parts.forEach(p => {
+        const clean = p.replace(/^[-#* ]+/, '').trim()
+          .replace(/\*\*([^*]+)\*\*/g, '$1')
+          .replace(/\*\*/g, '')
+          .replace(/__([^_]+)__/g, '$1')
+          .replace(/`([^`]*)`/g, '$1')
+          .replace(/\[(.*?)\]\([^)]*\)/g, '$1');
+        if (clean.length > 5) {
+          const colonIdx = clean.indexOf('：') > -1 ? clean.indexOf('：') : clean.indexOf(':');
+          let heading = clean.slice(0, 45);
+          let reason = clean;
+          if (colonIdx > 0 && colonIdx < 35) {
+            heading = clean.slice(0, colonIdx);
+            reason = clean.slice(colonIdx + 1);
+          }
+          altItems.push({
+            nodeId: n.id,
+            title,
+            cls: n.cls,
+            discarded: heading,
+            crux: reason,
+            winner: `采纳决策: ${title}`
+          });
+        }
+      });
+    }
+  });
+
+  const filtered = altItems.filter(item => {
+    if (!q) return true;
+    return item.discarded.toLowerCase().includes(q) || item.crux.toLowerCase().includes(q) || item.title.toLowerCase().includes(q);
+  });
+
+  document.getElementById('pitfalls-grid').innerHTML = filtered.length ? filtered.map(item => `
+    <div class="pitfall-dossier" data-node-id="${escapeHtml(item.nodeId)}">
+      <div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <span class="class-badge cls-${escapeHtml(item.cls)}">${escapeHtml(CLASS_LABELS[item.cls] || item.cls)}</span>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);">#${escapeHtml(item.nodeId.split('/').pop().replace('.md',''))}</span>
+        </div>
+        <div class="hazard-banner">🚫 放弃备选：${escapeHtml(item.discarded)}</div>
+        <div class="crux-evidence" style="margin-top:12px;">💡 权衡依据：${escapeHtml(item.crux)}</div>
+      </div>
+      <div class="triumphant-verdict">✅ ${escapeHtml(item.winner)}</div>
+    </div>
+  `).join('') : `<div style="grid-column:1/-1;color:var(--text-tertiary);text-align:center;padding:48px;font-family:var(--font-mono);">// 未检索到相关避坑记录</div>`;
+}
+
+function renderDirectory() {
+  const q = (Core.filterQuery || '').toLowerCase();
+  const st = Core.stFilter;
+  const cls = Core.clsFilter;
+
+  let list = Core.nodes.filter(n => {
+    if (st && n.lifecycle !== st) return false;
+    if (cls && n.cls !== cls) return false;
+    if (q) {
+      const hay = `${n.title} ${n.slug} ${n.problem || ''} ${n.decision || ''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (Core.sortMode === 'new') list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  else if (Core.sortMode === 'old') list.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  else if (Core.sortMode === 'cites') list.sort((a, b) => (Core.inCount.get(b.id) || 0) - (Core.inCount.get(a.id) || 0));
+
+  document.getElementById('matrix-matched-count').textContent = `匹配 ${list.length} 条`;
+
+  document.getElementById('matrix-rows-stream').innerHTML = list.length ? list.map((n, idx) => {
+    const cites = Core.inCount.get(n.id) || 0;
+    return `
+      <div class="matrix-row-cell" data-node-id="${escapeHtml(n.id)}">
+        <span class="cell-index">#${String(idx + 1).padStart(3, '0')}</span>
+        <span><span class="class-badge cls-${escapeHtml(n.cls)}">${escapeHtml(CLASS_LABELS[n.cls] || n.cls)}</span></span>
+        <span class="cell-title">${escapeHtml(n.title)}</span>
+        <span><span class="status-badge st-${escapeHtml(n.lifecycle)}">${escapeHtml(STATUS_LABELS[n.lifecycle] || n.lifecycle)}</span></span>
+        <span class="cell-date">${escapeHtml(n.date || '—')}</span>
+        <span class="cell-cites">${cites ? `↗ ${cites}` : ''}</span>
+      </div>
+    `;
+  }).join('') : '<div style="padding:40px;text-align:center;color:var(--text-tertiary);font-family:var(--font-mono);">// 没有匹配的决策记录</div>';
+}
+
+function openConsole(id) {
+  const n = Core.byId.get(id);
+  if (!n) return;
+
+  Core.drawerId = id;
+
+  const stBadge = document.getElementById('dr-status-badge');
+  stBadge.className = `status-badge st-${n.lifecycle}`;
+  stBadge.textContent = STATUS_LABELS[n.lifecycle] || n.lifecycle;
+
+  const clsBadge = document.getElementById('dr-class-badge');
+  clsBadge.className = `class-badge cls-${n.cls}`;
+  clsBadge.textContent = CLASS_LABELS[n.cls] || n.cls;
+
+  const anchor = `// Note: 见 .agents/notes/${n.id}`;
+  document.getElementById('dr-anchor-code').textContent = anchor;
+  document.getElementById('btn-anchor-copy').onclick = () => {
+    navigator.clipboard.writeText(anchor);
+    const btn = document.getElementById('btn-anchor-copy');
+    const old = btn.textContent;
+    btn.textContent = '已复制';
+    setTimeout(() => btn.textContent = old, 1500);
+  };
+
+  document.getElementById('dr-headline').textContent = n.title;
+  document.getElementById('dr-timestamp-bar').innerHTML = `
+    <span>${escapeHtml(n.date || '无日期')}</span>
+    <span>·</span>
+    <span>${escapeHtml(n.slug)}</span>
+    ${(Core.inCount.get(n.id) || 0) ? `<span>·</span><span style="color:var(--brand-blue);font-weight:700;">被引用 ${Core.inCount.get(n.id)} 次</span>` : ''}
+  `;
+
+  document.getElementById('dr-body-problem').innerHTML = parseMarkdown(n.problem) || '<span style="color:var(--text-tertiary);">（未独立分节说明问题）</span>';
+  document.getElementById('dr-body-decision').innerHTML = parseMarkdown(n.decision) || '<span style="color:var(--text-tertiary);">（未记录具体裁定事实）</span>';
+  document.getElementById('dr-body-alt').innerHTML = parseMarkdown(n.alternatives) || '<span style="color:var(--text-tertiary);">（无曾考虑的备选对比）</span>';
+  document.getElementById('dr-body-consequences').innerHTML = parseMarkdown(n.consequences) || '<span style="color:var(--text-tertiary);">（未详述工程后果）</span>';
+
+  const incoming = Core.nodes.filter(x => x.outLinks.includes(n.id));
+  const outgoing = n.outLinks.map(t => Core.byId.get(t)).filter(Boolean);
+
+  let lineageHtml = '';
+  if (outgoing.length) {
+    lineageHtml += `
+      <div>
+        <div class="lineage-group-title">前置先决依据：</div>
+        <div class="lineage-chips">
+          ${outgoing.map(o => `<div class="lineage-chip" data-node-id="${escapeHtml(o.id)}">↖ ${escapeHtml(o.title)}</div>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+  if (incoming.length) {
+    lineageHtml += `
+      <div style="margin-top:10px;">
+        <div class="lineage-group-title">派生制约影响：</div>
+        <div class="lineage-chips">
+          ${incoming.map(i => `<div class="lineage-chip" data-node-id="${escapeHtml(i.id)}">↘ ${escapeHtml(i.title)}</div>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+  if (!incoming.length && !outgoing.length) {
+    lineageHtml = '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);">独立节点，暂无交叉引用</span>';
+  }
+  document.getElementById('dr-lineage-stream').innerHTML = lineageHtml;
+
+  document.getElementById('drawer-curtain').classList.add('open');
+  document.getElementById('drawer-console').classList.add('open');
+  history.replaceState(null, '', '#note=' + encodeURIComponent(id));
+}
+
+function closeConsole() {
+  document.getElementById('drawer-curtain').classList.remove('open');
+  document.getElementById('drawer-console').classList.remove('open');
+  history.replaceState(null, '', '#' + Core.activeTab);
+}
+
+function handleDeepLink(link) {
+  for (const n of Core.nodes) {
+    if (link.includes(n.slug)) {
+      openConsole(n.id);
+      return;
+    }
+  }
+}
+
+function routeToListFilter(filterVal) {
+  switchDeckTab('directory');
+  // 彻底清空可能残留的旧筛选项与搜索词，确保列表与点击的卡片完全对应
+  Core.stFilter = '';
+  Core.clsFilter = '';
+  Core.filterQuery = '';
+  const gq = document.getElementById('global-query');
+  if (gq) gq.value = '';
+  document.getElementById('select-status').value = '';
+  document.getElementById('select-class').value = '';
+
+  if (['implemented', 'proposed', 'rejected', 'archived'].includes(filterVal)) {
+    Core.stFilter = filterVal;
+    document.getElementById('select-status').value = filterVal;
+  } else if (CLASSES.includes(filterVal)) {
+    Core.clsFilter = filterVal;
+    document.getElementById('select-class').value = filterVal;
+  }
+  renderDirectory();
+}
+
+function switchDeckTab(viewId) {
+  if (viewId.startsWith('note=')) {
+    const id = decodeURIComponent(viewId.slice('note='.length));
+    openConsole(id);
+    return;
+  }
+  if (!['baseline', 'timeline', 'alternatives', 'directory'].includes(viewId)) viewId = 'baseline';
+  Core.activeTab = viewId;
+  document.querySelectorAll('.deck-tab').forEach(t => t.classList.toggle('active', t.dataset.view === viewId));
+  document.querySelectorAll('.canvas-view').forEach(p => p.classList.toggle('active', p.id === `view-${viewId}`));
+  if (location.hash.slice(1) !== viewId && !location.hash.includes('note=')) {
+    history.replaceState(null, '', '#' + viewId);
+  }
+}
+
+async function triggerLiveSync(silent = false) {
+  if (!Core.dirHandle) return;
+  const radar = document.getElementById('radar-indicator');
+  const beaconText = document.getElementById('beacon-status');
+  radar.className = 'radar-dot syncing';
+  beaconText.textContent = '正在同步…';
+
+  try {
+    const notes = await scanDirectory(Core.dirHandle);
+    ingestDataset(notes);
+    radar.className = 'radar-dot active';
+    beaconText.textContent = `已连接本地目录（${notes.length} 篇）`;
+    Core.lastSyncTime = Date.now();
+  } catch (err) {
+    console.error('Directory sync fault:', err);
+    radar.className = 'radar-dot';
+    beaconText.textContent = '重新授权目录';
+  }
+}
+
+async function startMission() {
+  document.querySelectorAll('.deck-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchDeckTab(tab.dataset.view));
+  });
+
+  window.addEventListener('hashchange', () => {
+    const h = location.hash.slice(1);
+    if (h) switchDeckTab(h);
+  });
+
+  const queryInput = document.getElementById('global-query');
+  const searchPopover = document.getElementById('search-popover');
+  let selectedSearchIdx = -1;
+
+  function renderSearchPopover(q) {
+    if (!q) {
+      searchPopover.classList.remove('open');
+      searchPopover.innerHTML = '';
+      selectedSearchIdx = -1;
+      return;
+    }
+
+    const matches = [];
+    for (const n of Core.nodes) {
+      const hay = `${n.title} ${n.titleZh || ''} ${n.slug} ${n.problem || ''} ${n.problemZh || ''} ${n.decision || ''} ${n.decisionZh || ''}`.toLowerCase();
+      if (hay.includes(q)) matches.push(n);
+    }
+
+    const topMatches = matches.slice(0, 7);
+    selectedSearchIdx = -1;
+
+    if (!topMatches.length) {
+      searchPopover.innerHTML = `<div class="popover-empty">// 未找到与 "${escapeHtml(q)}" 匹配的决策记录</div>`;
+    } else {
+      searchPopover.innerHTML = topMatches.map((n, idx) => {
+        const title = escapeHtml(n.title);
+        const cites = Core.inCount.get(n.id) || 0;
+        return `
+          <div class="popover-item" data-id="${escapeHtml(n.id)}" data-idx="${idx}">
+            <div class="popover-item-main">
+              <div class="popover-title">${title}</div>
+              <div class="popover-sub">
+                <span class="class-badge cls-${escapeHtml(n.cls)}">${escapeHtml(CLASS_LABELS[n.cls] || n.cls)}</span>
+                <span>${escapeHtml(n.date || '进行中')}</span>
+                <span>#${escapeHtml(n.slug)}</span>
+              </div>
+            </div>
+            ${cites ? `<span class="weight-gauge">↗${cites}</span>` : ''}
+          </div>
+        `;
+      }).join('') + `
+        <div class="popover-footer">
+          <span>共找到 <b>${matches.length}</b> 项决策</span>
+          <span>按 ↵ 回车在全量清单中查看全部</span>
+        </div>
+      `;
+
+      searchPopover.querySelectorAll('.popover-item').forEach(item => {
+        item.addEventListener('click', () => {
+          openConsole(item.dataset.id);
+          searchPopover.classList.remove('open');
+        });
+      });
+    }
+
+    searchPopover.classList.add('open');
+  }
+
+  queryInput.addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    Core.filterQuery = q;
+    Core.altQuery = q;
+    renderDirectory();
+    renderAlternatives();
+    renderSearchPopover(q);
+  });
+
+  queryInput.addEventListener('keydown', e => {
+    const items = searchPopover.querySelectorAll('.popover-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!items.length) return;
+      selectedSearchIdx = (selectedSearchIdx + 1) % items.length;
+      items.forEach((it, i) => it.classList.toggle('selected', i === selectedSearchIdx));
+      items[selectedSearchIdx]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!items.length) return;
+      selectedSearchIdx = (selectedSearchIdx - 1 + items.length) % items.length;
+      items.forEach((it, i) => it.classList.toggle('selected', i === selectedSearchIdx));
+      items[selectedSearchIdx]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedSearchIdx >= 0 && items[selectedSearchIdx]) {
+        openConsole(items[selectedSearchIdx].dataset.id);
+        searchPopover.classList.remove('open');
+      } else {
+        switchDeckTab('directory');
+        searchPopover.classList.remove('open');
+      }
+    } else if (e.key === 'Escape') {
+      searchPopover.classList.remove('open');
+    }
+  });
+
+  document.addEventListener('click', e => {
+    const nodeTrigger = e.target.closest('[data-node-id]');
+    if (nodeTrigger) {
+      const id = nodeTrigger.getAttribute('data-node-id');
+      if (id) {
+        openConsole(id);
+        return;
+      }
+    }
+    const deepLink = e.target.closest('.md-deep-link');
+    if (deepLink) {
+      e.preventDefault();
+      const target = deepLink.getAttribute('data-deep-link');
+      if (target) handleDeepLink(target);
+      return;
+    }
+    if (!e.target.closest('.hud-search')) {
+      searchPopover.classList.remove('open');
+    }
+  });
+
+  window.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== queryInput) {
+      e.preventDefault();
+      queryInput.focus();
+    }
+    if (e.key === 'Escape') closeConsole();
+  });
+
+  document.getElementById('alt-query-input').addEventListener('input', e => {
+    Core.altQuery = e.target.value;
+    renderAlternatives();
+  });
+
+  const selSt = document.getElementById('select-status');
+  LIFECYCLES.forEach(s => selSt.innerHTML += `<option value="${s}">状态：${STATUS_LABELS[s]}</option>`);
+  selSt.addEventListener('change', e => { Core.stFilter = e.target.value; renderDirectory(); });
+
+  const selCls = document.getElementById('select-class');
+  CLASSES.forEach(c => selCls.innerHTML += `<option value="${c}">分类：${CLASS_LABELS[c]}</option>`);
+  selCls.addEventListener('change', e => { Core.clsFilter = e.target.value; renderDirectory(); });
+
+  document.getElementById('select-sort').addEventListener('change', e => { Core.sortMode = e.target.value; renderDirectory(); });
+
+  const btnResetMatrix = document.getElementById('btn-reset-matrix-filter');
+  if (btnResetMatrix) {
+    btnResetMatrix.addEventListener('click', () => {
+      Core.stFilter = '';
+      Core.clsFilter = '';
+      Core.filterQuery = '';
+      const gq = document.getElementById('global-query');
+      if (gq) gq.value = '';
+      document.getElementById('select-status').value = '';
+      document.getElementById('select-class').value = '';
+      renderDirectory();
+    });
+  }
+
+  document.getElementById('btn-console-close').addEventListener('click', closeConsole);
+  document.getElementById('drawer-curtain').addEventListener('click', closeConsole);
+
+  async function requestDirectoryAccess() {
+    if (!('showDirectoryPicker' in window)) {
+      alert('请使用 Chrome / Edge 浏览器体验 File System Access 本地无感同步。');
+      return;
+    }
+    try {
+      const handle = await window.showDirectoryPicker({ mode: 'read' });
+      Core.dirHandle = handle;
+      await saveDirHandle(handle);
+      await triggerLiveSync();
+    } catch (err) {
+      if (err.name !== 'AbortError') console.error('Directory request fault:', err);
+    }
+  }
+
+  document.getElementById('beacon-sync').addEventListener('click', requestDirectoryAccess);
+  document.getElementById('btn-authorize-dir').addEventListener('click', requestDirectoryAccess);
+  document.getElementById('btn-mount-demo').addEventListener('click', () => loadSampleDataset());
+
+  if (window.__INLINE_DATA__ && window.__INLINE_DATA__.length) {
+    ingestDataset(window.__INLINE_DATA__);
+  } else {
+    const saved = await loadSavedDirHandle();
+    if (saved) {
+      Core.dirHandle = saved;
+      try {
+        if ((await saved.queryPermission({ mode: 'read' })) === 'granted') {
+          await triggerLiveSync();
+        } else {
+          document.getElementById('beacon-status').textContent = '点击确认授权';
+        }
+      } catch {
+        document.getElementById('deck-onboarding').style.display = 'flex';
+      }
+    } else {
+      document.getElementById('deck-onboarding').style.display = 'flex';
+    }
+  }
+
+  window.addEventListener('focus', () => {
+    if (Core.dirHandle && Date.now() - Core.lastSyncTime > 2500) {
+      triggerLiveSync(true);
+    }
+  });
+
+  setInterval(() => {
+    if (Core.dirHandle && document.hasFocus() && Date.now() - Core.lastSyncTime > 4000) {
+      triggerLiveSync(true);
+    }
+  }, 5000);
+
+  if (location.hash.slice(1)) {
+    switchDeckTab(location.hash.slice(1));
+  }
+}
+
+function loadSampleDataset() {
+  const sample = [
+    {
+      id: 'implemented/architecture/2026-06-13-capability-seams.md',
+      slug: '2026-06-13-capability-seams',
+      lifecycle: 'implemented',
+      cls: 'architecture',
+      date: '2026-06-13',
+      title: '能力 Seam：Service Definition / Provider / Consumer 三权分立',
+      problem: '各项能力关注点以不同速率变化。把实现与面向模型的工具契约绑在一起，会导致换沙箱实现时工具 Schema 频发破坏性变更。',
+      decision: '拆分为 Service Definition（Cordis 抽象服务声明）、Service Provider（本地或沙箱实现插件）与 Consumer（面向模型的 Schema 工具），实现三者独立演进。',
+      alternatives: '### 始终合并各角色\n否决，重新耦合了独立变化的关注点。\n### @cordisjs/plugin-capability\n这是权限安全服务，并非实现替换机制。',
+      consequences: '增加包数量与胶水样板；换来沙箱后端替换时彻底零破坏面向模型的工具约定。',
+      outLinks: [],
+    },
+    {
+      id: 'implemented/architecture/2026-07-20-canonical-tool-output-contract.md',
+      slug: '2026-07-20-canonical-tool-output-contract',
+      lifecycle: 'implemented',
+      cls: 'architecture',
+      date: '2026-07-20',
+      title: '规范化工具输出契约 (Canonical Output Contract)',
+      problem: '工具直接产出 model-facing 的 ContentBlock 文本，导致编程式工具调用（PTC）无法拿到稳定的强类型领域对象。',
+      decision: '每个工具声明强制的 Canonical Output：执行期输出强类型 DTO，并通过纯函数式 render() 投影成持久化和模型可读文本。',
+      alternatives: '### 双轨制返回值\n否决，维护双重契约增加心智负担。',
+      consequences: '执行期拥有强类型无损数据；PTC 模式无需反向解析字符串。',
+      outLinks: ['implemented/architecture/2026-06-13-capability-seams.md'],
+    }
+  ];
+  ingestDataset(sample);
+}
+
+document.addEventListener('DOMContentLoaded', startMission);
+</script>
+</body>
+</html>

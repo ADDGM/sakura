@@ -36,3 +36,4 @@ mise
 .projectmem
 
 # Agent record rules are scoped in .agents/.gitignore.
+/board.html

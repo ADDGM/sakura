@@ -25,6 +25,24 @@
 - `notes/` 下所有生命周期都可纳入 Git，新增或移动笔记无需改忽略规则。放入该目录前确认内容适合协作，提交前审核差异及引用；可跟踪不等于已经提交，不使用 `git add -f` 绕过本地目录边界。
 - 共享链接必须指向仓库文件或公共来源。不得以私人计划、未共享附件或本机绝对路径作为读者必需入口；凭据、后台会话和个人环境记录不进入共享笔记。
 
+## 决策看板
+
+| 文件 | 用途 | 更新方式 |
+| --- | --- | --- |
+| 根目录 `board.html` | 本地直读，首次打开后连接 `.agents/notes/`；不内嵌笔记 | 缺失、模板更新或需从打包版切换时使用 `--init`；Git 忽略 |
+| [notes/board.html](notes/board.html) | 内嵌共享笔记全文的“项目决策看板”，可作为单个 HTML 分发 | 一轮共享笔记变更完成并通过校验后由 Agent 刷新，分发前再次核对；可随笔记纳入 Git |
+
+在已安装项目级技能的工作副本中，从仓库根目录运行：
+
+```powershell
+node ".agents/skills/write-notes-like-deepseek/scripts/build-board.ts" --init "board.html" "项目决策看板"
+node ".agents/skills/write-notes-like-deepseek/scripts/build-board.ts" --bundle ".agents/notes" ".agents/notes/board.html" "项目决策看板"
+```
+
+项目级技能不存在时，替换为当前 Agent 的实际用户级安装位置；均未安装时保留现有看板并说明未更新，不要求协作者安装个人工具。生成由 Agent 在任务节点执行，不设置后台监听或自动发布。上述命令展示目标路径；刷新已有看板时，先输出到目标旁的临时 HTML，校验成功后再替换，内容相同则保留原文件，并清理临时文件。只覆盖已确认的生成物；失败保留旧版，源码笔记始终是事实来源，不直接编辑 HTML 中的笔记。
+
+分发版只读取共享笔记，不包含 `local/`、`legacy/` 或 `validation/`。它是生成时的快照，原笔记发生变化后需要重新打包；HTML 本身不参与笔记校验或被打包为笔记。根目录版和分发版都不进入 WordPress 主题安装包。浏览器直接读取本地目录需要用户授权，建议使用支持目录访问的 Chrome 或 Edge；分发版已内嵌正文，无需连接目录。模板的在线字体不可用时使用系统字体。
+
 ## 本地资料与发布包
 
 `local/` 保存私人想法、个人工具和流程记录；`local/workflow.md` 是可选的本地工作约定，`local/notes/` 保存结构化私人笔记。`legacy/`、`validation/` 和仓库根目录的 `.projectmem/` 也继续仅本地保存。除共享入口和 `notes/` 外，`.agents/` 的其他直接子项默认忽略，不能把共享项目笔记与私人记录混放在 `notes/`。
