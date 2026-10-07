@@ -325,3 +325,11 @@ msgstr "Live2D の位置をリセット"
 #: footer.php
 msgid "Hide"
 msgstr "非表示"
+
+#: options.php
+msgid "Live2D settings"
+msgstr "Live2D 設定"
+
+#: options.php
+msgid "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."
+msgstr "ウィジェットはブラウザーの表示領域の幅が 861 ピクセル以上の場合にのみ読み込まれます。移動ハンドルでドラッグするか、リセットボタンで位置を元に戻せます。"

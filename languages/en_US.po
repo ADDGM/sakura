@@ -2489,3 +2489,11 @@ msgstr "Reset Live2D position"
 #: footer.php
 msgid "Hide"
 msgstr "Hide"
+
+#: options.php
+msgid "Live2D settings"
+msgstr "Live2D settings"
+
+#: options.php
+msgid "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."
+msgstr "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."

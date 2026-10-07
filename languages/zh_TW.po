@@ -2577,3 +2577,11 @@ msgstr "還原 Live2D 預設位置"
 #: footer.php
 msgid "Hide"
 msgstr "隱藏"
+
+#: options.php
+msgid "Live2D settings"
+msgstr "看板娘"
+
+#: options.php
+msgid "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."
+msgstr "僅在瀏覽器檢視區寬度不小於 861 像素時載入看板娘。使用移動把手拖曳，或點擊重設按鈕恢復位置。"
