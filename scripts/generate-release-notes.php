@@ -8,6 +8,18 @@ declare(strict_types=1);
 require_once __DIR__ . '/validate-commit-messages.php';
 
 const SAKURA_RELEASE_SECTIONS = array(
+    'feat' => '新增功能',
+    'fix' => '问题修复',
+    'docs' => '文档更新',
+    'style' => '代码格式',
+    'refactor' => '代码重构',
+    'perf' => '性能优化',
+    'test' => '测试更新',
+    'build' => '构建与依赖',
+    'ci' => '持续集成',
+    'chore' => '维护事项',
+    'revert' => '变更回退',
+    'init' => '项目初始化',
     '新增' => '新增功能',
     '修复' => '问题修复',
     '兼容' => '兼容性更新',
@@ -167,7 +179,7 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
     $sections = array();
     foreach ($commits as $commit) {
         $type = $commit['parsed']['type'] ?? '其他';
-        $sections[$type][] = $commit;
+        $sections[SAKURA_RELEASE_SECTIONS[$type] ?? '其他'][] = $commit;
     }
 
     $version = sakura_release_metadata($release, 'version', strpos($tag, 'v') === 0 ? substr($tag, 1) : $tag);
@@ -222,18 +234,19 @@ function sakura_render_release_notes(string $tag, string $previous, array $commi
     );
 
     $hasKnownSection = false;
-    foreach (SAKURA_RELEASE_SECTIONS as $type => $title) {
-        if (empty($sections[$type])) {
+    foreach (array_unique(array_values(SAKURA_RELEASE_SECTIONS)) as $title) {
+        if (empty($sections[$title])) {
             continue;
         }
         $hasKnownSection = true;
         $lines[] = '### ' . $title;
         $lines[] = '';
-        foreach ($sections[$type] as $commit) {
+        foreach ($sections[$title] as $commit) {
             $shortHash = substr($commit['hash'], 0, 7);
             $scope = $commit['parsed']['scope'] !== '' ? '（' . $commit['parsed']['scope'] . '）' : '';
             $link = $repository !== '' ? ' [' . $shortHash . '](https://github.com/' . $repository . '/commit/' . $commit['hash'] . ')' : ' `' . $shortHash . '`';
-            $lines[] = '- ' . $scope . $commit['parsed']['summary'] . $link;
+            $breaking = !empty($commit['parsed']['breaking']) ? '**破坏性变更** ' : '';
+            $lines[] = '- ' . $breaking . $scope . $commit['parsed']['summary'] . $link;
         }
         $lines[] = '';
     }
@@ -300,6 +313,9 @@ function sakura_release_self_test(): int
     $commits = array(
         array('hash' => str_repeat('a', 40), 'title' => '兼容(WordPress): 修复标题 API', 'author' => '测试', 'parsed' => sakura_parse_commit_title('兼容(WordPress): 修复标题 API')),
         array('hash' => str_repeat('b', 40), 'title' => '文档: 更新升级说明', 'author' => '测试', 'parsed' => sakura_parse_commit_title('文档: 更新升级说明')),
+        array('hash' => str_repeat('d', 40), 'title' => 'ci: 校验提交消息', 'author' => '测试', 'parsed' => sakura_parse_commit_title('ci: 校验提交消息')),
+        array('hash' => str_repeat('e', 40), 'title' => 'feat!: 调整响应结构', 'author' => '测试', 'parsed' => sakura_parse_commit_title('feat!: 调整响应结构')),
+        array('hash' => str_repeat('f', 40), 'title' => 'docs: 补充提交规范', 'author' => '测试', 'parsed' => sakura_parse_commit_title('docs: 补充提交规范')),
     );
     $release = array(
         'version' => '3.5.0',
@@ -315,6 +331,10 @@ function sakura_release_self_test(): int
         || strpos($notes, '## 支持环境') === false
         || strpos($notes, '## 更新记录') === false
         || strpos($notes, '### 兼容性更新') === false
+        || strpos($notes, '### 持续集成') === false
+        || strpos($notes, '校验提交消息') === false
+        || strpos($notes, '**破坏性变更** 调整响应结构') === false
+        || substr_count($notes, '### 文档更新') !== 1
         || strpos($notes, '修复标题 API') === false
         || strpos($notes, '构建与文档（1 个文件）') === false
         || strpos($notes, '## 完整更新日志') === false

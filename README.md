@@ -115,7 +115,30 @@ Google Fonts、阿里图标、主题光标和社交图标属于可选增强，�
 维护版本的提交格式为：
 
 ```text
-类型(范围): 中文摘要
+type(scope)!: 中文摘要
 ```
 
-类型使用 `新增`、`修复`、`兼容`、`优化`、`重构`、`文档`、`构建`、`测试` 或 `发布`。
+范围与 `!` 可选；`!` 表示破坏性变更。使用英文冒号及其后的空格，摘要须含中文。
+
+| 类型 | 用途 |
+| --- | --- |
+| `feat` / `fix` | 新增功能 / 修复缺陷 |
+| `docs` / `style` | 文档 / 不改变语义的代码格式，不专指 CSS |
+| `refactor` / `perf` | 代码重构 / 性能优化，`perf` 不泛指体验改进 |
+| `test` | 测试用例与测试设施 |
+| `build` / `ci` | 构建、打包、依赖 / CI 工作流 |
+| `chore` / `revert` | 其他维护 / 回退变更 |
+| `init` | 可选扩展：项目初始化 |
+
+示例：`feat(Live2D): 新增独立看板娘设置标签`。旧中文类型仅供历史发布说明解析；范围检查排除 `.github/commit-legacy-base.txt` 固定提交及其祖先，新提交不再接受中文类型。
+
+在仓库根目录运行（PHP 不在 PATH 时使用其完整路径）：
+
+```sh
+php scripts/validate-commit-messages.php --title="feat(Live2D): 新增独立看板娘设置标签"
+php scripts/install-commit-hook.php
+php scripts/validate-commit-messages.php --self-test
+php scripts/validate-commit-messages.php --range="HEAD^..HEAD"
+```
+
+安装器只添加本地 `commit-msg`，保留 projectmem 钩子；重复运行相同安装无副作用，已有不同钩子或自定义 `core.hooksPath` 时拒绝覆盖。钩子使用安装时的 PHP 路径，解释器迁移后需检查并重新接入。Git 克隆不会自动安装钩子，CI 继续调用同一校验器兜底。手动合并、回退及 squash/fixup 提交在最终提交时同样需提供合规标题；CI 范围检查略过合并提交。发布操作使用 `chore(release)`，兼容性修改按目的选 `fix` 或 `feat`。

@@ -1,11 +1,17 @@
 <?php
 /**
- * 校验版本基线之后的提交标题是否符合中文提交规范。
+ * 本地与 CI 共用的英文类型、中文摘要提交校验。
  */
 
 declare(strict_types=1);
 
 const SAKURA_COMMIT_TYPES = array(
+    'feat', 'fix', 'docs', 'style', 'refactor', 'perf',
+    'test', 'build', 'ci', 'chore', 'revert', 'init',
+);
+
+// 仅用于历史发布说明解析，不用于新提交校验。
+const SAKURA_LEGACY_COMMIT_TYPES = array(
     '新增',
     '修复',
     '兼容',
@@ -69,14 +75,20 @@ function sakura_run_git_command(array $arguments): string
     return $output;
 }
 
-function sakura_parse_commit_title(string $title): ?array
+function sakura_parse_commit_title(string $title, bool $allowLegacy = true): ?array
 {
-    $pattern = '/^(新增|修复|兼容|优化|重构|文档|构建|测试|发布)(?:\(([^)]+)\))?[：:]\s*(.+)$/u';
-    if (!preg_match($pattern, trim($title), $matches)) {
-        return null;
+    $types = implode('|', SAKURA_COMMIT_TYPES);
+    $pattern = '/^(' . $types . ')(?:\(([^\s():!]+)\))?(!)?: ([^\r\n]+)$/uD';
+    $legacy = false;
+    if (!preg_match($pattern, $title, $matches)) {
+        $pattern = '/^(' . implode('|', SAKURA_LEGACY_COMMIT_TYPES) . ')(?:\(([^)\r\n]+)\))?[：:][ \t]*([^\r\n]+)$/uD';
+        if (!$allowLegacy || !preg_match($pattern, $title, $matches)) {
+            return null;
+        }
+        $legacy = true;
     }
 
-    $summary = trim($matches[3]);
+    $summary = trim($matches[$legacy ? 3 : 4]);
     if ($summary === '' || !preg_match('/[\x{4e00}-\x{9fff}]/u', $summary)) {
         return null;
     }
@@ -85,13 +97,21 @@ function sakura_parse_commit_title(string $title): ?array
         'type' => $matches[1],
         'scope' => isset($matches[2]) ? trim($matches[2]) : '',
         'summary' => $summary,
+        'breaking' => !$legacy && ($matches[3] ?? '') === '!',
     );
 }
 
 function sakura_commit_lines(string $range): array
 {
     $range = sakura_validate_git_range($range);
-    $output = sakura_run_git_command(array('git', 'log', '--no-merges', '--format=%H%x09%s', $range));
+    $baselinePath = dirname(__DIR__) . '/.github/commit-legacy-base.txt';
+    $baseline = is_file($baselinePath) ? trim((string) file_get_contents($baselinePath)) : '';
+    if (!preg_match('/^[a-f0-9]{40}$/D', $baseline)) {
+        throw new RuntimeException('提交规范迁移基线缺失或无效。');
+    }
+    // CI 使用完整历史；对象缺失必须失败，不静默跳过校验。
+    sakura_run_git_command(array('git', 'cat-file', '-e', $baseline . '^{commit}'));
+    $output = sakura_run_git_command(array('git', 'log', '--no-merges', '--format=%H%x09%s', $range, '--not', $baseline));
 
     $commits = array();
     foreach (sakura_split_git_lines($output) as $line) {
@@ -111,7 +131,7 @@ function sakura_validate_commits(array $commits): array
 {
     $errors = array();
     foreach ($commits as $commit) {
-        if (sakura_parse_commit_title($commit['title']) === null) {
+        if (sakura_parse_commit_title($commit['title'], false) === null) {
             $errors[] = $commit['hash'] . ' ' . $commit['title'];
         }
     }
@@ -121,30 +141,49 @@ function sakura_validate_commits(array $commits): array
 function sakura_validate_self_test(): int
 {
     $valid = array(
-        '兼容(WordPress): 修复旧版标题 API',
-        '构建(工作流): 推送 develop 时生成测试主题包',
-        '文档: 更新升级说明',
+        'fix(WordPress): 修复旧版标题 API',
+        'build(工作流): 推送 develop 时生成测试主题包',
+        'docs: 更新升级说明',
+        'feat(api)!: 调整响应结构',
+        'refactor!: 调整模块接口',
     );
     $invalid = array(
         'fix: update workflow',
         '修复: fix workflow',
         '未知(范围): 这是不允许的类型',
         '兼容(PHP):',
+        '优化: 更新设置',
+        'improve: 更新设置',
+        'Feat: 更新设置',
+        'fix(): 修复错误',
+        'fix( ): 修复错误',
+        'fix:修复错误',
+        'fix： 修复错误',
+        "fix: 修复错误\n另一行",
     );
 
     foreach ($valid as $title) {
-        if (sakura_parse_commit_title($title) === null) {
+        if (sakura_parse_commit_title($title, false) === null) {
             fwrite(STDERR, "自测失败：合法提交未通过：{$title}\n");
             return 1;
         }
     }
     foreach ($invalid as $title) {
-        if (sakura_parse_commit_title($title) !== null) {
+        if (sakura_parse_commit_title($title, false) !== null) {
             fwrite(STDERR, "自测失败：非法提交通过：{$title}\n");
             return 1;
         }
     }
 
+    foreach (SAKURA_COMMIT_TYPES as $type) {
+        if (sakura_parse_commit_title($type . ': 校验类型', false) === null) {
+            return 1;
+        }
+    }
+    if (sakura_parse_commit_title('兼容(WordPress): 修复标题 API') === null
+        || !sakura_parse_commit_title('feat!: 更新接口', false)['breaking']) {
+        return 1;
+    }
     $lines = sakura_split_git_lines("a\t文档(维护): 补充兼容性说明\r\nb\t兼容(主题): 支持新版 WordPress\n");
     if (count($lines) !== 2 || strpos($lines[0], '补充兼容性说明') === false || strpos($lines[1], '支持新版 WordPress') === false) {
         fwrite(STDERR, "自测失败：中文 Git 输出被错误分行。\n");
@@ -161,20 +200,41 @@ function sakura_validate_cli(array $arguments): int
         return sakura_validate_self_test();
     }
 
-    $range = '';
+    $inputs = array();
     foreach ($arguments as $argument) {
-        if (strpos($argument, '--range=') === 0) {
-            $range = substr($argument, 8);
+        if (!preg_match('/^--(range|title|message-file)=(.*)$/s', $argument, $match)
+            || isset($inputs[$match[1]])) {
+            fwrite(STDERR, "参数无效或重复。\n");
+            return 2;
         }
+        $inputs[$match[1]] = $match[2];
     }
-    $range = $range !== '' ? $range : (getenv('COMMIT_RANGE') ?: '');
-    if ($range === '') {
-        fwrite(STDERR, "用法：php scripts/validate-commit-messages.php --range=<起点..终点>\n");
+    if (!$inputs && getenv('COMMIT_RANGE')) {
+        $inputs['range'] = getenv('COMMIT_RANGE');
+    }
+    if (count($inputs) !== 1) {
+        fwrite(STDERR, "用法：--title=<标题> 或 --message-file=<文件> 或 --range=<起点..终点>\n");
         return 2;
     }
 
     try {
-        $commits = sakura_commit_lines($range);
+        if (isset($inputs['range'])) {
+            $commits = sakura_commit_lines($inputs['range']);
+        } else {
+            $title = $inputs['title'] ?? '';
+            if (isset($inputs['message-file'])) {
+                $file = $inputs['message-file'];
+                if (!is_file($file) || !is_readable($file)) {
+                    throw new RuntimeException('提交消息文件不可读。');
+                }
+                $message = file_get_contents($file);
+                if ($message === false) {
+                    throw new RuntimeException('提交消息文件读取失败。');
+                }
+                $title = preg_split('/\r\n|\r|\n/', $message)[0];
+            }
+            $commits = array(array('hash' => '候选标题', 'title' => $title));
+        }
         $errors = sakura_validate_commits($commits);
     } catch (Throwable $exception) {
         fwrite(STDERR, $exception->getMessage() . "\n");
@@ -186,7 +246,7 @@ function sakura_validate_cli(array $arguments): int
         foreach ($errors as $error) {
             fwrite(STDERR, "- {$error}\n");
         }
-        fwrite(STDERR, "提交格式：类型(范围): 中文摘要；类型必须为新增、修复、兼容、优化、重构、文档、构建、测试或发布。\n");
+        fwrite(STDERR, '提交格式：type(scope)!: 中文摘要；范围和 ! 可选；类型为 ' . implode(', ', SAKURA_COMMIT_TYPES) . "。\n");
         return 1;
     }
 

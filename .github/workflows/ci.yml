@@ -108,7 +108,7 @@ jobs:
           if-no-files-found: error
 
   commit-message:
-    name: 中文提交信息检查
+    name: 提交规范检查
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -158,6 +158,9 @@ jobs:
 
       - name: Validate commit messages
         run: php scripts/validate-commit-messages.php --range="${{ steps.range.outputs.range }}"
+
+      - name: Test local commit hook and migration policy
+        run: python3 scripts/tests/commit-policy.py php
 
   wordpress-smoke:
     name: WordPress ${{ matrix.wordpress }} / PHP ${{ matrix.php }} 烟雾测试
@@ -254,7 +257,7 @@ jobs:
       TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
     if: ${{ always() }}
-    needs: build
+    needs: [build, commit-message, wordpress-smoke]
     permissions: {}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -269,11 +272,14 @@ jobs:
           token: ${{ env.TELEGRAM_TOKEN }}
           format: markdown
           message: |
-            *Sakura CI 构建报告*
+            *Sakura CI 检查报告*
 
             *工作流*: `${{ github.workflow }}`
-            *状态*: `${{ needs.build.result == 'failure' && '❌ 构建失败' || needs.build.result == 'cancelled' && '⚪ 构建取消' || needs.build.result == 'success' && '✅ 构建成功' || '⚠️ 构建未完成' }}`
-            *任务*: `${{ needs.build.result }}`
+            *整体状态*: `${{ contains(needs.*.result, 'failure') && '❌ CI 检查失败' || contains(needs.*.result, 'cancelled') && '⚪ CI 检查取消' || contains(needs.*.result, 'skipped') && '⚠️ CI 检查未全部执行' || (needs.build.result == 'success' && needs['commit-message'].result == 'success' && needs['wordpress-smoke'].result == 'success') && '✅ CI 全部通过' || '⚠️ CI 状态未知' }}`
+            *构建*: `${{ needs.build.result }}`
+            *提交规范*: `${{ needs['commit-message'].result }}`
+            *WordPress 烟雾测试*: `${{ needs['wordpress-smoke'].result }}`
+            *覆盖范围*: 当前兼容性工作流，不包含独立的质量检查工作流。
             *触发事件*: `${{ github.event_name }}`
             *分支*: `${{ github.ref_name }}`
             *提交*: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})

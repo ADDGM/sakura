@@ -4,6 +4,7 @@
 
 ```bash
 php scripts/validate-commit-messages.php --self-test
+python scripts/tests/commit-policy.py php
 php scripts/generate-release-notes.php --self-test
 ```
 
