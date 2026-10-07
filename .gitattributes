@@ -1,6 +1,9 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# Development notes are shared in Git, not in installable theme archives.
+.agents export-ignore
+
 # The legacy H-Siren costume catalog is not loaded by Sakura. Keep it in the
 # repository for reference, but exclude it from installable theme archives.
 live2d/textures/** export-ignore

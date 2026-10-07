@@ -31,7 +31,8 @@ mise
 .spec-workflow/
 .serena/
 .playwright-mcp/
-.agents/
 .zcf
 .codegraph
 .projectmem
+
+# Agent record rules are scoped in .agents/.gitignore.

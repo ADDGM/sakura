@@ -1,0 +1,5 @@
+# Share project notes; keep other agent records local.
+/*
+!/.gitignore
+!/README.md
+!/notes/

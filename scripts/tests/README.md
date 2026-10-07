@@ -1,14 +1,19 @@
-# 发布脚本自测
+# 脚本自测与按需回归
 
 在已安装 PHP 8.0 或更高版本的环境中执行：
 
 ```bash
 php scripts/validate-commit-messages.php --self-test
-python scripts/tests/commit-policy.py php
 php scripts/generate-release-notes.php --self-test
+php scripts/theme-metadata.php --self-test
+php scripts/compile-translations.php --self-test
 ```
 
-CI 会在 PHP 矩阵中执行这两项自测。
+兼容性CI在PHP矩阵中执行以上四项自测。提交规范与钩子的隔离检查另需Python 3，在CI的提交检查任务中执行：
+
+```bash
+python scripts/tests/commit-policy.py php
+```
 
 完整 WordPress 检查使用 `wp eval-file scripts/wordpress-smoke.php`。源码契约比较会规范化 CRLF/LF 换行，以兼容 Windows 安装包；实际主题源码和运行时行为不受影响。
 
@@ -20,13 +25,15 @@ CI 会在 PHP 矩阵中执行这两项自测。
 node --test scripts/tests/live2d.test.cjs
 ```
 
-浏览器回归使用 Playwright Chromium 和与内置运行时一致的 APlayer 1.10.1 基础样式：
+浏览器回归是按需运行的局部夹具，需要Playwright、Chromium兼容浏览器和与内置运行时一致的APlayer 1.10.1基础样式。克隆仓库不包含这些外部依赖，应在需要复测时准备：
 
 ```bash
 node scripts/tests/live2d-browser.cjs
 ```
 
 默认从本地 Node 模块解析 `playwright` 和 `aplayer/dist/APlayer.min.css`。也可通过环境变量 `PLAYWRIGHT_MODULE_PATH`、`APLAYER_CSS_PATH` 指定已有文件，`BROWSER_EXECUTABLE` 指定已安装的 Chromium/Edge；设置 `LIVE2D_SCREENSHOT_DIR` 可保存模型截图。
+
+这些依赖和测试截图不属于主题构建输入。正式测试源码继续维护，测试结束后按需保留结论和必要附件；既有临时WordPress、下载包或测试CSS无需长期保留。项目效果验收使用GitHub构建包更新测试服务器，局部夹具结果不替代该验收。
 
 测试启动仅监听 `127.0.0.1` 的临时 HTTP 服务，使用仓库中的 Live2D、jQuery、APlayer 和播放器初始化代码，覆盖布局、鼠标/触摸拖动、位置恢复、键盘、重置、提示、860/861px 边界及 WebGL 渲染。远程换装使用本地 PNG 模拟接口响应，不访问第三方换装服务。
 
