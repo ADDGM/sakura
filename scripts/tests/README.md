@@ -17,6 +17,26 @@ python scripts/tests/commit-policy.py php
 
 完整 WordPress 检查使用 `wp eval-file scripts/wordpress-smoke.php`。源码契约比较会规范化 CRLF/LF 换行，以兼容 Windows 安装包；实际主题源码和运行时行为不受影响。
 
+核心资源检查使用独立临时目录中的构建信息，覆盖完整源码提交、缺失或无效来源、显式固定版本覆盖、旧本地/远程开关与缓存参数。检查读取真实构建解析函数，完成后恢复过滤器并清理自身夹具，不请求CDN；发布后的远程文件仍需单独核对，见[构建资源引用](../../.agents/notes/implemented/architecture/2026-10-09-core-resource-build-reference.md)。
+
+## 前台依赖一致性
+
+```bash
+node --test scripts/tests/frontend-vendor.test.cjs
+```
+
+检查维护的独立源文件与实际`lib.js`一致且只出现一次，jQuery保持官方完整发行文件，PJAX/Fancybox使用本批版本与已记录的原生API迁移。补丁、生成方式及浏览器验证见[前台迁移笔记](../../.agents/notes/implemented/architecture/2026-10-08-jquery4-and-plugin-migration.md)。这些检查与下方HLS、Live2D测试由CI的前端检查一起运行。
+
+## HLS 加载与播放回归
+
+无需第三方依赖的按需加载、失败重试、并发及过期回调检查：
+
+```bash
+node --test scripts/tests/hls.test.cjs
+```
+
+测试执行内置APlayer真实`setAudio`，覆盖无HLS封面的音频、后续HLS曲目、显式normal类型、重复初始化、封面销毁和原生回退。媒体元素与网络为隔离模拟；新版库仍须用实际浏览器验证音频/视频解码、worker和站点交互，模拟原生支持不代表Safari验收。已完成范围见[HLS维护笔记](../../.agents/notes/implemented/architecture/2026-10-08-hls-loading-and-upgrade.md)。
+
 ## Live2D 回归
 
 无需第三方依赖的 loader、翻译键和模型资源检查：

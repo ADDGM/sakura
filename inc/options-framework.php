@@ -206,9 +206,6 @@ function optionsframework_add_page() {
 function optionsframework_load_styles() {
 	$theme_version = defined( 'SAKURA_VERSION' ) ? SAKURA_VERSION : false;
 	wp_enqueue_style( 'optionsframework', OPTIONS_FRAMEWORK_DIRECTORY.'css/optionsframework.css', array(), $theme_version );
-	if ( !wp_style_is( 'wp-color-picker','registered' ) ) {
-		wp_register_style( 'wp-color-picker', OPTIONS_FRAMEWORK_DIRECTORY.'css/color-picker.min.css', array(), $theme_version );
-	}
 	wp_enqueue_style( 'wp-color-picker' );
 }
 
@@ -220,18 +217,6 @@ function optionsframework_load_scripts( $hook ) {
 
 	if ( 'appearance_page_' . $menu['menu_slug'] != $hook )
         return;
-
-	// Enqueue colorpicker scripts for versions below 3.5 for compatibility
-	if ( !wp_script_is( 'wp-color-picker', 'registered' ) ) {
-		wp_register_script( 'iris', OPTIONS_FRAMEWORK_DIRECTORY . 'js/iris.min.js', array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1 );
-		wp_register_script( 'wp-color-picker', OPTIONS_FRAMEWORK_DIRECTORY . 'js/color-picker.min.js', array( 'jquery', 'iris' ) );
-		$colorpicker_l10n = array(
-			'clear' => __( 'Clear', 'sakura' ),
-			'defaultString' => __( 'Default', 'sakura' ),
-			'pick' => __( 'Select Color', 'sakura' )
-		);
-		wp_localize_script( 'wp-color-picker', 'wpColorPickerL10n', $colorpicker_l10n );
-	}
 
 	// Enqueue custom option panel JS
 	$theme_version = defined( 'SAKURA_VERSION' ) ? SAKURA_VERSION : false;

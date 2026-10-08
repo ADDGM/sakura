@@ -5,7 +5,6 @@
  * @date 2019.8.3
  */
 mashiro_global.variables = new function () {
-    this.has_hls = false;
     this.skinSecter = true;
 }
 mashiro_global.ini = new function () {
@@ -626,39 +625,102 @@ function killCoverVideo() {
     }
 }
 
-function loadHls(){
-    var video = document.getElementById('coverVideo');
-    var video_src = $('#coverVideo').attr('data-src');
+var hlsLibraryRequest = null;
+var coverHls = null;
+var nativeCoverVideo = null;
+var nativeCoverMetadataHandler = null;
+var coverVideoGeneration = 0;
+
+function ensureHls() {
+    if (typeof window.Hls === 'function' && typeof window.Hls.isSupported === 'function') {
+        return $.Deferred().resolve(window.Hls).promise();
+    }
+    if (hlsLibraryRequest) {
+        return hlsLibraryRequest;
+    }
+
+    var deferred = $.Deferred();
+    var request = deferred.promise();
+    hlsLibraryRequest = request;
+    $.ajax({
+        url: mashiro_option.template_url + '/cdn/js/src/16.hls.js',
+        dataType: 'script',
+        timeout: 15000
+    }).done(function () {
+        hlsLibraryRequest = null;
+        if (typeof window.Hls === 'function' && typeof window.Hls.isSupported === 'function') {
+            deferred.resolve(window.Hls);
+        } else {
+            deferred.reject(new Error('HLS script did not expose a usable Hls constructor.'));
+        }
+    }).fail(function () {
+        hlsLibraryRequest = null;
+        deferred.reject(new Error('Unable to load the HLS playback library.'));
+    });
+    return request;
+}
+
+function destroyCoverHls() {
+    coverVideoGeneration++;
+    if (coverHls) {
+        coverHls.destroy();
+        coverHls = null;
+    }
+    if (nativeCoverVideo) {
+        nativeCoverVideo.removeEventListener('loadedmetadata', nativeCoverMetadataHandler);
+        nativeCoverVideo.pause();
+        nativeCoverVideo.removeAttribute('src');
+        nativeCoverVideo.load();
+        nativeCoverVideo = null;
+        nativeCoverMetadataHandler = null;
+    }
+}
+
+function loadHls(video, Hls, generation) {
+    var video_src = video && video.getAttribute('data-src');
     if (!video || !video_src) {
         return;
     }
+    function play() {
+        if (generation !== coverVideoGeneration || !document.documentElement.contains(video)) {
+            return;
+        }
+        var playback = video.play();
+        if (playback && typeof playback.catch === 'function') {
+            playback.catch(function () {
+                // Autoplay may be blocked; the cover play button remains available.
+            });
+        }
+    }
     if (Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(video_src);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-            video.play();
-        });
+        coverHls = new Hls();
+        coverHls.on(Hls.Events.MANIFEST_PARSED, play);
+        coverHls.loadSource(video_src);
+        coverHls.attachMedia(video);
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        nativeCoverVideo = video;
+        nativeCoverMetadataHandler = play;
         video.src = video_src;
-        video.addEventListener('loadedmetadata', function () {
-            video.play();
-        });
+        video.addEventListener('loadedmetadata', play, {once: true});
     }
 }
 
 function coverVideoIni() {
-    if ($('video').hasClass('hls')) {
-        if (mashiro_global.variables.has_hls){
-            loadHls();
-        }else{
-            $.getScript(mashiro_option.template_url + "/cdn/js/src/16.hls.js", function(){
-                loadHls();
-                mashiro_global.variables.has_hls = true;
-              });
-        }
-        //console.info('ini:coverVideoIni()');
+    destroyCoverHls();
+    var generation = coverVideoGeneration;
+    var video = document.getElementById('coverVideo');
+    if (!video || !video.classList.contains('hls') || !video.getAttribute('data-src')) {
+        return;
     }
+    ensureHls().done(function (Hls) {
+        if (generation === coverVideoGeneration && document.getElementById('coverVideo') === video) {
+            loadHls(video, Hls, generation);
+        }
+    }).fail(function (error) {
+        if (generation === coverVideoGeneration && document.getElementById('coverVideo') === video) {
+            console.warn('[Sakura]', error.message);
+        }
+    });
 }
 
 function copy_code_block() {
@@ -888,6 +950,8 @@ $(function () {
 
 if (mashiro_option.float_player_on) {
     var live2DPlayerLayoutTimer;
+    var aplayers = [];
+    var aplayerLoadGeneration = 0;
     function notifyLive2DPlayerLayout() {
         if (window.sakuraLive2D && typeof window.sakuraLive2D.updatePlayerOffset === 'function') {
             window.sakuraLive2D.updatePlayerOffset();
@@ -898,9 +962,37 @@ if (mashiro_option.float_player_on) {
 
     function aplayerF() {
         'use strict';
-        var aplayers = [],
-            loadMeting = function () {
+        var generation = ++aplayerLoadGeneration;
+        var loadMeting = function () {
+                if (generation !== aplayerLoadGeneration) {
+                    return;
+                }
+                function isCurrent(container) {
+                    return generation === aplayerLoadGeneration && document.documentElement.contains(container);
+                }
                 function a(a, b) {
+                    if (!isCurrent(a)) {
+                        return;
+                    }
+                    function create() {
+                        if (isCurrent(a)) {
+                            createPlayer(a, b);
+                        }
+                    }
+                    var needsHls = b.some(function (audio) {
+                        return audio.type === 'hls' || ((!audio.type || audio.type === 'auto') && /m3u8(#|\?|$)/i.test(audio.url));
+                    });
+                    if (needsHls) {
+                        ensureHls().done(create).fail(function (error) {
+                            if (isCurrent(a)) {
+                                console.warn('[Sakura]', error.message);
+                            }
+                        });
+                    } else {
+                        create();
+                    }
+                }
+                function createPlayer(a, b) {
                     var c = {
                         container: a,
                         audio: b,
@@ -1037,7 +1129,7 @@ function getqqinfo() {
     }
     var emailAddressFlag = cached.filter('#email').val();
     cached.filter('#author').on('blur', function () {
-        var qq = cached.filter('#author').val(),
+        var qq = (cached.filter('#author').val() || '').trim(),
             $reg = /^[1-9]\d{4,9}$/;
         if ($reg.test(qq)) {
             $.ajax({
@@ -1046,13 +1138,13 @@ function getqqinfo() {
                 dataType: 'json',
                 success: function (data) {
                     cached.filter('#author').val(data.name);
-                    cached.filter('#email').val($.trim(qq) + '@qq.com');
+                    cached.filter('#email').val(qq + '@qq.com');
                     if (mashiro_option.qzone_autocomplete) {
-                        cached.filter('#url').val('https://user.qzone.qq.com/' + $.trim(qq));
+                        cached.filter('#url').val('https://user.qzone.qq.com/' + qq);
                     }
                     $('div.comment-user-avatar img').attr('src', 'https://q2.qlogo.cn/headimg_dl?dst_uin=' + qq + '&spec=100');
                     is_get_by_qq = true;
-                    cached.filter('#qq').val($.trim(qq));
+                    cached.filter('#qq').val(qq);
                     if (cached.filter('#qq').val()) {
                         $('.qq-check').css('display', 'block');
                         $('.gravatar-check').css('display', 'none');
@@ -1995,6 +2087,7 @@ $(function () {
             fragment: '#page',
             timeout: 8000,
         }).on('pjax:beforeSend', () => { //离开页面停止播放
+            destroyCoverHls();
             $('.normal-cover-video').each(function () {
                 this.pause();
                 this.src = '';

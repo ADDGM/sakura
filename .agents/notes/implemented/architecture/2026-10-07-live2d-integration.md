@@ -35,9 +35,35 @@ Status: implemented
 
 ## Consequences
 
-依赖、配置和模型目录职责明确，可保留已有 Tia/Pio 资源与 WordPress 缓存机制；代价是旧运行时及模型格式仍限制扩展。素材来源和使用、分发条件尚未补齐，不能用主题 GPL 声明替代第三方许可依据。扩展服装或升级运行时前需要单独确定兼容性和许可依据。
+依赖、配置和模型目录职责明确，可保留已有 Tia/Pio 资源与 WordPress 缓存机制；代价是旧运行时及模型格式仍限制扩展。直接分发来源与游戏开发团队已有下节证据，原作者授权及旧SDK适用的完整条款仍未补齐，不能用主题 GPL 声明替代第三方许可依据。扩展服装或升级运行时前需要单独确定兼容性和许可依据。
+
+## Resource provenance
+
+2026-10-08以Sakura的`c842725`工作副本核查来源。文件相同能够证明分发副本同源，不能单独证明原作者允许使用、修改或再分发。下表标识均为Git blob SHA-1，不是文件原始字节的普通SHA-1。
+
+| 对象 | Git blob | 可复核的上游 |
+| --- | --- | --- |
+| 初始导入的`live2d/js/live2d.js` | `4428f6279a2cad8abb668abc4b568b4f626809e2` | [H-Siren固定提交](https://github.com/galnetwen/H-Siren/blob/79bcde23ccca45f313d7ba08d3af5e3369b598a3/live2d/js/live2d.js)，与Sakura导入提交`0d1a0cb92119035a584a8a3024e9e495b91e67cb`中的文件一致 |
+| Pio的`model.moc` | `4c7909d8161b5a6cf31e89b34f8138861013e10d` | [Potion-Maker/Pio](https://github.com/fghrsh/live2d_api/blob/02dc5b3aaf5cee35455c816596820055c5363205/model/Potion-Maker/Pio/model.moc) |
+| Tia的`model.moc` | `78ea2af466442e97a49052f441d5606304942046` | [Potion-Maker/Tia](https://github.com/fghrsh/live2d_api/blob/02dc5b3aaf5cee35455c816596820055c5363205/model/Potion-Maker/Tia/model.moc) |
+
+当前`live2d/model/pio/`与`live2d/model/tia/`共73个Git跟踪文件，全部与[H-Siren的模型目录](https://github.com/galnetwen/H-Siren/tree/79bcde23ccca45f313d7ba08d3af5e3369b598a3/live2d/model)同路径文件一致，包括模型、动作、纹理和清单。核查采用`git ls-files`盘点、`git hash-object --no-filters`计算本地blob，并与GitHub固定提交的tree条目比较；两份`.moc`另与上表分发仓库比较。当前合并脚本已包含Sakura后续修补，初始导入相同不代表当前脚本与官方SDK原包相同。
+
+**模型来源与权利依据。** 分发仓库将相同模型归入《Potion Maker》；[Live2D官方作者访谈](https://www.live2d.com/en/business/interview/potionmaker/)确认该游戏由韩国Sinsiroad团队开发，成员包括程序员halak、插画师mauve和图形设计师kutata。访谈能够支持游戏来源和团队署名，未向读者授予模型文件使用或再分发权。本轮没有取得由该团队直接发布的模型原包或授权说明。
+
+[分发仓库README](https://github.com/fghrsh/live2d_api/blob/02dc5b3aaf5cee35455c816596820055c5363205/README.md)将API代码标为MIT，同时单独注明模型版权属于原作者、仅供研究学习且不得用于商业用途。该声明保留了模型的第三方权利，不能把代码的MIT许可扩展为模型许可，也不能把社区声明代替原作者授权。
+
+**旧运行时条款。** 当前脚本含`2.1.00_1`版本标识。[非官方SDK镜像的ReadMe](https://github.com/paulbrzeski/Live2D-WebGL-SDK/blob/5f1dd4e9b39ff46201aa467172866edfed2d87b6/ReadMe.txt)同样标明Cubism SDK for WebGL 2.1.00_1及2016-07-20发布记录，列出framework、lib/live2d.min.js与sample目录可部署到条款同意者管理的服务器；[镜像README](https://github.com/paulbrzeski/Live2D-WebGL-SDK/blob/5f1dd4e9b39ff46201aa467172866edfed2d87b6/README.md)自述下载自旧官方站。它提供版本和历史条款入口线索，不能单独证明Sakura当前合并脚本的完整来源或随主题再分发权限。ReadMe指向的两个历史许可路径`/sdk_license_cubism`与`/sdk_license_cubism_indie`在本轮HTTPS访问时均返回404。
+
+官方现行[专有软件许可](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_en.html)与[开放软件许可](https://www.live2d.com/eula/live2d-open-software-license-agreement_en.html)分别标注协议版本2.1和1.4、修订日期2025-02-03；协议版本号不表示其对应Cubism SDK 2.1。专有协议第1.15、5节对可再分发代码及其条件另作规定，[发布许可页面](https://www.live2d.com/en/sdk/license/)对个人和小规模企业的豁免也有适用条件。本轮仅将这些作为现行官方入口，尚未证实其对2016年运行时、中间封装和Sakura修补的具体适用关系，不据此认定已获无条件再分发权。
+
+**尚缺的证据。** 模型需要权利人明确网站公开展示、模型/动作/纹理修改、随主题包分发、商业使用与署名条件；运行时需要对应旧SDK的完整协议、允许分发的文件范围及合并或修改条件。2026-10-08维护者确认目前找不到默认资源的其他来源资料，现有来源核查据此收尾，授权依据仍记为缺失；取得原作者声明、旧SDK协议等新证据后再补查。已核实来源及其限制继续保留，代码维护与测试可独立继续。此阶段更新事实与证据，不改变既有接入决定；若后续选择替换资源或调整分发方式，再单独记录方案及取舍。
+
+**版权联系注释。** 按维护者选择，[运行时源码](../../../../live2d/js/live2d.js)顶部使用英文注释保留Live2D运行时与Tia/Pio资源的权利归属、H-Siren分发来源和权利人条款边界，并将[项目GitHub Issues](https://github.com/ADDGM/sakura/issues)作为疑似侵权的联系入口。该说明用于联系维护者核实处理，不补足使用或分发授权。2026-10-08经GitHub API核对，仓库Issues尚未启用；维护者确认稍后手动开启，代码注释保留该入口。
 
 ## Verification
+
+2026-10-08的版权联系补充仅在运行时前置440字节注释；原149,976字节保持不变，`node --check live2d/js/live2d.js`通过。本轮未改变加载、模型资源或交互逻辑，因此未重跑浏览器渲染测试。
 
 本篇于 2026-10-07 核对 `2a42534` 后形成。原生接入及服装范围决定在 2026-09-20 的项目事件中已有记录；本篇日期不表示功能首次提出或首次实现时间。本轮直接核对 enqueue 配置、两种 loader、提示委托及打包排除规则。
 

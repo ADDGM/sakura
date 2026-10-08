@@ -10,11 +10,6 @@
 define('SAKURA_VERSION', wp_get_theme()->get('Version'));
 define('BUILD_VERSION', '3');
 
-// 远程模式只作为显式兼容选项；固定到当前正式发布标签，避免跟随分支或浮动版本。
-if (!defined('SAKURA_REMOTE_RESOURCE_TAG')) {
-    define('SAKURA_REMOTE_RESOURCE_TAG', 'v3.5.0');
-}
-
 require_once dirname(__FILE__) . '/inc/release-info.php';
 
 if (!function_exists('akina_setup')):
@@ -196,20 +191,42 @@ function sakura_frontend_cache_version()
 }
 
 /**
+ * Resolve a fixed remote reference from this installation's build metadata.
+ */
+function sakura_remote_resource_ref()
+{
+    $build = sakura_release_build_info();
+    $default = preg_match('/\A[0-9a-f]{40}\z/', $build['commit']) ? $build['commit'] : '';
+    $ref = defined('SAKURA_REMOTE_RESOURCE_TAG') ? SAKURA_REMOTE_RESOURCE_TAG : $default;
+    $ref = apply_filters('sakura_remote_resource_tag', $ref);
+
+    if (!is_string($ref)) {
+        return $default;
+    }
+    $ref = trim($ref);
+    if (preg_match('/\A[0-9a-f]{40}\z/i', $ref)) {
+        return strtolower($ref);
+    }
+    if (sakura_release_is_valid_tag($ref)) {
+        return $ref;
+    }
+
+    // 无有效构建来源时使用包内资源，不推导未发布或落后的主题标签。
+    return $default;
+}
+
+/**
  * Resolve a core resource URL while preserving the legacy local/remote switches.
  */
 function sakura_core_resource_url($path, $option_key, $versioned = false)
 {
     $path = ltrim((string) $path, '/');
-    if (sakura_core_resource_is_local($option_key)) {
-        $url = get_template_directory_uri() . '/' . $path;
-    } else {
-        $tag = apply_filters('sakura_remote_resource_tag', SAKURA_REMOTE_RESOURCE_TAG);
-        $tag = preg_replace('/[^A-Za-z0-9._-]/', '', (string) $tag);
-        if ('' === $tag) {
-            $tag = SAKURA_REMOTE_RESOURCE_TAG;
+    $url = sakura_theme_asset_url($path);
+    if (!sakura_core_resource_is_local($option_key)) {
+        $ref = sakura_remote_resource_ref();
+        if ('' !== $ref) {
+            $url = 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@' . $ref . '/' . $path;
         }
-        $url = 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@' . $tag . '/' . $path;
     }
 
     if ($versioned) {

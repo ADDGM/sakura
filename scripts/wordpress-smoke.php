@@ -23,7 +23,7 @@ if (strtolower($theme->get('Name')) !== 'sakura') {
 if (!current_theme_supports('title-tag')) {
     $errors[] = '主题未启用 title-tag 支持。';
 }
-foreach (array('akina_setup', 'sakura_scripts', 'DEFAULT_FEATURE_IMAGE', 'convertip', 'push_smilies', 'get_next_thumbnail_url') as $function) {
+foreach (array('akina_setup', 'sakura_scripts', 'sakura_remote_resource_ref', 'DEFAULT_FEATURE_IMAGE', 'convertip', 'push_smilies', 'get_next_thumbnail_url') as $function) {
     if (!function_exists($function)) {
         $errors[] = "缺少主题函数：{$function}";
     }
@@ -64,9 +64,6 @@ $sourceChecks = array(
     array('inc/options-interface.php', 'class="of-radio-option"', '主题设置页普通单选控件缺少选项包装。'),
     array('inc/options-interface.php', 'class="of-multicheck-option"', '主题设置页多选控件缺少选项包装。'),
     array('inc/options-framework.php', "defined( 'SAKURA_VERSION' ) ? SAKURA_VERSION : false", '主题设置页资源未使用主题版本控制缓存。'),
-    array('inc/options-framework.php', "__( 'Clear', 'sakura' )", '颜色选择器清除标签未使用 Sakura 文本域。'),
-    array('inc/options-framework.php', "__( 'Default', 'sakura' )", '颜色选择器默认标签未使用 Sakura 文本域。'),
-    array('inc/options-framework.php', "__( 'Select Color', 'sakura' )", '颜色选择器选择标签未使用 Sakura 文本域。'),
     array('inc/options-framework.php', "__( 'Default options restored.', 'sakura' )", '恢复默认设置提示未使用 Sakura 文本域。'),
     array('inc/options-framework.php', "__( 'Options saved.', 'sakura' )", '设置保存提示未使用 Sakura 文本域。'),
     array('header.php', 'nav-default-open', '导航未使用状态类表达宽屏默认展开。'),
@@ -110,7 +107,6 @@ $sourceChecks = array(
     array('functions.php', 'sakura_dash_scheme_localize_urls', '后台配色未把已内置资源的外链改写为本地地址。'),
     array('functions.php', 'function sakura_core_resource_url', '核心资源没有统一的本地/远程 URL 解析函数。'),
     array('functions.php', 'function sakura_theme_asset_url', '主题内置资源没有统一的本地 URL 解析函数。'),
-    array('functions.php', 'SAKURA_REMOTE_RESOURCE_TAG', '远程核心资源没有固定的已发布标签。'),
     array('functions.php', 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@', '远程核心资源没有指向 ADDGM/sakura。'),
     array('functions.php', '$value = akina_option($option_key, \'1\');', '前端资源统一解析器缺少本地优先的缺省值。'),
     array('functions.php', 'return !($value === false || $value === 0 || \'0\' === (string) $value);', '前端资源统一解析器未兼容旧设置值 0。'),
@@ -120,7 +116,6 @@ $sourceChecks = array(
     array('inc/swicher.php', "sakura_core_resource_url('cdn/css/lib.css', 'jsdelivr_cdn_test', true)", '前端动态 lib.css 地址没有复用本地优先资源解析器。'),
     array('inc/swicher.php', 'sakura_frontend_cache_version()', '文章代码主题 CSS 未复用统一的前端缓存版本。'),
     array('inc/theme_plus.php', "images/loaders/orange.progress-bar-stripe-loader.svg", '页面头图加载占位图未使用主题内置资源。'),
-    array('js/sakura-app.js', 'mashiro_option.template_url + "/cdn/js/src/16.hls.js"', 'HLS 脚本仍未使用主题内置副本。'),
     array('style.css', 'background-image: url(images/comment-bg.png)', '评论框背景图未使用主题内置资源。'),
     array('footer.php', "images/wordpress-rotating-ball-o.svg", '页脚预加载图未使用主题内置资源。'),
     array('options.php', "'id' => 'jsdelivr_cdn_test',\n        'std' => '1'", '前端库设置的新安装默认值不是本地优先。'),
@@ -193,57 +188,172 @@ foreach ($sourceChecks as $check) {
     }
 }
 
-if (function_exists('sakura_core_resource_url') && function_exists('sakura_frontend_cache_version')) {
+// 颜色控件由 WordPress 提供，检查实际依赖而不是已退役的主题翻译字符串。
+if (!function_exists('optionsframework_load_styles') || !function_exists('optionsframework_load_scripts')) {
+    $errors[] = '主题设置页缺少颜色控件资源入口。';
+} else {
+    if (!function_exists('set_current_screen')) {
+        require_once ABSPATH . 'wp-admin/includes/admin.php';
+    }
+    $previousScreen = get_current_screen();
+    $previousPostType = $GLOBALS['typenow'] ?? null;
+    $previousTaxonomy = $GLOBALS['taxnow'] ?? null;
+    $optionsMenu = optionsframework_menu_settings();
+    set_current_screen('appearance_page_' . $optionsMenu['menu_slug']);
+    $scripts = wp_scripts();
+    $styles = wp_styles();
+    // WP-CLI 默认使用前台上下文，后台句柄需要按真实后台页面补注册。
+    wp_default_scripts($scripts);
+    $coreScripts = array();
+    foreach (array('jquery', 'jquery-core', 'iris', 'wp-color-picker') as $handle) {
+        if (!isset($scripts->registered[$handle])) {
+            $errors[] = "WordPress 未注册后台依赖：{$handle}。";
+        } else {
+            $coreScripts[$handle] = clone $scripts->registered[$handle];
+        }
+    }
+    $corePickerStyle = isset($styles->registered['wp-color-picker']) ? clone $styles->registered['wp-color-picker'] : null;
+    if ($corePickerStyle === null) {
+        $errors[] = 'WordPress 未注册颜色控件样式。';
+    }
+
+    optionsframework_load_styles();
+    optionsframework_load_scripts('appearance_page_' . $optionsMenu['menu_slug']);
+
+    foreach ($coreScripts as $handle => $dependency) {
+        if (!isset($scripts->registered[$handle]) || $scripts->registered[$handle] != $dependency) {
+            $errors[] = "主题设置页覆盖了 WordPress 后台依赖：{$handle}。";
+        }
+    }
+    if ($corePickerStyle !== null && (!isset($styles->registered['wp-color-picker']) || $styles->registered['wp-color-picker'] != $corePickerStyle)) {
+        $errors[] = '主题设置页覆盖了 WordPress 颜色控件样式。';
+    }
+    $optionsScript = $scripts->registered['options-custom'] ?? null;
+    if (!wp_script_is('options-custom', 'enqueued') || $optionsScript === null || !in_array('jquery', $optionsScript->deps, true) || !in_array('wp-color-picker', $optionsScript->deps, true)) {
+        $errors[] = '主题设置脚本未入队或缺少 jQuery、原生颜色控件依赖。';
+    }
+    if (!wp_style_is('wp-color-picker', 'enqueued')) {
+        $errors[] = '主题设置页未加载原生颜色控件样式。';
+    }
+    $GLOBALS['current_screen'] = $previousScreen;
+    $GLOBALS['typenow'] = $previousPostType;
+    $GLOBALS['taxnow'] = $previousTaxonomy;
+}
+foreach (array('inc/js/iris.min.js', 'inc/js/color-picker.min.js', 'inc/css/color-picker.min.css') as $retiredAsset) {
+    if (file_exists(get_template_directory() . '/' . $retiredAsset)) {
+        $errors[] = "主题包仍包含已退役的后台依赖：{$retiredAsset}。";
+    }
+}
+
+if (function_exists('sakura_core_resource_url') && function_exists('sakura_frontend_cache_version') && function_exists('sakura_remote_resource_ref')) {
     $frameworkFilter = static function ($value) {
         return array('id' => 'sakura');
     };
-    $localDefaultsFilter = static function ($value) {
-        return array();
+    $resourceOptions = array();
+    $resourceOptionsFilter = static function () use (&$resourceOptions) {
+        return $resourceOptions;
     };
-    $remoteOptionsFilter = static function ($value) {
-        return array(
-            'jsdelivr_cdn_test' => '0',
-            'app_no_jsdelivr_cdn' => '0',
-        );
+    $resourceFixtureRoot = trailingslashit(get_temp_dir()) . 'sakura-core-resources-' . wp_generate_uuid4();
+    $resourceDirectoryFilter = static function () use ($resourceFixtureRoot) {
+        return $resourceFixtureRoot;
     };
-
-    add_filter('pre_option_optionsframework', $frameworkFilter);
-    add_filter('pre_option_sakura', $localDefaultsFilter);
-    $localDefaultUrl = sakura_core_resource_url('cdn/js/lib.js', 'jsdelivr_cdn_test');
-    remove_filter('pre_option_sakura', $localDefaultsFilter);
-    add_filter('pre_option_sakura', $remoteOptionsFilter);
-    $remoteLibraryUrl = sakura_core_resource_url('cdn/js/lib.js', 'jsdelivr_cdn_test');
-    $remoteThemeUrl = sakura_core_resource_url('style.css', 'app_no_jsdelivr_cdn');
-    remove_filter('pre_option_sakura', $remoteOptionsFilter);
-
-    $remotePrefix = 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@' . (defined('SAKURA_REMOTE_RESOURCE_TAG') ? SAKURA_REMOTE_RESOURCE_TAG : '') . '/';
-
-    if (strpos($localDefaultUrl, '/wp-content/themes/sakura/cdn/js/lib.js') === false) {
-        $errors[] = '缺失旧设置值时核心资源没有回退到主题本地文件。';
-    }
-    if (strpos($remoteLibraryUrl, $remotePrefix . 'cdn/js/lib.js') !== 0) {
-        $errors[] = '旧设置值 0 没有解析到固定版本的 ADDGM 远程前端库。';
-    }
-    if (strpos($remoteThemeUrl, $remotePrefix . 'style.css') !== 0) {
-        $errors[] = '旧设置值 0 没有解析到固定版本的 ADDGM 主题 CSS。';
-    }
-
-    $cacheOptionsFilter = static function () {
-        return array('cookie_version' => 'cache-check');
-    };
-    add_filter('pre_option_sakura', $cacheOptionsFilter);
-    $cacheVersion = sakura_frontend_cache_version();
-    $versionedLocalUrl = sakura_core_resource_url('style.css', 'app_no_jsdelivr_cdn', true);
-    remove_filter('pre_option_sakura', $cacheOptionsFilter);
+    $resourcePaths = array(
+        'cdn/js/lib.js' => 'jsdelivr_cdn_test',
+        'cdn/css/lib.css' => 'jsdelivr_cdn_test',
+        'style.css' => 'app_no_jsdelivr_cdn',
+        'js/sakura-app.js' => 'app_no_jsdelivr_cdn',
+    );
+    $localPrefix = trailingslashit(get_template_directory_uri());
     $expectedCacheVersion = SAKURA_VERSION . 'cache-check';
-    if ($cacheVersion !== $expectedCacheVersion) {
-        $errors[] = '前端缓存版本函数没有合并 cookie_version。';
+    $buildCommit = str_repeat('a1', 20);
+    $overrideCommit = str_repeat('b2', 20);
+    $buildMetadata = "source_sha={$buildCommit}\nchannel=development\n";
+    $resourceCases = array(
+        array('name' => '缺失构建信息', 'metadata' => null, 'ref' => ''),
+        array('name' => '空构建信息', 'metadata' => '', 'ref' => ''),
+        array('name' => '开发构建', 'metadata' => $buildMetadata, 'ref' => $buildCommit),
+        array('name' => '正式构建优先源码提交', 'metadata' => "source_sha={$buildCommit}\nchannel=stable\ntag=v9.8.7\n", 'ref' => $buildCommit),
+        array('name' => '预发布构建', 'metadata' => "source_sha={$buildCommit}\nchannel=testing\ntag=v9.8.7-rc.1\n", 'ref' => $buildCommit),
+        array('name' => 'sha字段', 'metadata' => "sha={$buildCommit}\n", 'ref' => $buildCommit),
+        array('name' => '无源码提交的标签', 'metadata' => "tag=v9.8.7\n", 'ref' => ''),
+        array('name' => '短提交号', 'metadata' => "source_sha=a1b2c3d\n", 'ref' => ''),
+        array('name' => '非法源码提交', 'metadata' => "source_sha=develop\n", 'ref' => ''),
+        array('name' => '显式固定标签', 'metadata' => null, 'override' => 'v9.8.7', 'ref' => 'v9.8.7'),
+        array('name' => '显式Beta标签', 'metadata' => $buildMetadata, 'override' => 'v9.8.7-beta.1', 'ref' => 'v9.8.7-beta.1'),
+        array('name' => '显式RC标签', 'metadata' => $buildMetadata, 'override' => 'v9.8.7-rc.1', 'ref' => 'v9.8.7-rc.1'),
+        array('name' => '显式完整提交', 'metadata' => $buildMetadata, 'override' => strtoupper($overrideCommit), 'ref' => $overrideCommit),
+    );
+    foreach (array('', false, null, array('v9.8.7'), 'develop', 'latest', 'v9.8.7/other', 'v9.8.7?ref=other', 'a1b2c3d') as $invalidReference) {
+        $resourceCases[] = array('name' => '无效覆盖值回到构建提交', 'metadata' => $buildMetadata, 'override' => $invalidReference, 'ref' => $buildCommit);
     }
-    if (strpos($versionedLocalUrl, 'ver=' . rawurlencode($expectedCacheVersion)) === false) {
-        $errors[] = '本地核心资源 URL 没有附加统一的前端缓存版本。';
-    }
+    $resourceCases[] = array('name' => '无效覆盖且缺失构建', 'metadata' => null, 'override' => 'latest', 'ref' => '');
 
-    remove_filter('pre_option_optionsframework', $frameworkFilter);
+    if (!mkdir($resourceFixtureRoot, 0700)) {
+        $errors[] = '无法创建核心资源构建信息的隔离夹具。';
+    } else {
+        $resourceMetadataFile = $resourceFixtureRoot . '/build-info.txt';
+        $referenceFilter = null;
+        add_filter('pre_option_optionsframework', $frameworkFilter);
+        add_filter('pre_option_sakura', $resourceOptionsFilter);
+        add_filter('template_directory', $resourceDirectoryFilter);
+        try {
+            foreach ($resourceCases as $resourceCase) {
+                if (null === $resourceCase['metadata']) {
+                    if (file_exists($resourceMetadataFile) && !unlink($resourceMetadataFile)) {
+                        $errors[] = '无法移除核心资源测试自身的构建信息夹具。';
+                        break;
+                    }
+                } elseif (false === file_put_contents($resourceMetadataFile, $resourceCase['metadata'])) {
+                    $errors[] = '无法写入核心资源构建信息夹具。';
+                    break;
+                }
+                if (array_key_exists('override', $resourceCase)) {
+                    $referenceFilter = static function () use ($resourceCase) {
+                        return $resourceCase['override'];
+                    };
+                    add_filter('sakura_remote_resource_tag', $referenceFilter);
+                }
+                foreach (array(null, '1', false, 0, '0') as $resourceChoice) {
+                    $resourceOptions = array('cookie_version' => 'cache-check');
+                    if (null !== $resourceChoice) {
+                        $resourceOptions['jsdelivr_cdn_test'] = $resourceChoice;
+                        $resourceOptions['app_no_jsdelivr_cdn'] = $resourceChoice;
+                    }
+                    $expectRemote = in_array($resourceChoice, array(false, 0, '0'), true) && '' !== $resourceCase['ref'];
+                    $expectedPrefix = $expectRemote ? 'https://cdn.jsdelivr.net/gh/ADDGM/sakura@' . $resourceCase['ref'] . '/' : $localPrefix;
+                    foreach ($resourcePaths as $resourcePath => $resourceOptionKey) {
+                        if (sakura_core_resource_url($resourcePath, $resourceOptionKey) !== $expectedPrefix . $resourcePath) {
+                            $errors[] = '核心资源来源不符合构建与选项：' . $resourceCase['name'] . ' / ' . $resourcePath;
+                        }
+                        $expectedVersionedUrl = $expectedPrefix . $resourcePath . '?ver=' . rawurlencode($expectedCacheVersion);
+                        if (sakura_core_resource_url($resourcePath, $resourceOptionKey, true) !== $expectedVersionedUrl) {
+                            $errors[] = '核心资源缓存版本或来源错误：' . $resourceCase['name'] . ' / ' . $resourcePath;
+                        }
+                    }
+                }
+                if (null !== $referenceFilter) {
+                    remove_filter('sakura_remote_resource_tag', $referenceFilter);
+                    $referenceFilter = null;
+                }
+            }
+            if (sakura_frontend_cache_version() !== $expectedCacheVersion) {
+                $errors[] = '前端缓存版本函数没有合并 cookie_version。';
+            }
+        } finally {
+            if (null !== $referenceFilter) {
+                remove_filter('sakura_remote_resource_tag', $referenceFilter);
+            }
+            remove_filter('template_directory', $resourceDirectoryFilter);
+            remove_filter('pre_option_sakura', $resourceOptionsFilter);
+            remove_filter('pre_option_optionsframework', $frameworkFilter);
+            if (file_exists($resourceMetadataFile) && !unlink($resourceMetadataFile)) {
+                $errors[] = '无法清理核心资源构建信息夹具。';
+            }
+            if (!rmdir($resourceFixtureRoot)) {
+                $errors[] = '无法清理核心资源夹具目录。';
+            }
+        }
+    }
 }
 
 // 旧的动态配色端点必须彻底移除：它无鉴权且直接回显查询参数，构成反射型 CSS 注入。
