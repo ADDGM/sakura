@@ -23,7 +23,6 @@ mashiro_global.ini = new function () {
         social_share();
         post_list_show_animation();
         copy_code_block();
-        coverVideoIni();
         checkskinSecter();
         load_bangumi();
     }
@@ -2086,8 +2085,7 @@ $(function () {
         $(document).pjax('a[target!=_top]', '#page', {
             fragment: '#page',
             timeout: 8000,
-        }).on('pjax:beforeSend', () => { //离开页面停止播放
-            destroyCoverHls();
+        }).on('pjax:beforeReplace', destroyCoverHls).on('pjax:beforeSend', () => { //离开页面停止播放
             $('.normal-cover-video').each(function () {
                 this.pause();
                 this.src = '';
@@ -2115,6 +2113,7 @@ $(function () {
                 }
             }
         }).on('pjax:end', function() {
+            coverVideoIni();
             if (window.gtag){
                 gtag('config', Poi.google_analytics_id, {
                     'page_path': window.location.pathname

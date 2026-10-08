@@ -9,6 +9,8 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const source = read('js/sakura-app.js');
 const coverSource = source.slice(source.indexOf('/*视频feature*/'), source.indexOf('function copy_code_block()'));
 const playerSource = source.match(/if \(mashiro_option.float_player_on\) \{[\s\S]+?    aplayerF\(\);\r?\n\}/)[0];
+const initSource = source.slice(source.indexOf('mashiro_global.ini ='), source.indexOf('function setCookie('));
+const navigationSource = source.slice(source.indexOf('$(document).pjax('), source.indexOf("window.addEventListener('popstate'"));
 // Exercise the bundled player's real type detection and HLS/native fallback.
 const setAudioSource = read('cdn/js/src/07.APlayer.min.js').match(/key:"setAudio",value:(function\(e\)\{[\s\S]+?)\},\{key:"theme"/)[1];
 
@@ -99,6 +101,28 @@ function harness({dataset = {url: '/song.mp3'}, cover = false, loading = false} 
         context.Hls.Events = {MANIFEST_PARSED: 'manifestParsed'};
     }
     return {context, container, video, dom, requests, apiRequests, players, streams, warnings, ready, installHls};
+}
+
+function pjaxLifecycle(env) {
+    const handlers = new Map();
+    const chain = env.context.$();
+    chain.length = 0;
+    chain.pjax = chain.css = chain.fadeOut = chain.each = () => chain;
+    chain.on = (event, ...args) => {
+        if (!handlers.has(event)) handlers.set(event, []);
+        handlers.get(event).push(args.at(-1));
+        return chain;
+    };
+    for (const name of ['lazyload', 'social_share', 'post_list_show_animation', 'copy_code_block',
+        'checkskinSecter', 'scrollBar', 'load_bangumi', 'pjaxInit']) {
+        env.context[name] = () => {};
+    }
+    env.context.Siren = {AH() {}, PE() {}, CE() {}, MNH() {}};
+    // Run the real initialization and event bindings; unrelated UI has no role in this lifecycle.
+    vm.runInContext(initSource + '\n' + navigationSource, env.context);
+    return event => {
+        for (const handler of handlers.get(event) || []) handler.call(env.context.document);
+    };
 }
 
 test('ordinary audio initializes immediately without requesting HLS', () => {
@@ -241,6 +265,86 @@ test('native HLS fallback works for both bundled APlayer and cover', async () =>
     assert.equal(env.video.loads, 1);
     assert.equal(env.video.src, undefined);
     assert.equal(env.video.listeners.loadedmetadata, undefined);
+});
+
+test('AJAX PJAX navigation replaces the outgoing HLS cover exactly once', () => {
+    const env = harness({cover: true});
+    env.installHls();
+    const emit = pjaxLifecycle(env);
+    env.context.mashiro_global.ini.normalize();
+    const previous = env.streams[0];
+    emit('pjax:beforeSend');
+    emit('pjax:send');
+    emit('pjax:beforeReplace');
+    assert.equal(previous.destroyed, true);
+    env.video.connected = false;
+    const replacement = {...env.video, connected: true, listeners: {}};
+    env.dom.cover = replacement;
+    emit('pjax:success');
+    emit('pjax:complete');
+    emit('pjax:end');
+    assert.equal(env.streams.length, 2);
+    assert.equal(env.streams[1].media, replacement);
+    assert.equal(env.streams.filter(stream => !stream.destroyed).length, 1);
+    previous.events.manifestParsed();
+    assert.equal(env.video.plays, 0);
+    env.streams[1].events.manifestParsed();
+    assert.equal(replacement.plays, 1);
+});
+
+test('cached PJAX history releases the old cover and recreates it on return', () => {
+    const env = harness({cover: true});
+    env.installHls();
+    const emit = pjaxLifecycle(env);
+    env.context.mashiro_global.ini.normalize();
+    // jquery-pjax cache hits emit start/beforeReplace/end, without Ajax send/complete events.
+    emit('pjax:start');
+    emit('pjax:beforeReplace');
+    assert.equal(env.streams[0].destroyed, true);
+    env.video.connected = false;
+    env.dom.cover = null;
+    emit('pjax:end');
+    assert.equal(env.streams.filter(stream => !stream.destroyed).length, 0);
+
+    emit('pjax:start');
+    emit('pjax:beforeReplace');
+    env.video.connected = true;
+    env.dom.cover = env.video;
+    emit('pjax:end');
+    assert.equal(env.streams.length, 2);
+    assert.equal(env.streams[1].media, env.video);
+    env.streams[1].events.manifestParsed();
+    assert.equal(env.video.plays, 1);
+    assert.equal(env.requests.length, 0);
+});
+
+test('cached PJAX history detaches and restores native HLS with one metadata handler', () => {
+    const env = harness({cover: true});
+    env.installHls({supported: false});
+    const emit = pjaxLifecycle(env);
+    env.context.mashiro_global.ini.normalize();
+    const previousHandler = env.video.listeners.loadedmetadata;
+    emit('pjax:start');
+    emit('pjax:beforeReplace');
+    assert.equal(env.video.src, undefined);
+    assert.equal(env.video.listeners.loadedmetadata, undefined);
+    assert.equal(env.video.pauses, 1);
+    assert.equal(env.video.loads, 1);
+    env.video.connected = false;
+    env.dom.cover = null;
+    emit('pjax:end');
+    previousHandler();
+    assert.equal(env.video.plays, 0);
+
+    emit('pjax:start');
+    emit('pjax:beforeReplace');
+    env.video.connected = true;
+    env.dom.cover = env.video;
+    emit('pjax:end');
+    assert.equal(env.video.src, '/cover.m3u8');
+    assert.notEqual(env.video.listeners.loadedmetadata, previousHandler);
+    env.video.listeners.loadedmetadata();
+    assert.equal(env.video.plays, 1);
 });
 
 test('the shipped HLS runtime exposes the APIs used by both consumers', () => {
