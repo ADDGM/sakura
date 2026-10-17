@@ -20,6 +20,8 @@ Status: implemented
 
 部署回归需写清版本、入口、登录状态、视口及网络条件。动态漂亮链接落到Nginx错误页时先区分服务器路由和主题404；实际图片上传需要独立验证，不能由前端布局或模拟接口通过来推定。
 
+分类图片初始化的[独立回归](../../../../scripts/tests/categories-images.php)使用PHP进程加载真实模块，仅替代WordPress选项读取和钩子注册接口。测试把包括弃用提示在内的PHP诊断作为失败，检查缺失/非数组配置的回退、有效排除列表的钩子行为，以及初始化不写回选项；接入既有三版本PHP构建检查。它补充WP-CLI smoke未触发的后台初始化路径，不代表真实后台心跳或数据库集成已经复验。
+
 ## Existing record audit
 
 与[Live2D边界验证](2026-10-07-live2d-deployed-boundaries.md)、[正式发布](../process/2026-10-07-stable-release.md)部分重叠，保留各自模块/版本证据；本篇提炼通用验证边界。旧中文提交类型已由[提交规范](../process/2026-10-07-commit-policy.md)替代，不沿用总计划的旧格式。历史smoke与MO故障、Beta/RC验收在本篇保留结论和覆盖范围。
@@ -30,6 +32,7 @@ Status: implemented
 - 只做PHP8.2静态检查：原草稿范围较小、执行成本低，但覆盖不到其他目标PHP和WordPress运行时；当前采用三PHP、六组WordPress矩阵，再按变更补实际场景。
 - 复用任何工具生成的MO：历史出现“文件可反编译但二进制不一致”的失败，当前要求使用仓库编译器及同步检查。
 - 仅删除升级后失效的四条源码断言：能消除误报，但后台原生依赖会缺少对应保护，因此以真实WordPress资源注册与依赖检查接管；HLS地址复用已有行为测试，不再增加重复字符串匹配。
+- 仅在完整WordPress smoke中验证分类图片初始化：能覆盖宿主真实选项API，但需准备数据库且原smoke没有触发后台初始化。该缺陷可由真实模块接收`false`直接复现，因此增加无外部依赖的行为回归；实际部署后的后台日志仍须独立核对。
 
 ## Consequences
 
@@ -52,6 +55,26 @@ WordPress7.1/PHP8.2的两个反向检查分别在临时主题副本中移除`opt
 SQLite插件要求至少3.37.0，下载的PHP8.0/8.1默认库分别为3.33.0/3.36.0，最初无法初始化数据库。本轮仅在这两个隔离运行时中备份并换入PHP8.2.33分发的SQLite3.53.2，实际版本探针通过；没有改全局PHP或把SQLite作为主题依赖。WordPress初次整包下载被截断，未通过ZIP校验；从官方`downloads.wordpress.org/release/`分段获取后核对每段范围、总长度及CRC，才用于测试。
 
 六组结果不代替Linux/MySQL的GitHub CI，也不覆盖真实Safari、正式包部署或远程核心资源同步。当时远程标签仍为v3.5.0；2026-10-09的[构建资源引用](../architecture/2026-10-09-core-resource-build-reference.md)接管默认来源，记录新增的资源回归、六组矩阵和反向检查。运行时边界由[核心资源契约](../architecture/2026-10-07-core-resource-policy.md)持有；[质量检查](../process/2026-10-07-quality-workflow-boundary.md#local-dependency-validation-2026-10-08)另行记录规则覆盖限制。
+
+## Category image initialization 2026-10-12
+
+后台`admin_init`在`zci_options`缺失时得到`false`，原[分类图片模块](../../../../inc/categories-images.php)随即向它写入`excluded_taxonomies`，触发PHP弃用警告。读取后对选项容器和排除列表分别检查`is_array`，非法形状仅在本次请求中回退为空数组；有效列表与旧配置均保持原值，不写回数据库。只给`get_option`增加默认数组虽然能处理缺失记录，却不能覆盖已保存的`false`或其他非数组值，因此采用读取边界检查。
+
+PHP8.2.33运行正式回归，修复前15例中6例失败：缺失/false配置复现相同弃用警告，字符串/对象配置与排除列表触发类型错误；修复后15例全部通过，内置/自定义分类的四类字段和列表钩子、全排除、未知排除及不改写原值均满足断言。两个修改相关PHP文件通过语法检查。首次夹具曾用`function_exists`检测已加载WordPress，却被本文件提前声明的替身命中而退出；去掉该检查后才取得上述修复前后结果。
+
+新增测试已接入PHP8.0/8.1/8.2的CI配置，本地阶段实际仅运行PHP8.2.33；没有重建已清理的WordPress环境或重跑六组矩阵。封面验收期间的共用日志污染与最终矩阵结果保留其历史边界。
+
+2026-10-12维护者安装修复快照后，WordPress7.1.3/PHP8.2.33（FPM、Nginx）实站后台文件编辑器中的分类图片源码与本地修复逐字符一致，比较前仅统一CRLF/LF；没有通过编辑器保存源码。分类/标签管理页的图片字段与图像列、既有分类编辑页的图片输入、预览和添加/删除按钮均正常显示，浏览器未捕获error/warn；没有保存分类或全站设置。站点健康显示`WP_DEBUG`和`WP_DEBUG_LOG`关闭，服务器PHP日志与心跳响应未读取；维护者确认没有日志入口并接受按现有证据收尾，不将页面无提示解释为日志无警告。快照ZIP与校验文件在安装验收后清理，保留来源与验证结论。
+
+## Login header compatibility 2026-10-15
+
+2026-10-13隔离登录页记录到主题注册`login_headertitle`引起的弃用提示。WordPress自5.2起推荐[login_headertext](https://developer.wordpress.org/reference/hooks/login_headertext/)，用于登录页Logo链接的文本；[旧钩子](https://developer.wordpress.org/reference/hooks/login_headertitle/)仍经过弃用分派。[login_header源码](https://developer.wordpress.org/reference/functions/login_header/)先兼容旧钩子，再应用新钩子，最后直接输出链接文本。
+
+[主题回调](../../../../functions.php)改为注册`login_headertext`，并使用`esc_html`转义站点名称；保留回调名和既有`login_headerurl`首页链接。只移除品牌回调虽然最简单，但会丢失站点名称；保留旧钩子并屏蔽诊断也无法解决弃用根因。主题最低WordPress7.0已覆盖新接口，不增加旧版本分支。此次只处理该钩子及文本输出上下文，登录页脚本和验证逻辑留在各自范围。
+
+PHP8.2.33对`functions.php`语法检查通过；将本次三行改动在内存中还原后，文件SHA-256与上一轮交付清单一致，确认保留了既有未提交工作。本地阶段依据官方接口与源码核对注册和输出上下文，没有为这个局部替换重建WordPress或新增重复注册断言，也未将静态检查表述为运行时日志已经消警。
+
+2026-10-15维护者手动安装后，后台主题编辑器只读取得的`functions.php`在统一换行后与工作副本逐字符一致，新钩子和文本转义存在，旧钩子注册不存在；主题管理页确认该目录已启用。真实登录页的Logo链接文本为站点名称，链接跳转到本站首页，用户名/密码输入框、登录按钮、既有滑块及页面样式正常呈现。浏览器捕获error/warn为空，页面没有可见PHP警告；服务器日志无入口，仍未验证服务端日志完全无警告。没有提交登录信息、操作滑块或退出已有会话，此项不代表完整认证流程回归。安装验收完成后快照ZIP及校验文件已清除，保留来源、检查结果和截图。
 
 ## Historical fixture lessons
 

@@ -52,6 +52,9 @@ jobs:
           php scripts/compile-translations.php --self-test
           php scripts/compile-translations.php --check
 
+      - name: Test category image initialization
+        run: php scripts/tests/categories-images.php
+
       - name: Check frontend JavaScript
         shell: bash
         run: |

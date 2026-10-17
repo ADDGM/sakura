@@ -1112,12 +1112,12 @@ function custom_login()
 
 add_action('login_head', 'custom_login');
 
-//Login Page Title
+//Login Page Logo Text
 function custom_headertitle($title)
 {
-    return get_bloginfo('name');
+    return esc_html(get_bloginfo('name'));
 }
-add_filter('login_headertitle', 'custom_headertitle');
+add_filter('login_headertext', 'custom_headertitle');
 
 //Login Page Link
 function custom_loginlogo_url($url)
