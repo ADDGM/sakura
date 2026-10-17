@@ -14,6 +14,8 @@ WordPress登录后省略匿名字段，旧主题却依赖这些字段闭合容�
 
 提交按钮使用专用submit-comment-tips容器及提示样式；通用popup不能控制它的display布局。上传选择与主题既有接口保持原契约；本篇不将前端文件数量/大小限制视为服务端安全校验。
 
+评论回复直接使用当前data属性和委托事件；WordPress5.1分支及`Poi.reply_link_version`于2026-10-15随[运行基线清理](../architecture/2026-10-15-supported-runtime-cleanup.md)移除。本篇的表单结构和上传幂等规则保持有效，前台jQuery版本由[jQuery4迁移](../architecture/2026-10-08-jquery4-and-plugin-migration.md)持有。
+
 ## Existing record audit
 
 活跃笔记未覆盖评论表单初始化；三个评论修复计划按同一表单边界提炼。[兼容性验证](../testing/2026-10-07-compatibility-evidence.md)持有登录态和视口验证层级，[后台设置](../architecture/2026-10-07-admin-settings-boundary.md)承接原混合计划中的radio部分，本篇不复制它们。
@@ -26,8 +28,10 @@ WordPress登录后省略匿名字段，旧主题却依赖这些字段闭合容�
 
 ## Consequences
 
-重复初始化可重用当前控件，提交与选择图片的命中区域分离；代价是仍需维护旧jQuery/PJAX及comment_form扩展。这是当前单评论表单的实现，不代表任意多个表单的全页面幂等保证，也不证明第三方上传API可用。
+重复初始化可重用当前控件，提交与选择图片的命中区域分离；代价是仍需维护jQuery/PJAX及comment_form扩展。这是当前单评论表单的实现，不代表任意多个表单的全页面幂等保证，也不证明第三方上传API可用。
 
 ## Verification
 
 2026-10-07按 `2a42534` 核对匿名字段分组、专用提交容器、节点复用与事件委托。Beta.4记录有登录/匿名、桌面/390px和按钮区域复验；实际图床上传当时未测，仍需另行验证。本轮没有提交评论或上传文件，成文日不推定旧修复的首次提出日。
+
+2026-10-15在WordPress7.1/PHP8.2.33/SQLite隔离站中，评论展开、回复时表单移动及取消回复通过。未提交评论或上传文件；没有把本次桌面交互表述为移动端或外部图床验收。

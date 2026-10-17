@@ -10,6 +10,8 @@ Status: implemented
 
 [functions.php](../../../../functions.php)在 admin_init 注册 sakura/custom，保留用户资料 admin_color 标识。两种配色共用[静态CSS](../../../../inc/css/dash-scheme.css)，主题版本使用 sv 参数；颜色和Custom规则由内联CSS承载，不再进入资源URL。已保存方案与预览共用 sakura_dash_scheme_css()。
 
+无运行时引用的 `inc/css/dashboard-light.css` 已于2026-10-15随[当前运行基线清理](2026-10-15-supported-runtime-cleanup.md)退役；当前 `dash-scheme.css`、配色标识和已保存配置保持本篇契约。
+
 Custom七个颜色读取旧设置键，经 sanitize_hex_color() 校验并回退统一预设；可读前景色按背景对比度计算。源码内置默认CSS始终加载，附加字段的空值、纯注释或精确历史默认值按空附加规则处理；其他自定义CSS经去HTML标签及已知资源URL映射后追加。该处理不是任意CSS安全沙箱。
 
 只映射已具备本地副本的旧樱花与Win10背景地址，分别指向 dash-sakura-bg.webp 和 Custom.jpg，覆盖HTTP、HTTPS及协议相对写法；不重写用户数据库。当前默认效果与附加覆盖分开维护，不把历史“保留失效外链”当作最终决定。
@@ -25,6 +27,8 @@ Custom七个颜色读取旧设置键，经 sanitize_hex_color() 校验并回退�
 WordPress 3.5以前的后备注册与主题内`inc/js/iris.min.js`、`inc/js/color-picker.min.js`、`inc/css/color-picker.min.css`退役。维护者于2026-10-08批准的依赖分批升级包括移除仅为旧库保留的路径；当前最低WordPress版本已经提供这些原生组件，无需保留2012年的副本。宿主提供的具体版本随WordPress维护，不把前台升级解释为自动升级服务器上的WordPress。
 
 ## Existing record audit
+
+逐文章的图片/视频选择由[封面编辑面板](../feature/2026-10-11-post-cover-editor.md)负责，复用宿主媒体库和编辑器兼容层，不进入Options Framework全站配置。
 
 创建前检索配色、Options Framework、存储及翻译，现有看板娘标签笔记只有分组契约，部分重叠并互链；[核心资源](2026-10-07-core-resource-policy.md)持有全站资源来源，本篇只负责后台渲染。原配色、语义化、国际化和早期radio修复归并到这里，间距微调保留历史。
 

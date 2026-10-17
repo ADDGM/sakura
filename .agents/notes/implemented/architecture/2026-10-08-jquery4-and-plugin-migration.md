@@ -10,6 +10,8 @@ Status: implemented
 
 维护者于2026-10-08批准分批升级，本篇持有第二批实现。前台使用jQuery完整UMD 4.0.0、jquery-pjax 2.0.1、当前GPL发行包`@fancyapps/fancybox`的最新3.5.7。APlayer保持最新1.10.1，HLS首批结果见[HLS实现](2026-10-08-hls-loading-and-upgrade.md)。
 
+独立登录页的jQuery1.9、背景脚本与旧SliderUnlock已于2026-10-15由[运行基线清理](2026-10-15-supported-runtime-cleanup.md)接管，登录和前台注册共享原生滑块。本篇仍持有前台合并包及插件补丁；WordPress宿主自己的jQuery/Migrate由宿主管理，主题不覆写它们。
+
 1. 固定npm发行包经SHA-512 integrity核验。jQuery为官方完整UMD，保留Ajax、Deferred等必需模块；独立文件和实际合并包同步，附带MIT许可。
 2. PJAX/Fancybox的已删除jQuery调用改为原生类型判断、Array.isArray和字符串trim。Fancybox的DOM/jQuery内容对象与普通参数对象分别判断；动画时间接受有限数字及数字字符串。`jQuery`对象上不恢复旧方法，不引入Migrate。[固定源补丁脚本](../../../../scripts/vendor/jquery4.cjs)保留每项修改，并拒绝哈希或预期匹配数量不同的上游源码。
 3. [主题脚本](../../../../js/sakura-app.js)的QQ字段在读取时统一trim，不再调用`$.trim`。合并包只替换三个已核对的唯一组件片段，屏蔽这些片段后其余字节保持完全一致。Fancybox独立CSS已与3.5.7官方文件逐字节相同，因此本批没有更换CSS。

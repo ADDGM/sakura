@@ -19,6 +19,14 @@ python scripts/tests/commit-policy.py php
 
 核心资源检查使用独立临时目录中的构建信息，覆盖完整源码提交、缺失或无效来源、显式固定版本覆盖、旧本地/远程开关与缓存参数。检查读取真实构建解析函数，完成后恢复过滤器并清理自身夹具，不请求CDN；发布后的远程文件仍需单独核对，见[构建资源引用](../../.agents/notes/implemented/architecture/2026-10-09-core-resource-build-reference.md)。
 
+## 分类图片后台初始化
+
+```bash
+php scripts/tests/categories-images.php
+```
+
+独立PHP进程加载真实`inc/categories-images.php`，以内存选项和钩子替身覆盖未保存配置、非数组配置、有效/无效排除列表及内置/自定义分类注册。弃用提示等PHP诊断直接使测试失败，并检查初始化不写回选项。无需WordPress、数据库或下载依赖，CI在PHP8.0/8.1/8.2构建矩阵中执行；不替代实站后台心跳与日志验收。
+
 ## 前台依赖一致性
 
 ```bash
@@ -37,12 +45,43 @@ node --test scripts/tests/hls.test.cjs
 
 测试执行内置APlayer真实`setAudio`，覆盖无HLS封面的音频、后续HLS曲目、显式normal类型、重复初始化、封面销毁和原生回退。媒体元素与网络为隔离模拟；新版库仍须用实际浏览器验证音频/视频解码、worker和站点交互，模拟原生支持不代表Safari验收。已完成范围见[HLS维护笔记](../../.agents/notes/implemented/architecture/2026-10-08-hls-loading-and-upgrade.md)。
 
+## 首页背景视频
+
+```bash
+node --test scripts/tests/home-video.test.cjs
+```
+
+执行真实首页控制器和PJAX事件接线，覆盖MP4/WebM直连、HLS共享库请求与原生回退、加载失败重试、用户暂停、切换、超时、过期回调和两轮历史恢复。WordPress smoke另验证完整链接与查询参数、专用保存清洗、非法值保留、空列表回退及旧相对目录。状态测试使用模拟媒体，三格式解码与Safari须单独运行浏览器验收；不能把离线接口探针当作播放结果。
+
+## 文章封面编辑
+
+```bash
+node --test scripts/tests/post-cover.test.cjs
+```
+
+执行完整表单脚本，模拟宿主DOM/store与已解析响应，使用真实Response/FormData验证同页A→B→A、未修改字段保值、保存中继续编辑、旧非法值修正后再校验、请求隔离、失败提示和响应缺失时的保存锁。真实WordPress保存响应HTML解析与经典/区块编辑器交互仍须浏览器验收；该测试已由CI现有`*.test.cjs`入口自动覆盖。
+
+`wordpress-smoke.php`调用`post-cover.php`，在真实WordPress保存钩子中验证文章/页面类型切换、旧值保留、自定义字段并行编辑、nonce与权限、非法输入、修订、缺字段及写入失败提示。测试恢复请求、用户和重定向过滤器，并清理自身草稿；媒体库选图和经典/区块编辑器实际保存需要浏览器验收。选择图片沿用原生特色图片面板，详细契约见[封面编辑器笔记](../../.agents/notes/implemented/feature/2026-10-11-post-cover-editor.md)。
+
+## 登录与前台注册滑块
+
+```bash
+node --test scripts/tests/verification.test.cjs
+```
+
+执行真实原生脚本，覆盖表单隔离、未完成拦截、完成后隐藏字段不提交、指针取消/释放复位、键盘累积、重复初始化和 PJAX 新表单重置。该测试由现有 CI 的 `*.test.cjs` 自动执行；真实登录、注册及浏览器原生 range 交互仍需单独验收，客户端滑块不替代服务端认证。
+
+## 音乐接口签名
+
+完整 WordPress smoke 自动执行 `music-api.php`：在内存选项和 Transient 过滤器中提供无网络夹具，运行真实 Aplayer 和请求处理器，覆盖四类有效签名、旧 nonce/混合请求拒绝、参数不匹配、过期、服务失败、缓存头及资源签名生成。检查结束恢复过滤器，不写数据库音乐配置。旧 nonce 退役后需刷新旧页面及静态缓存，其他接口的 REST nonce 保持；真实音乐平台播放需另验。
+
 ## Live2D 回归
 
-无需第三方依赖的 loader、翻译键和模型资源检查：
+无需第三方依赖的 loader、翻译键、模型资源与换装行为检查：
 
 ```bash
 node --test scripts/tests/live2d.test.cjs
+node --test scripts/tests/live2d-costume.test.cjs
 ```
 
 浏览器回归是按需运行的局部夹具，需要Playwright、Chromium兼容浏览器和与内置运行时一致的APlayer 1.10.1基础样式。克隆仓库不包含这些外部依赖，应在需要复测时准备：
@@ -58,6 +97,8 @@ node scripts/tests/live2d-browser.cjs
 测试启动仅监听 `127.0.0.1` 的临时 HTTP 服务，使用仓库中的 Live2D、jQuery、APlayer 和播放器初始化代码，覆盖布局、鼠标/触摸拖动、位置恢复、键盘、重置、提示、860/861px 边界及 WebGL 渲染。远程换装使用本地 PNG 模拟接口响应，不访问第三方换装服务。
 
 固定页头和 WordPress 管理栏夹具验证边缘位置的控件仍可点击，包含历史位置恢复、拖动、键盘、缩放和页头移出屏幕后返回。延迟纹理响应的用例验证模型初始化前点击不会抛异常，随后仍能正常渲染。内置 Cubism 2 的 `hitTestSimpleCustom` 保留就绪状态及坐标数组保护；替换运行时时应保留该修复或确认上游已解决，并运行此回归。
+
+换装单测覆盖就绪和单套守卫、本地不立即重复、忙碌时阻止重复请求、图片错误/超时/上传失败回收、模型变化与远程查询参数。浏览器执行Tia/Pio各六次切换、键盘Enter、404恢复及模拟远程PNG两次切换，检查模型和Canvas保持单实例、旧GPU纹理释放、没有模型/动作重载。缓存命中不要求额外网络请求；本地模拟接口不能证明第三方返回不同衣服或具备CORS。实现边界见[换装笔记](../../.agents/notes/implemented/feature/2026-10-17-live2d-costume-button.md)。
 
 播放器收起回归保留真实歌词显示，不手动隐藏歌词或强制重算；覆盖默认/自定义位置恢复、歌词窗口外与空白文本、实际文字重叠，以及歌词显示和播放进度事件驱动的避让更新。
 
