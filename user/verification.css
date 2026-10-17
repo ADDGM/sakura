@@ -1,0 +1,64 @@
+.sakura-verification {
+    margin: 1em auto;
+    max-width: 300px;
+}
+
+.sakura-verification-track {
+    position: relative;
+    height: 46px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #ffb0a1 var(--sakura-verification-progress, 0%), #eee 0);
+}
+
+.sakura-verification-label {
+    display: block;
+    padding: 0 46px;
+    color: #585858;
+    font: 13px/46px "Microsoft Yahei", sans-serif;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.sakura-verification input.sakura-verification-range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 46px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    appearance: none;
+    cursor: ew-resize;
+    touch-action: pan-y;
+}
+
+.sakura-verification-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 46px;
+    height: 46px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.sakura-verification-range::-moz-range-thumb {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.sakura-verification-range:focus-visible {
+    outline: 2px solid #d43e3e;
+    outline-offset: 3px;
+}
+
+.sakura-verification-range:disabled {
+    visibility: hidden;
+}
+
+.login .sakura-verification {
+    margin: 1em 35px;
+}

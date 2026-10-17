@@ -172,12 +172,10 @@ try {
     code_highlight_style();
 } catch (e) {}
 
-if (Poi.reply_link_version == 'new') {
-    $('body').on('click', '.comment-reply-link', function () {
-        addComment.moveForm("comment-" + $(this).attr('data-commentid'), $(this).attr('data-commentid'), "respond", $(this).attr('data-postid'));
-        return false;
-    });
-}
+$('body').on('click', '.comment-reply-link', function () {
+    addComment.moveForm("comment-" + $(this).attr('data-commentid'), $(this).attr('data-commentid'), "respond", $(this).attr('data-postid'));
+    return false;
+});
 
 function attach_image() {
     var cached = $('.insert-image-tips').first();
@@ -1058,7 +1056,7 @@ if (mashiro_option.float_player_on) {
                     });
                     notifyLive2DPlayerLayout();
                 }
-                var b = mashiro_option.meting_api_url + '?server=:server&type=:type&id=:id&_wpnonce=' + Poi.nonce;
+                var b = mashiro_option.meting_api_url;
                 'undefined' != typeof meting_api && (b = meting_api);
                 for (var f = 0; f < aplayers.length; f++) try {
                     aplayers[f].destroy()
@@ -2255,6 +2253,7 @@ $(function () {
                 }
             }
         }).on('pjax:end', function() {
+            if (window.SakuraVerification) window.SakuraVerification.init();
             coverVideoIni();
             Siren.PE();
             if (homeVideo) homeVideo.enter($('h1.main-title').length > 0);

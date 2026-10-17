@@ -21,17 +21,7 @@ function sakura_rest_nonce_is_valid(WP_REST_Request $request) {
     return is_string($nonce) && wp_verify_nonce(sanitize_text_field($nonce), 'wp_rest');
 }
 
-function sakura_meting_nonce_is_valid(WP_REST_Request $request, $type, $id) {
-    $meting_nonce = $request->get_param('meting_nonce');
-    if ($meting_nonce !== null && $meting_nonce !== '') {
-        return is_string($meting_nonce)
-            && wp_verify_nonce(sanitize_text_field($meting_nonce), $type . '#:' . $id);
-    }
-
-    return sakura_rest_nonce_is_valid($request);
-}
-
-function sakura_meting_legacy_request_present(WP_REST_Request $request) {
+function sakura_meting_has_nonce(WP_REST_Request $request) {
     $meting_nonce = $request->get_param('meting_nonce');
     $wp_nonce = $request->get_param('_wpnonce');
     $header_nonce = $request->get_header('X-WP-Nonce');
@@ -417,14 +407,10 @@ function meting_aplayer(WP_REST_Request $request) {
     $id = sanitize_text_field((string) $request->get_param('id'));
     $server = sanitize_key((string) $request->get_param('server'));
     $music_token = sanitize_text_field((string) $request->get_param('music_token'));
-    $legacy_request_present = sakura_meting_legacy_request_present($request);
-    $public_request = $music_token !== ''
-        && !$legacy_request_present
+    $authorized = $music_token !== ''
+        && !sakura_meting_has_nonce($request)
         && sakura_meting_token_is_valid($music_token, $type, $id, $server);
-    $legacy_request = $type === 'playlist'
-        ? sakura_rest_nonce_is_valid($request)
-        : sakura_meting_nonce_is_valid($request, $type, $id);
-    if ($type === '' || $id === '' || !in_array($type, array('playlist', 'url', 'pic', 'lyric'), true) || (!$public_request && !$legacy_request)) {
+    if ($type === '' || $id === '' || !in_array($type, array('playlist', 'url', 'pic', 'lyric'), true) || !$authorized) {
         $output = array(
             'status' => 403,
             'success' => false,
@@ -456,14 +442,10 @@ function meting_aplayer(WP_REST_Request $request) {
                 return $response;
             }
             $response = new WP_REST_Response($data, 200);
-            $response->set_headers($public_request
-                ? sakura_meting_public_cache_headers($type)
-                : sakura_meting_no_cache_headers());
+            $response->set_headers(sakura_meting_public_cache_headers($type));
         } elseif ($type === 'lyric') {
             $response = new WP_REST_Response(null, 200);
-            $response->set_headers(array_merge($public_request
-                ? sakura_meting_public_cache_headers($type)
-                : sakura_meting_no_cache_headers(), array(
+            $response->set_headers(array_merge(sakura_meting_public_cache_headers($type), array(
                 'content-type' => 'text/plain; charset=UTF-8',
             )));
             echo is_string($data) ? $data : '';
@@ -479,9 +461,7 @@ function meting_aplayer(WP_REST_Request $request) {
             }
             $response = new WP_REST_Response();
             $response->set_status(301);
-            $response->set_headers($public_request
-                ? sakura_meting_public_cache_headers($type)
-                : sakura_meting_no_cache_headers());
+            $response->set_headers(sakura_meting_public_cache_headers($type));
             $response->header('Location', $data);
         }
     }

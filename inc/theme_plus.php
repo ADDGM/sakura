@@ -179,7 +179,6 @@ add_filter( 'comment_text' , 'comment_add_at', 20, 2);
 /*
  * Ajax评论
  */
-if ( version_compare( $GLOBALS['wp_version'], '4.4-alpha', '<' ) ) { wp_die(__('Please upgrade wordpress to version 4.4+','sakura')); }/*请升级到4.4以上版本*/
 // 提示
 if(!function_exists('siren_ajax_comment_err')) {
     function siren_ajax_comment_err($t) {
@@ -689,12 +688,8 @@ function no_category_base_refresh_rules() {
 // Remove category base
 add_action('init', 'no_category_base_permastruct');
 function no_category_base_permastruct() {
-  global $wp_rewrite, $wp_version;
-  if (version_compare($wp_version, '3.4', '<')) {
-    
-  } else {
-    $wp_rewrite -> extra_permastructs['category']['struct'] = '%category%';
-  }
+  global $wp_rewrite;
+  $wp_rewrite -> extra_permastructs['category']['struct'] = '%category%';
 }
 // Add our custom category rewrite rules
 add_filter('category_rewrite_rules', 'no_category_base_rewrite_rules');

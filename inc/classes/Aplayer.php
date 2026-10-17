@@ -14,7 +14,7 @@ class Aplayer
         $this->playlist_id = akina_option('aplayer_playlistid');
         $this->cookies = akina_option('aplayer_cookie');
         $this->api_url = rest_url('sakura/v1/meting/aplayer');
-        require('Meting.php');
+        require_once __DIR__ . '/Meting.php';
     }
 
     public function get_data($type, $id) {
@@ -129,13 +129,9 @@ class Aplayer
             'type' => $type,
             'id' => $id,
         );
-        if (function_exists('sakura_meting_create_token')) {
-            $query['music_token'] = sakura_meting_create_token($type, $id, null, $server);
-        } else {
-            $query['meting_nonce'] = wp_create_nonce($type . '#:' . $id);
-        }
+        $query['music_token'] = sakura_meting_create_token($type, $id, null, $server);
 
-        return $api_url . '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+        return add_query_arg(array_map('rawurlencode', $query), $api_url);
     }
 
     private function json_url($data) {

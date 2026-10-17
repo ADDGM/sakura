@@ -37,7 +37,6 @@ $sourceChecks = array(
     array('inc/classes/Aplayer.php', 'music_token', 'APlayer 未生成公开播放器签名令牌。'),
     array('inc/classes/Meting.php', 'is_http_url', 'Meting 未校验网易云音频 URL。'),
     array('inc/api.php', 'sakura_meting_token_is_valid', 'Meting 未验证公开播放器签名令牌。'),
-    array('inc/api.php', 'sakura_meting_legacy_request_present', 'Meting 未识别旧播放器请求。'),
     array('inc/api.php', 'public, max-age=', 'Meting 未提供公开播放器缓存头。'),
     array('inc/swicher.php', 'meting_api', '前端播放器未注入公开签名令牌 URL。'),
     array('functions.php', 'sakura_set_frontend_cache_headers', '前台页面未按登录状态隔离缓存。'),
@@ -1059,36 +1058,7 @@ if (is_wp_error($postId)) {
     wp_delete_post($postId, true);
 }
 
-if (function_exists('sakura_meting_nonce_is_valid')) {
-    $resourceId = '12345';
-    $validRequest = new WP_REST_Request('GET', '/sakura/v1/meting/aplayer');
-    $validRequest->set_param('meting_nonce', wp_create_nonce('pic#:' . $resourceId));
-    if (!sakura_meting_nonce_is_valid($validRequest, 'pic', $resourceId)) {
-        $errors[] = '合法的 Meting 资源 nonce 未通过。';
-    }
-
-    $invalidRequest = new WP_REST_Request('GET', '/sakura/v1/meting/aplayer');
-    $invalidRequest->set_param('meting_nonce', wp_create_nonce('pic#:different-id'));
-    if (sakura_meting_nonce_is_valid($invalidRequest, 'pic', $resourceId)) {
-        $errors[] = '不匹配资源 ID 的 Meting nonce 被错误接受。';
-    }
-
-    if (!function_exists('sakura_meting_legacy_request_present')) {
-        $errors[] = '旧播放器请求识别函数不存在。';
-    } else {
-        $legacyRequest = new WP_REST_Request('GET', '/sakura/v1/meting/aplayer');
-        $legacyRequest->set_param('meting_nonce', 'legacy-placeholder');
-        if (!sakura_meting_legacy_request_present($legacyRequest)) {
-            $errors[] = '带 meting_nonce 的旧播放器请求未被识别。';
-        }
-
-        $publicTokenRequest = new WP_REST_Request('GET', '/sakura/v1/meting/aplayer');
-        $publicTokenRequest->set_param('music_token', 'public-placeholder');
-        if (sakura_meting_legacy_request_present($publicTokenRequest)) {
-            $errors[] = '不带旧 nonce 的公开播放器请求被错误识别为旧请求。';
-        }
-    }
-}
+require __DIR__ . '/tests/music-api.php';
 
 if (function_exists('sakura_meting_create_token') && function_exists('sakura_meting_token_is_valid')) {
     $musicServer = sanitize_key((string) akina_option('aplayer_server', 'netease'));

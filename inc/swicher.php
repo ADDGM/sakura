@@ -67,17 +67,16 @@ mashiro_option.entry_content_theme = "<?php echo akina_option('entry_content_the
 mashiro_option.jsdelivr_css_src = "<?php echo esc_js(sakura_core_resource_url('cdn/css/lib.css', 'jsdelivr_cdn_test', true)); ?>";
 <?php if (akina_option('aplayer_server') != 'off'): ?>
 mashiro_option.float_player_on = true;
-mashiro_option.meting_api_url = "<?php echo rest_url('sakura/v1/meting/aplayer'); ?>";
 <?php
-$music_token = function_exists('sakura_meting_create_token')
-    ? sakura_meting_create_token('playlist', (string) akina_option('aplayer_playlistid', ''), null, (string) akina_option('aplayer_server', 'netease'))
-    : '';
-$music_api = rest_url('sakura/v1/meting/aplayer') . '?server=:server&type=:type&id=:id&music_token=' . rawurlencode($music_token);
-if ($music_token !== ''): ?>
-if (typeof meting_api === 'undefined') {
-    var meting_api = <?php echo wp_json_encode($music_api); ?>;
-}
-<?php endif; ?>
+$music_token = sakura_meting_create_token('playlist', (string) akina_option('aplayer_playlistid', ''), null, (string) akina_option('aplayer_server', 'netease'));
+$music_api = add_query_arg(array(
+    'server' => ':server',
+    'type' => ':type',
+    'id' => ':id',
+    'music_token' => rawurlencode($music_token),
+), rest_url('sakura/v1/meting/aplayer'));
+?>
+mashiro_option.meting_api_url = <?php echo wp_json_encode($music_api); ?>;
 <?php endif; ?>
 
 mashiro_option.cover_api = "<?php echo rest_url('sakura/v1/image/cover'); ?>";

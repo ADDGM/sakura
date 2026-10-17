@@ -268,6 +268,10 @@ function sakura_scripts()
         true
     );
     $app_dependencies = array();
+    if (akina_option('ex_register_open') && akina_option('login_validate')) {
+        sakura_verification_assets();
+        $app_dependencies[] = 'sakura-verification';
+    }
     if (akina_option('aplayer_server') != 'off') {
         wp_enqueue_script('aplayer_localization', get_template_directory_uri() . '/js/aplayer-localization.js', array('js_lib'), $cache_version, true);
         $app_dependencies[] = 'aplayer_localization';
@@ -403,7 +407,6 @@ function sakura_scripts()
     //     $auto_height = 'fixed';
     // }
     //拦截移动端
-    version_compare($GLOBALS['wp_version'], '5.1', '>=') ? $reply_link_version = 'new' : $reply_link_version = 'old';
     $gravatar_url = akina_option('gravatar_proxy') ?: 'dn-qiniu-avatar.qbox.me/avatar';
     wp_localize_script('app', 'Poi', array(
         'pjax' => akina_option('poi_pjax'),
@@ -413,7 +416,6 @@ function sakura_scripts()
         'ajaxurl' => admin_url('admin-ajax.php'),
         'order' => get_option('comment_order'), // ajax comments
         'formpostion' => 'bottom', // ajax comments 默认为bottom，如果你的表单在顶部则设置为top。
-        'reply_link_version' => $reply_link_version,
         'api' => esc_url_raw(rest_url()),
         'nonce' => wp_create_nonce('wp_rest'),
         'google_analytics_id' => akina_option('google_analytics_id', ''),
@@ -1104,13 +1106,37 @@ function bolo_QTnextpage_arg1() {
 //Login Page style
 function custom_login()
 {
-    //echo '<link rel="stylesheet" type="text/css" href="' . get_bloginfo('template_directory') . '/inc/login.css" />'."\n";
-    echo '<link rel="stylesheet" type="text/css" href="' . get_template_directory_uri() . '/inc/login.css?' . SAKURA_VERSION . '" />' . "\n";
-    //echo '<script type="text/javascript" src="'.get_bloginfo('template_directory').'/js/jquery.min.js"></script>'."\n";
-    echo '<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/jquery/jquery@1.9.0/jquery.min.js"></script>' . "\n";
+    sakura_verification_assets();
+    wp_enqueue_style('sakura-login', get_template_directory_uri() . '/inc/login.css', array('sakura-verification'), sakura_frontend_cache_version());
+    $logo = esc_url_raw(akina_option('logo_img', ''));
+    if ($logo !== '') {
+        wp_add_inline_style('sakura-login', '#login h1 a { background-image: url("' . $logo . '"); }');
+    }
 }
 
-add_action('login_head', 'custom_login');
+add_action('login_enqueue_scripts', 'custom_login');
+
+/**
+ * 登录与前台注册共用的客户端滑块；不替代服务端认证和 nonce。
+ */
+function sakura_verification_assets()
+{
+    $version = sakura_frontend_cache_version();
+    wp_enqueue_style('sakura-verification', get_template_directory_uri() . '/user/verification.css', array(), $version);
+    wp_enqueue_script('sakura-verification', get_template_directory_uri() . '/user/verification.js', array(), $version, true);
+}
+
+function sakura_verification_field()
+{
+    $label = __('Drag the slider to verify', 'sakura');
+    echo '<div class="sakura-verification" data-prompt="' . esc_attr($label) . '">';
+    echo '<div class="sakura-verification-track"><span class="sakura-verification-label" role="status">' . esc_html($label) . '</span>';
+    echo '<input class="sakura-verification-range" type="range" min="0" max="100" value="0" aria-label="' . esc_attr($label) . '" /></div>';
+    echo '<input type="hidden" name="verification" value="verification" /></div>';
+}
+add_action('login_form', 'sakura_verification_field');
+add_action('register_form', 'sakura_verification_field');
+add_action('lostpassword_form', 'sakura_verification_field');
 
 //Login Page Logo Text
 function custom_headertitle($title)
@@ -1129,76 +1155,8 @@ add_filter('login_headerurl', 'custom_loginlogo_url');
 //Login Page Footer
 function custom_html()
 {
-    if (akina_option('login_bg')) {
-        $loginbg = akina_option('login_bg');
-    } else {
-        $loginbg = get_template_directory_uri() . '/images/hd.png';
-    }
-    echo '<script type="text/javascript" src="' . get_template_directory_uri() . '/js/login.js"></script>' . "\n";
-    echo '<script type="text/javascript">' . "\n";
-    echo 'jQuery("body").prepend("<div class=\"loading\"><img src=\"' . esc_url(get_template_directory_uri() . '/images/login_loading.gif') . '\" width=\"58\" height=\"10\"></div><div id=\"bg\"><img /></div>");' . "\n";
-    echo 'jQuery(\'#bg\').children(\'img\').attr(\'src\', \'' . $loginbg . '\').load(function(){' . "\n";
-    echo '	resizeImage(\'bg\');' . "\n";
-    echo '	jQuery(window).bind("resize", function() { resizeImage(\'bg\'); });' . "\n";
-    echo '	jQuery(\'.loading\').fadeOut();' . "\n";
-    echo '});';
-    echo '</script>' . "\n";
-    echo '<script>
-	function verificationOK(){
-		var x, y, z = "verification";
-		var x=$(\'#loginform\').find(\'input[name="verification"]\').val();
-		//var x=document.forms["loginform"]["verification"].value; //原生js实现
-		var y=$(\'#registerform\').find(\'input[name="verification"]\').val();
-		var z=$(\'#lostpasswordform\').find(\'input[name="verification"]\').val();
-		if (x=="verification" || y=="verification" || z=="verification"){
-		  alert("Please slide the block to verificate!");
-		  return false;
-	  }
-	}
-	$(document).ready(function(){
-		$( \'<p><div id="verification-slider"><div id="slider"><div id="slider_bg"></div><span id="label">»</span><span id="labelTip">Slide to Verificate</span></div><input type="hidden" name="verification" value="verification" /></div><p>\' ).insertBefore( $( ".submit" ) );
-		$(\'form\').attr(\'onsubmit\',\'return verificationOK();\');
-        $(\'h1 a\').attr(\'style\',\'background-image: url(' . akina_option('logo_img') . '); \');
-		$(".forgetmenot").replaceWith(\'<p class="forgetmenot">Remember Me<input name="rememberme" id="rememberme" value="forever" type="checkbox"><label for="rememberme" style="float: right;margin-top: 5px;transform: scale(2);margin-right: -10px;"></label></p>\');
-	});
-	</script>';
-    echo '<script type="text/javascript">
-		var startTime = 0;
-		var endTime = 0;
-		var numTime = 0;
-		$(function () {
-			var slider = new SliderUnlock("#slider",{
-			successLabelTip : "OK"
-		},function(){
-			var sli_width = $("#slider_bg").width();
-			$(\'#verification-slider\').html(\'\').append(\'<input id="verification-ok" class="input" type="text" size="25" value="OK!" name="verification" disabled="true" />\');
-
-			endTime = nowTime();
-			numTime = endTime-startTime;
-			endTime = 0;
-			startTime = 0;
-			// 获取到滑动使用的时间 滑动的宽度
-			// alert( numTime );
-			// alert( sli_width );
-		});
-			slider.init();
-		})
-
-		/**
-		* 获取时间精确到毫秒
-		* @type
-		*/
-		function nowTime(){
-			var myDate = new Date();
-			var H = myDate.getHours();//获取小时
-			var M = myDate.getMinutes(); //获取分钟
-			var S = myDate.getSeconds();//获取秒
-			var MS = myDate.getMilliseconds();//获取毫秒
-			var milliSeconds = H * 3600 * 1000 + M * 60 * 1000 + S * 1000 + MS;
-			return milliSeconds;
-		}
-	</script>
-	<script type="text/javascript" src="' . get_template_directory_uri() . '/user/verification.js"></script>';
+    $background = akina_option('login_bg') ?: get_template_directory_uri() . '/images/hd.png';
+    echo '<div id="bg" aria-hidden="true"><img src="' . esc_url($background) . '" alt="" /></div>';
 }
 add_action('login_footer', 'custom_html');
 
