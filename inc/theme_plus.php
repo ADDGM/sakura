@@ -48,15 +48,22 @@ function get_random_bg_url(){
 }
 
 
+function sakura_get_post_timestamp($post = null) {
+  $timestamp = get_post_time('U', true, $post);
+  // 草稿可能没有 GMT 日期；使用站点时区解析本地日期，避免叠加时区偏移。
+  return false !== $timestamp ? $timestamp : get_post_timestamp($post);
+}
+
 /*
  * 订制时间样式
- * poi_time_since(strtotime($post->post_date_gmt));
- * poi_time_since(strtotime($comment->comment_date_gmt), true );
- * 如果中途修改过Linux系统时间则继续使用GMT可能出现时差问题!!
- * poi_time_since(strtotime($post->post_date));
- * poi_time_since(strtotime($comment->comment_date), true );
+ * poi_time_since(sakura_get_post_timestamp($post));
+ * poi_time_since(strtotime($comment->comment_date), true);
  */
 function poi_time_since( $older_date, $comment_date = false, $text = false ) {
+  if (!is_numeric($older_date)) {
+    return '';
+  }
+
   $chunks = array(
     array( 24 * 60 * 60, __( ' days ago', 'sakura' ) ),/*天前*/
     array( 60 * 60 , __( ' hours ago', 'sakura' ) ),/*小时前*/
@@ -296,7 +303,7 @@ function the_headPattern(){
         $edit_this_post_link = '';
     }
     $t .= the_title( '<h1 class="entry-title">', '</h1>', false);
-    $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(get_post_time('U', true),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
+    $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(sakura_get_post_timestamp(),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
     endwhile; endif;
   }elseif(is_page()){
     $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
@@ -351,7 +358,7 @@ function the_video_headPattern_hls(){
         $edit_this_post_link = '';
     }
     $t .= the_title( '<h1 class="entry-title">', '<button id="coverVideo-btn" class=".constant-width-to-height-ratio" onclick="coverVideo()"><i class="fa fa-pause" aria-hidden="true"></i></button></h1>', false);
-    $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(get_post_time('U', true),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
+    $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(sakura_get_post_timestamp(),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
     endwhile; endif;
   }elseif(is_page()){
     $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';
@@ -419,7 +426,7 @@ function the_video_headPattern_normal(){
         $edit_this_post_link = '';
     }
     $t .= the_title( '<h1 class="entry-title">', '<button id="coverVideo-btn" class=".constant-width-to-height-ratio" onclick="coverVideo()"><i class="fa fa-pause" aria-hidden="true"></i></button></h1>', false);
-    $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(get_post_time('U', true),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
+    $t .= '<p class="entry-census"><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'"><img src="'. get_avatar_url( get_the_author_meta('ID'), 64 )/*$ava*/ .'"></a></span><span><a href="'. esc_url(get_author_posts_url(get_the_author_meta('ID'),get_the_author_meta( 'user_nicename' ))) .'">'. get_the_author() .'</a></span><span class="bull">·</span>'. poi_time_since(sakura_get_post_timestamp(),false,true) .'<span class="bull">·</span>'. get_post_views(get_the_ID()) .' '._n("View","Views",get_post_views(get_the_ID()),"sakura")/*次阅读*/.$edit_this_post_link.'</p>';
     endwhile; endif;
   }elseif(is_page()){
     $full_image_url = is_array($full_image_url) ? $full_image_url[0] : '';

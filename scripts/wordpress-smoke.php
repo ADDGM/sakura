@@ -901,6 +901,80 @@ if (convertip('invalid-ip') !== 'Unknown') {
 if (!is_string(push_smilies())) {
     $errors[] = '表情面板未返回字符串。';
 }
+
+// 草稿允许缺少 GMT 日期；日期读取必须保留真实时间戳与有效的零值。
+if (!function_exists('sakura_get_post_timestamp')) {
+    $errors[] = '缺少统一的文章时间戳读取函数。';
+} else {
+    $postTimeZone = 'Asia/Shanghai';
+    $postTimeZoneFilter = static function () use (&$postTimeZone) {
+        return $postTimeZone;
+    };
+    $postTimeOffsetFilter = static function () {
+        return 5.5;
+    };
+    $postTimeOriginalPost = isset($GLOBALS['post']) ? $GLOBALS['post'] : null;
+    add_filter('pre_option_timezone_string', $postTimeZoneFilter);
+    add_filter('pre_option_gmt_offset', $postTimeOffsetFilter);
+    try {
+        $postTimeCases = array(
+            array('草稿本地日期', 'Asia/Shanghai', 'draft', '2000-09-01 08:30:00', '0000-00-00 00:00:00', gmmktime(0, 30, 0, 9, 1, 2000)),
+            array('待审半小时时区', '', 'pending', '2000-09-01 08:30:00', '0000-00-00 00:00:00', gmmktime(3, 0, 0, 9, 1, 2000)),
+            array('夏令时本地日期', 'America/New_York', 'draft', '2000-07-01 08:30:00', '0000-00-00 00:00:00', gmmktime(12, 30, 0, 7, 1, 2000)),
+            array('有效GMT优先', 'America/New_York', 'publish', '2000-09-01 08:30:00', '2000-09-01 00:30:00', gmmktime(0, 30, 0, 9, 1, 2000)),
+            array('零日期', 'UTC', 'draft', '0000-00-00 00:00:00', '0000-00-00 00:00:00', false),
+            array('无效日期', 'UTC', 'draft', 'invalid-date', 'invalid-date', false),
+            array('有效GMT零时间戳', 'UTC', 'publish', '2000-09-01 08:30:00', '1970-01-01 00:00:00', 0),
+            array('有效GMT负时间戳', 'UTC', 'publish', '2000-09-01 08:30:00', '1969-12-31 23:59:00', -60),
+            array('有效本地零时间戳', 'UTC', 'draft', '1970-01-01 00:00:00', '0000-00-00 00:00:00', 0),
+        );
+        foreach ($postTimeCases as $postTimeCase) {
+            list($label, $postTimeZone, $status, $localDate, $gmtDate, $expectedTimestamp) = $postTimeCase;
+            $postTimeSample = new WP_Post((object) array(
+                'ID' => 987654321,
+                'filter' => 'raw',
+                'post_status' => $status,
+                'post_date' => $localDate,
+                'post_date_gmt' => $gmtDate,
+            ));
+            $GLOBALS['post'] = $postTimeSample;
+            if (sakura_get_post_timestamp($postTimeSample) !== $expectedTimestamp || sakura_get_post_timestamp() !== $expectedTimestamp) {
+                $errors[] = '文章时间戳未符合预期：' . $label;
+            }
+            $renderedPostTime = poi_time_since(sakura_get_post_timestamp($postTimeSample), false, true);
+            $expectedPostTime = false === $expectedTimestamp ? '' : gmdate('Y-m-d', $expectedTimestamp);
+            if ($renderedPostTime !== $expectedPostTime) {
+                $errors[] = '文章日期显示未符合预期：' . $label;
+            }
+        }
+        // 有效 GMT 仍经过 WordPress 的时间过滤器，不被本地日期覆盖。
+        $postTimeSample->post_date = '2000-09-01 08:30:00';
+        $postTimeSample->post_date_gmt = '2000-09-01 00:30:00';
+        $postTimeFilter = static function () {
+            return 0;
+        };
+        add_filter('get_post_time', $postTimeFilter);
+        try {
+            if (sakura_get_post_timestamp($postTimeSample) !== 0) {
+                $errors[] = '文章时间戳未保留 get_post_time 过滤结果。';
+            }
+        } finally {
+            remove_filter('get_post_time', $postTimeFilter);
+        }
+    } finally {
+        $GLOBALS['post'] = $postTimeOriginalPost;
+        remove_filter('pre_option_timezone_string', $postTimeZoneFilter);
+        remove_filter('pre_option_gmt_offset', $postTimeOffsetFilter);
+    }
+}
+
+if (poi_time_since(false, false, true) !== '' || poi_time_since(null, false, true) !== '') {
+    $errors[] = '无效日期被格式化为Unix起点日期。';
+}
+if (poi_time_since(0, false, true) !== '1970-01-01') {
+    $errors[] = '合法的Unix零时间戳被错误隐藏。';
+}
+
 $postId = wp_insert_post(array(
     'post_title' => 'Sakura PHP 8 回归文章',
     'post_content' => '没有特色图，也没有下一篇文章。',
