@@ -383,9 +383,9 @@ function the_video_headPattern_hls(){
     $video_cover_thumb = get_post_meta(get_the_ID(), 'video_cover_thumb', true);
     // 检查这个字段是否有值
     if (empty ( $video_cover_thumb )) { //如果值为空，输出默认值
-        $video_poster_attr = "";
+        $video_poster_attr = ' poster="' . esc_url(get_the_post_thumbnail_url(get_the_ID(), 'full')) . '" ';
     } else {
-        $video_poster_attr = ' poster="' . $video_cover_thumb . '" ';
+        $video_poster_attr = ' poster="' . esc_url($video_cover_thumb) . '" ';
     }
 
   if(is_single()){
@@ -429,7 +429,7 @@ function the_video_headPattern_hls(){
       <video loop id="coverVideo" class='hls' 
              style="width: 100%; height: 100%"
              <?php echo $video_poster_attr; ?>
-             data-src="<?php echo $video_cover; ?>">
+             data-src="<?php echo esc_url($video_cover); ?>">
         
       </video>
     </div>
@@ -451,9 +451,9 @@ function the_video_headPattern_normal(){
     $video_cover_thumb = get_post_meta(get_the_ID(), 'video_cover_thumb', true);
     // 检查这个字段是否有值
     if (empty ( $video_cover_thumb )) { //如果值为空，输出默认值
-        $video_poster_attr = "";
+        $video_poster_attr = ' poster="' . esc_url(get_the_post_thumbnail_url(get_the_ID(), 'full')) . '" ';
     } else {
-        $video_poster_attr = ' poster="' . $video_cover_thumb . '" ';
+        $video_poster_attr = ' poster="' . esc_url($video_cover_thumb) . '" ';
     }
 
   if(is_single()){
@@ -465,7 +465,7 @@ function the_video_headPattern_normal(){
     $ava = akina_option('focus_logo', '') ? akina_option('focus_logo', '') : get_avatar_url(get_the_author_meta('user_email'));
     global $user_ID; 
     if($user_ID && current_user_can('manage_options')) {
-        $edit_this_post_link = '<span class="bull">·</span><a href="'.get_edit_post_link().'">'._e("EDIT","sakura").'</a>';
+        $edit_this_post_link = '<span class="bull">·</span><a href="'.esc_url(get_edit_post_link()).'">'.esc_html__("EDIT","sakura").'</a>';
     } else {
         $edit_this_post_link = '';
     }
@@ -497,7 +497,7 @@ function the_video_headPattern_normal(){
         <video autoplay loop id="coverVideo" class="normal-cover-video"
                style="width: 100%; height: 100%"
                <?php echo $video_poster_attr; ?>>
-            <source src="<?php echo $video_cover; ?>" type="video/mp4">
+            <source src="<?php echo esc_url($video_cover); ?>">
             Your browser does not support HTML5 video.
         </video>
     </div>

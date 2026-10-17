@@ -1163,6 +1163,8 @@ if (class_exists('Sakura\\API\\Meting')) {
     }
 }
 
+require __DIR__ . '/tests/post-cover.php';
+
 do_action('rest_api_init');
 $routes = rest_get_server()->get_routes();
 foreach ($requiredRoutes as $route) {

@@ -504,6 +504,7 @@ require get_template_directory() . '/inc/customizer.php';
  * function update
  */
 require get_template_directory() . '/inc/theme_plus.php';
+require get_template_directory() . '/inc/post-cover.php';
 require get_template_directory() . '/inc/categories-images.php';
 require get_template_directory() . '/inc/mail.php';
 

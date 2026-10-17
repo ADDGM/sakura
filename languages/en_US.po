@@ -2542,3 +2542,75 @@ msgstr "Pause video"
 #: functions.php
 msgid "Choose another video"
 msgstr "Choose another video"
+
+#: inc/post-cover.php
+msgid "Post cover"
+msgstr "Post cover"
+
+#: inc/post-cover.php
+msgid "Cover type"
+msgstr "Cover type"
+
+#: inc/post-cover.php
+msgid "Image (featured image)"
+msgstr "Image (featured image)"
+
+#: inc/post-cover.php
+msgid "Video (MP4 / WebM)"
+msgstr "Video (MP4 / WebM)"
+
+#: inc/post-cover.php
+msgid "HLS video (m3u8)"
+msgstr "HLS video (m3u8)"
+
+#: inc/post-cover.php
+msgid "Choose the cover image in the Featured image panel. A featured image is required for video covers too. Save or update the post to apply these settings."
+msgstr "Choose the cover image in the Featured image panel. A featured image is required for video covers too. Save or update the post to apply these settings."
+
+#: inc/post-cover.php
+msgid "Header images are disabled in Sakura settings. Enable them to display this cover."
+msgstr "Header images are disabled in Sakura settings. Enable them to display this cover."
+
+#: inc/post-cover.php
+msgid "Cover video URL"
+msgstr "Cover video URL"
+
+#: inc/post-cover.php
+msgid "Use a complete HTTP(S) media URL, not a video website page. Choose HLS for m3u8 streams. Visitors can read this URL."
+msgstr "Use a complete HTTP(S) media URL, not a video website page. Choose HLS for m3u8 streams. Visitors can read this URL."
+
+#: inc/post-cover.php
+msgid "Video poster URL"
+msgstr "Video poster URL"
+
+#: inc/post-cover.php
+msgid "Choose video poster"
+msgstr "Choose video poster"
+
+#: inc/post-cover.php
+msgid "Use this image"
+msgstr "Use this image"
+
+#: inc/post-cover.php
+msgid "Choose from media library"
+msgstr "Choose from media library"
+
+#: inc/post-cover.php
+msgid "Use featured image"
+msgstr "Use featured image"
+
+#: inc/post-cover.php
+msgid "Leave empty to use the featured image. Switching to image cover keeps the video settings for later."
+msgstr "Leave empty to use the featured image. Switching to image cover keeps the video settings for later."
+
+#: inc/post-cover.php
+msgid "Video poster preview"
+msgstr "Video poster preview"
+
+#: inc/post-cover.php
+msgid "Cover settings were not changed. Select a valid type and complete HTTP(S) URLs; a video cover needs a video URL."
+msgstr "Cover settings were not changed. Select a valid type and complete HTTP(S) URLs; a video cover needs a video URL."
+
+#: inc/post-cover.php
+msgid "Cover settings could not be saved completely. Reload the editor and try again."
+msgstr "Cover settings could not be saved completely. Reload the editor and try again."

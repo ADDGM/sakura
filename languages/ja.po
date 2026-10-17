@@ -378,3 +378,75 @@ msgstr "動画を一時停止"
 #: functions.php
 msgid "Choose another video"
 msgstr "別の動画を選ぶ"
+
+#: inc/post-cover.php
+msgid "Post cover"
+msgstr "記事のカバー"
+
+#: inc/post-cover.php
+msgid "Cover type"
+msgstr "カバーの種類"
+
+#: inc/post-cover.php
+msgid "Image (featured image)"
+msgstr "画像（アイキャッチ画像）"
+
+#: inc/post-cover.php
+msgid "Video (MP4 / WebM)"
+msgstr "動画（MP4 / WebM）"
+
+#: inc/post-cover.php
+msgid "HLS video (m3u8)"
+msgstr "HLS 動画（m3u8）"
+
+#: inc/post-cover.php
+msgid "Choose the cover image in the Featured image panel. A featured image is required for video covers too. Save or update the post to apply these settings."
+msgstr "アイキャッチ画像パネルで画像を選んでください。動画カバーにもアイキャッチ画像が必要です。記事を保存または更新すると適用されます。"
+
+#: inc/post-cover.php
+msgid "Header images are disabled in Sakura settings. Enable them to display this cover."
+msgstr "Sakura 設定でヘッダー画像が無効になっています。カバーを表示するには有効にしてください。"
+
+#: inc/post-cover.php
+msgid "Cover video URL"
+msgstr "カバー動画の URL"
+
+#: inc/post-cover.php
+msgid "Use a complete HTTP(S) media URL, not a video website page. Choose HLS for m3u8 streams. Visitors can read this URL."
+msgstr "動画サイトのページではなく、完全な HTTP(S) メディア URL を入力してください。m3u8 は HLS を選びます。この URL は訪問者にも見えます。"
+
+#: inc/post-cover.php
+msgid "Video poster URL"
+msgstr "動画ポスターの URL"
+
+#: inc/post-cover.php
+msgid "Choose video poster"
+msgstr "動画ポスターを選択"
+
+#: inc/post-cover.php
+msgid "Use this image"
+msgstr "この画像を使用"
+
+#: inc/post-cover.php
+msgid "Choose from media library"
+msgstr "メディアライブラリから選択"
+
+#: inc/post-cover.php
+msgid "Use featured image"
+msgstr "アイキャッチ画像を使用"
+
+#: inc/post-cover.php
+msgid "Leave empty to use the featured image. Switching to image cover keeps the video settings for later."
+msgstr "空欄ではアイキャッチ画像を使用します。画像カバーに切り替えても動画設定は保持されます。"
+
+#: inc/post-cover.php
+msgid "Video poster preview"
+msgstr "動画ポスターのプレビュー"
+
+#: inc/post-cover.php
+msgid "Cover settings were not changed. Select a valid type and complete HTTP(S) URLs; a video cover needs a video URL."
+msgstr "カバー設定は変更されませんでした。有効な種類と完全な HTTP(S) URL を指定してください。動画カバーには動画 URL が必要です。"
+
+#: inc/post-cover.php
+msgid "Cover settings could not be saved completely. Reload the editor and try again."
+msgstr "カバー設定を完全に保存できませんでした。編集画面を再読み込みして再試行してください。"

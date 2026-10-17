@@ -2630,3 +2630,75 @@ msgstr "暫停影片"
 #: functions.php
 msgid "Choose another video"
 msgstr "切換影片"
+
+#: inc/post-cover.php
+msgid "Post cover"
+msgstr "文章封面"
+
+#: inc/post-cover.php
+msgid "Cover type"
+msgstr "封面類型"
+
+#: inc/post-cover.php
+msgid "Image (featured image)"
+msgstr "圖片（特色圖片）"
+
+#: inc/post-cover.php
+msgid "Video (MP4 / WebM)"
+msgstr "影片（MP4 / WebM）"
+
+#: inc/post-cover.php
+msgid "HLS video (m3u8)"
+msgstr "HLS 影片（m3u8）"
+
+#: inc/post-cover.php
+msgid "Choose the cover image in the Featured image panel. A featured image is required for video covers too. Save or update the post to apply these settings."
+msgstr "請在「特色圖片」面板選擇封面圖片，影片封面也需要設定特色圖片。儲存或更新文章後生效。"
+
+#: inc/post-cover.php
+msgid "Header images are disabled in Sakura settings. Enable them to display this cover."
+msgstr "Sakura 設定已關閉頁首裝飾圖，啟用後才能顯示封面。"
+
+#: inc/post-cover.php
+msgid "Cover video URL"
+msgstr "封面影片位址"
+
+#: inc/post-cover.php
+msgid "Use a complete HTTP(S) media URL, not a video website page. Choose HLS for m3u8 streams. Visitors can read this URL."
+msgstr "填寫完整 HTTP(S) 媒體直連，不是影片網站頁面；m3u8 串流請選擇 HLS。訪客可以讀取此位址。"
+
+#: inc/post-cover.php
+msgid "Video poster URL"
+msgstr "影片預覽圖位址"
+
+#: inc/post-cover.php
+msgid "Choose video poster"
+msgstr "選擇影片預覽圖"
+
+#: inc/post-cover.php
+msgid "Use this image"
+msgstr "使用此圖片"
+
+#: inc/post-cover.php
+msgid "Choose from media library"
+msgstr "從媒體庫選擇"
+
+#: inc/post-cover.php
+msgid "Use featured image"
+msgstr "使用特色圖片"
+
+#: inc/post-cover.php
+msgid "Leave empty to use the featured image. Switching to image cover keeps the video settings for later."
+msgstr "留空時使用特色圖片。切換為圖片封面會保留影片設定，方便日後恢復。"
+
+#: inc/post-cover.php
+msgid "Video poster preview"
+msgstr "影片預覽圖"
+
+#: inc/post-cover.php
+msgid "Cover settings were not changed. Select a valid type and complete HTTP(S) URLs; a video cover needs a video URL."
+msgstr "封面設定未變更。請選擇有效類型並填寫完整 HTTP(S) 位址；影片封面必須填寫影片位址。"
+
+#: inc/post-cover.php
+msgid "Cover settings could not be saved completely. Reload the editor and try again."
+msgstr "封面設定未能完整儲存，請重新載入編輯器後重試。"

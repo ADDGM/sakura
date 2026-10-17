@@ -2355,3 +2355,75 @@ msgstr ""
 #: functions.php
 msgid "Choose another video"
 msgstr ""
+
+#: inc/post-cover.php
+msgid "Post cover"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Cover type"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Image (featured image)"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Video (MP4 / WebM)"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "HLS video (m3u8)"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Choose the cover image in the Featured image panel. A featured image is required for video covers too. Save or update the post to apply these settings."
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Header images are disabled in Sakura settings. Enable them to display this cover."
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Cover video URL"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Use a complete HTTP(S) media URL, not a video website page. Choose HLS for m3u8 streams. Visitors can read this URL."
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Video poster URL"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Choose video poster"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Use this image"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Choose from media library"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Use featured image"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Leave empty to use the featured image. Switching to image cover keeps the video settings for later."
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Video poster preview"
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Cover settings were not changed. Select a valid type and complete HTTP(S) URLs; a video cover needs a video URL."
+msgstr ""
+
+#: inc/post-cover.php
+msgid "Cover settings could not be saved completely. Reload the editor and try again."
+msgstr ""
