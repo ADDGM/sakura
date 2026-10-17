@@ -32,8 +32,12 @@
 				<span aria-hidden="true">↺</span>
 				<span class="live2d-visually-hidden"><?php esc_html_e('Reset Live2D position', 'sakura'); ?></span>
 			</button>
+			<button type="button" class="change-costume" hidden disabled aria-label="<?php esc_attr_e('Change costume', 'sakura'); ?>" title="<?php esc_attr_e('Change costume', 'sakura'); ?>">
+				<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3 3 6l-2 5 5 2v8h12v-8l5-2-2-5-5-3c0 4-8 4-8 0Z"/></svg>
+			</button>
 			<button type="button" class="hide-button"><?php esc_html_e('Hide', 'sakura'); ?></button>
 		</div>
+		<span class="costume-status live2d-visually-hidden" role="status" aria-live="polite"></span>
 	</div>
 	<?php endif; ?>
 	<footer id="colophon" class="site-footer" role="contentinfo">

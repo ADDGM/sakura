@@ -2702,3 +2702,19 @@ msgstr "封面設定未變更。請選擇有效類型並填寫完整 HTTP(S) 位
 #: inc/post-cover.php
 msgid "Cover settings could not be saved completely. Reload the editor and try again."
 msgstr "封面設定未能完整儲存，請重新載入編輯器後重試。"
+
+#: footer.php
+msgid "Change costume"
+msgstr "換裝"
+
+#: functions.php
+msgid "Changing costume..."
+msgstr "正在換裝…"
+
+#: functions.php
+msgid "Costume changed."
+msgstr "換裝完成。"
+
+#: functions.php
+msgid "Unable to change costume. Please try again."
+msgstr "換裝失敗，請重試。"

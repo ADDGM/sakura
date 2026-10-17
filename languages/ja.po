@@ -450,3 +450,19 @@ msgstr "カバー設定は変更されませんでした。有効な種類と完
 #: inc/post-cover.php
 msgid "Cover settings could not be saved completely. Reload the editor and try again."
 msgstr "カバー設定を完全に保存できませんでした。編集画面を再読み込みして再試行してください。"
+
+#: footer.php
+msgid "Change costume"
+msgstr "着替える"
+
+#: functions.php
+msgid "Changing costume..."
+msgstr "着替え中…"
+
+#: functions.php
+msgid "Costume changed."
+msgstr "着替えました。"
+
+#: functions.php
+msgid "Unable to change costume. Please try again."
+msgstr "着替えに失敗しました。もう一度お試しください。"

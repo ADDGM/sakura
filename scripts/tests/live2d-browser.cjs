@@ -115,9 +115,10 @@ const server = http.createServer((request, response) => {
         if (blockedStorage) {
             await page.evaluate(() => Object.defineProperty(window, 'localStorage', {get() {throw new Error('Storage blocked');}}));
         }
+        if (model) await page.addScriptTag({path: path.join(root, 'live2d/js/live2d.js')});
         await page.addScriptTag({path: path.join(root, 'live2d/js/message.js')});
         if (model) {
-            await page.addScriptTag({path: path.join(root, 'live2d/js/live2d.js')});
+            await page.addScriptTag({path: path.join(root, 'live2d/js/costume.js')});
             await page.addScriptTag({path: path.join(root, 'live2d/js/' + (remote ? 'run_field.js' : 'run_local.js'))});
         }
         await page.waitForTimeout(450);
@@ -410,10 +411,71 @@ const server = http.createServer((request, response) => {
                 }
             });
         }
+        for (const model of ['tia', 'pio']) {
+            await check(model + ' costume swaps keep one model and release replaced textures', async () => {
+                await setup({model});
+                await page.waitForFunction(() => !document.querySelector('.change-costume').hidden);
+                await page.evaluate(() => {window.costumeOriginalModel = window.sakuraLive2D.getTextureTarget().model;});
+                const requests = [];
+                const listener = request => {if (request.url().includes('/live2d/model/')) requests.push(request.url());};
+                page.on('request', listener);
+                for (let i = 0; i < 6; i++) {
+                    assert.equal(await page.evaluate(async () => {
+                        const api = window.sakuraLive2D, before = api.getTextureTarget();
+                        const previous = before.model.getDrawParam().textures[0];
+                        const ok = await api.changeCostume();
+                        return ok && before.model === window.costumeOriginalModel && !before.gl.isTexture(previous) &&
+                            before.gl.isTexture(before.model.getDrawParam().textures[0]);
+                    }), true);
+                }
+                page.off('request', listener);
+                assert.equal(requests.filter(url => url.endsWith('.moc') || url.endsWith('.mtn')).length, 0);
+                // Reusing a cached image need not generate a network request.
+                assert.ok(requests.length <= 6);
+                assert.ok(requests.every(url => url.includes('/live2d/model/' + model + '/textures/') && url.endsWith('.png')));
+                assert.equal(await page.locator('#live2d').count(), 1);
+                await page.locator('.change-costume').focus();
+                await page.keyboard.press('Enter');
+                await page.waitForFunction(() => document.querySelector('.costume-status').textContent === window.SakuraLive2D.messages.costumeChanged);
+                await page.evaluate(() => {window.live2d_Tips(); window.live2d_Tips();});
+                assert.equal(await page.locator('.change-costume').count(), 1);
+            });
+        }
+        await check('failed costume requests retain a renderable texture and recover', async () => {
+            await page.evaluate(() => {window.costumeBeforeFailure = window.sakuraLive2D.getTextureTarget().model.getDrawParam().textures[0];});
+            await page.route('**/live2d/model/pio/textures/*.png', route => route.fulfill({status:404,body:''}));
+            assert.equal(await page.evaluate(() => window.sakuraLive2D.changeCostume()), false);
+            assert.equal(await page.evaluate(() => {
+                const t=window.sakuraLive2D.getTextureTarget();
+                return t.model.getDrawParam().textures[0] === window.costumeBeforeFailure && t.gl.isTexture(window.costumeBeforeFailure);
+            }), true);
+            await page.unroute('**/live2d/model/pio/textures/*.png');
+            assert.equal(await page.evaluate(() => window.sakuraLive2D.changeCostume()), true);
+        });
         await check('model clicks still show a translated tip', async () => {
             await page.locator('#live2d').click({position: {x: 140, y: 160}});
             const tip = await page.locator('#landlord .message').textContent();
             assert.ok(['modelClick', 'modelClickShy', 'modelClickTease', 'modelClickWarning', 'modelClickHelp'].some(key => messages[key] === tip));
+        });
+        await check('remote costume button reuses the model with fresh PNG queries', async () => {
+            await setup({model: 'pio', remote: true});
+            await page.waitForFunction(() => !document.querySelector('.change-costume').hidden);
+            const requests = [];
+            const listener = request => {if (request.url().includes('/live2d/model/')) requests.push(request.url());};
+            page.on('request', listener);
+            for (let i = 0; i < 2; i++) {
+                assert.equal(await page.evaluate(async () => {
+                    const api = window.sakuraLive2D, before = api.getTextureTarget();
+                    const old = before.model.getDrawParam().textures[0];
+                    return await api.changeCostume() && api.getTextureTarget().model === before.model &&
+                        !before.gl.isTexture(old) && before.gl.isTexture(before.model.getDrawParam().textures[0]);
+                }), true);
+            }
+            page.off('request', listener);
+            assert.equal(requests.length, 2);
+            const urls = requests.map(url => new URL(url));
+            assert.ok(urls.every(url => url.pathname.endsWith(remoteTexture) && url.searchParams.has('sakura_costume')));
+            assert.notEqual(urls[0].searchParams.get('sakura_costume'), urls[1].searchParams.get('sakura_costume'));
         });
         assert.deepEqual(errors, [], 'Browser JavaScript errors');
         console.log('All ' + reports.length + ' browser checks passed.');

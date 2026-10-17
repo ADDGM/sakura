@@ -324,9 +324,16 @@ function sakura_scripts()
             true
         );
         wp_enqueue_script(
+            'sakura-live2d-costume',
+            sakura_theme_asset_url('live2d/js/costume.js'),
+            array('sakura-live2d-message'),
+            $cache_version,
+            true
+        );
+        wp_enqueue_script(
             'sakura-live2d-loader',
             sakura_theme_asset_url('live2d/js/' . ($use_remote_dress ? 'run_field.js' : 'run_local.js')),
-            array('sakura-live2d-message'),
+            array('sakura-live2d-costume'),
             $cache_version,
             true
         );
@@ -335,6 +342,9 @@ function sakura_scripts()
             'modelPath' => trailingslashit(sakura_theme_asset_url('live2d/model/' . $live2d_model)),
             'messageUrl' => add_query_arg('ver', $cache_version, sakura_theme_asset_url('live2d/message.json')),
             'messages' => array(
+                'costumeChanging' => __('Changing costume...', 'sakura'),
+                'costumeChanged' => __('Costume changed.', 'sakura'),
+                'costumeFailed' => __('Unable to change costume. Please try again.', 'sakura'),
                 'viewLink' => __('Want to read <span style="color:#f6f;">{text}</span>?', 'sakura'),
                 'postImage' => __('Do you like the featured image?', 'sakura'),
                 'readMore' => __('Keep reading to find out more!', 'sakura'),

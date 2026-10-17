@@ -79,7 +79,8 @@
 }
 
 #landlord .drag-handle,
-#landlord .reset-position {
+#landlord .reset-position,
+#landlord .change-costume {
     width: 24px;
     height: 24px;
     padding: 0;
@@ -102,8 +103,10 @@
 
 #landlord:hover .drag-handle,
 #landlord:hover .reset-position,
+#landlord:hover .change-costume,
 #landlord .drag-handle:focus-visible,
-#landlord .reset-position:focus-visible {
+#landlord .reset-position:focus-visible,
+#landlord .change-costume:focus-visible {
     opacity: 1;
 }
 
@@ -114,12 +117,14 @@
 }
 
 #landlord .drag-handle:hover,
-#landlord .reset-position:hover {
+#landlord .reset-position:hover,
+#landlord .change-costume:hover {
     background: #f4f6f8;
 }
 
 #landlord .drag-handle:focus-visible,
 #landlord .reset-position:focus-visible,
+#landlord .change-costume:focus-visible,
 #landlord .hide-button:focus-visible {
     outline: 2px solid #2980b9;
     outline-offset: 2px;
@@ -127,6 +132,19 @@
 
 #landlord.is-dragging {
     transition: none;
+}
+
+#landlord .change-costume svg {
+    vertical-align: middle;
+}
+
+#landlord .change-costume:disabled {
+    cursor: wait;
+    opacity: .4;
+}
+
+#landlord .change-costume[hidden] {
+    display: none;
 }
 
 #landlord.is-dragging .drag-handle {

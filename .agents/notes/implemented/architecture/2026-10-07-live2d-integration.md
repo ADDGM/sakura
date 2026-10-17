@@ -8,13 +8,17 @@ Status: implemented
 
 ## Decision
 
-[functions.php](../../../../functions.php) 通过 `sakura_scripts()` 入队样式、Cubism 2 运行时、交互和一个 loader，并用 `SakuraLive2D` 注入配置；[footer.php](../../../../footer.php)负责容器和 Canvas。缓存策略复用[核心资源契约](2026-10-07-core-resource-policy.md)，不恢复直接拼接配置的页脚脚本注入。
+[functions.php](../../../../functions.php) 通过 `sakura_scripts()` 入队样式、Cubism 2 运行时、提示交互、换装控制器和一个 loader，并用 `SakuraLive2D` 注入配置；脚本依赖按上述顺序加载，[footer.php](../../../../footer.php)负责容器、控件和 Canvas。缓存策略复用[核心资源契约](2026-10-07-core-resource-policy.md)，不恢复直接拼接配置的页脚脚本注入。
 
 基础模型固定为 Tia/Pio，保留 Cubism 2 的 `.moc` / `.mtn` 资源。[本地 loader](../../../../live2d/js/run_local.js)读取选定模型目录的 `model.json` 与 `textures.json`，沿用 `pioUrl` 清单字段；挑选并检查纹理条目后构造模型纹理地址。字段名不表示仅支持 Pio，也不意味着读取根目录的服装清单。
 
 远程模式必须同时满足远程开关开启和接口非空，才选择[远程 loader](../../../../live2d/js/run_field.js)；该 loader 读取同一模型配置并替换 PNG 地址。两个 loader 都在依赖不可用、配置缺失或不满足 `min-width: 861px` 时退出，模型请求发生在该守卫之后。这个入口判断不等于已经加载后的运行时会在缩窄窗口时被卸载。
 
 [.gitattributes](../../../../.gitattributes) 排除根目录 `live2d/textures/**` 与 `live2d/textures.json`，保留各模型最小纹理。大型服装须先建立模型—纹理映射并验证视觉兼容；Cubism 3/4/5 属于独立迁移评估，不纳入现有基础能力。
+
+根级集合的资源盘点、模型兼容映射方法和小批接入备选见[扩展服装提案](../../proposed/feature/2026-10-17-live2d-costume-catalog.md)。该提案尚未实施，不改变本篇的模型专属加载与安装包边界。
+
+[一键换装](../feature/2026-10-17-live2d-costume-button.md)复用模型专属清单或已配置远程PNG接口。运行时只提供就绪纹理目标与就绪事件，控制器解码和上传成功后替换第0槽并释放旧纹理，不重新创建模型或动作；忙碌时禁用，图片失败保留当前纹理。远程每次增加缓存参数但可能返回相同图片，初始远程加载仍按下节既有失败边界处理。
 
 ## Interaction and failure boundary
 
@@ -62,6 +66,8 @@ Status: implemented
 **版权联系注释。** 按维护者选择，[运行时源码](../../../../live2d/js/live2d.js)顶部使用英文注释保留Live2D运行时与Tia/Pio资源的权利归属、H-Siren分发来源和权利人条款边界，并将[项目GitHub Issues](https://github.com/ADDGM/sakura/issues)作为疑似侵权的联系入口。该说明用于联系维护者核实处理，不补足使用或分发授权。2026-10-08经GitHub API核对，仓库Issues尚未启用；维护者确认稍后手动开启，代码注释保留该入口。
 
 ## Verification
+
+2026-10-17新增换装能力的本地验证为87项Node、30项Chrome浏览器回归、PHP8.2.33语法/三配置enqueue替身及四MO一致性，具体覆盖和限制见[换装笔记](../feature/2026-10-17-live2d-costume-button.md#verification)。运行时新增两处连接，原有模型文件和动作未修改；本次本地结果不更新下方历史部署结论。
 
 2026-10-08的版权联系补充仅在运行时前置440字节注释；原149,976字节保持不变，`node --check live2d/js/live2d.js`通过。本轮未改变加载、模型资源或交互逻辑，因此未重跑浏览器渲染测试。
 

@@ -16,6 +16,9 @@
     $.getJSON(config.modelPath + 'model.json').done(function (model) {
         var modelObj = JSON.parse(JSON.stringify(model));
         modelObj.textures = [config.dressUrl];
+        if (window.sakuraLive2D && typeof window.sakuraLive2D.configureCostumes === 'function') {
+            window.sakuraLive2D.configureCostumes({remote: true, current: config.dressUrl});
+        }
         window.loadlive2d('live2d', config.modelPath, '', modelObj);
     }).fail(function () {
         reportLoadError(config.modelPath + 'model.json');

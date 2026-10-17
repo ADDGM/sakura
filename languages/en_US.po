@@ -2614,3 +2614,19 @@ msgstr "Cover settings were not changed. Select a valid type and complete HTTP(S
 #: inc/post-cover.php
 msgid "Cover settings could not be saved completely. Reload the editor and try again."
 msgstr "Cover settings could not be saved completely. Reload the editor and try again."
+
+#: footer.php
+msgid "Change costume"
+msgstr "Change costume"
+
+#: functions.php
+msgid "Changing costume..."
+msgstr "Changing costume..."
+
+#: functions.php
+msgid "Costume changed."
+msgstr "Costume changed."
+
+#: functions.php
+msgid "Unable to change costume. Please try again."
+msgstr "Unable to change costume. Please try again."

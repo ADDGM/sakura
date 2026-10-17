@@ -16,21 +16,20 @@
     $.getJSON(config.modelPath + 'model.json').done(function (model) {
         $.getJSON(config.modelPath + 'textures.json').done(function (textures) {
             var modelObj = JSON.parse(JSON.stringify(model));
-            var textureList = textures.pioUrl || [];
+            var textureList = (Array.isArray(textures.pioUrl) ? textures.pioUrl : []).map(function (entry) {
+                var keys = entry && typeof entry === 'object' ? Object.keys(entry) : [];
+                var path = keys.length ? entry[keys[0]] : '';
+                return typeof path === 'string' && path ? config.modelPath + path : '';
+            }).filter(Boolean);
             if (!textureList.length) {
                 reportLoadError(config.modelPath + 'textures.json');
                 return;
             }
 
-            var randomTexture = textureList[Math.floor(Math.random() * textureList.length)];
-            var textureKeys = randomTexture && typeof randomTexture === 'object' ? Object.keys(randomTexture) : [];
-            var texturePath = textureKeys.length ? randomTexture[textureKeys[0]] : '';
-            if (!texturePath) {
-                reportLoadError(config.modelPath + 'textures.json');
-                return;
+            modelObj.textures = [textureList[Math.floor(Math.random() * textureList.length)]];
+            if (window.sakuraLive2D && typeof window.sakuraLive2D.configureCostumes === 'function') {
+                window.sakuraLive2D.configureCostumes({textures: textureList, current: modelObj.textures[0]});
             }
-
-            modelObj.textures = [config.modelPath + texturePath];
             window.loadlive2d('live2d', config.modelPath, '', modelObj);
         }).fail(function () {
             reportLoadError(config.modelPath + 'textures.json');
