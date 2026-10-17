@@ -437,6 +437,13 @@ function optionsframework_options()
         'type' => 'checkbox');
 
     $options[] = array(
+        'name' => __('Video links', 'sakura'), /*视频链接*/
+        'desc' => __('Optional: one complete HTTP(S) URL per line, ending in .mp4, .webm or .m3u8. Query parameters are allowed. Videos are selected randomly. This list takes priority; leave it empty to use the video address and names below. Use publicly accessible links: visitors can read these URLs.', 'sakura'),
+        'id' => 'amv_sources',
+        'std' => '',
+        'type' => 'textarea');
+
+    $options[] = array(
         'name' => __('Video address', 'sakura'), /*视频地址*/
         'desc' => __('The source address of the video, the address is spliced below the video name, the slash is not required at the end of the address', 'sakura'), /*视频的来源地址，该地址拼接下面的视频名，地址尾部不需要加斜杠*/
         'id' => 'amv_url',

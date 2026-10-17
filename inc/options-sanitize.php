@@ -28,6 +28,28 @@ function of_sanitize_site_start_date( $input, $option = array() ) {
 }
 add_filter( 'of_sanitize_site_start_date', 'of_sanitize_site_start_date', 10, 2 );
 
+/**
+ * Reject the entire invalid list and preserve the previously saved URLs.
+ */
+function of_sanitize_amv_sources( $input ) {
+	$sources = sakura_parse_home_video_sources( $input );
+	if ( ! is_wp_error( $sources ) ) {
+		return implode( "\n", array_column( $sources, 'url' ) );
+	}
+	$data = $sources->get_error_data();
+	add_settings_error(
+		'options-framework',
+		'amv_sources',
+		sprintf( __( 'Invalid video link on line %d. Use a complete HTTP(S) URL ending in .mp4, .webm or .m3u8; query parameters are allowed. The previous list was kept.', 'sakura' ), $data['line'] ),
+		'error'
+	);
+	$framework_settings = get_option( 'optionsframework' );
+	$option_name = is_array( $framework_settings ) && isset( $framework_settings['id'] ) ? $framework_settings['id'] : '';
+	$saved = $option_name ? get_option( $option_name, array() ) : array();
+	return is_array( $saved ) && isset( $saved['amv_sources'] ) && is_string( $saved['amv_sources'] ) ? $saved['amv_sources'] : '';
+}
+add_filter( 'of_sanitize_amv_sources', 'of_sanitize_amv_sources' );
+
 function of_sanitize_textarea($input) {
 	global $allowedposttags;
 	$output = wp_kses( $input, $allowedposttags);

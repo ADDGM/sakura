@@ -2497,3 +2497,48 @@ msgstr "Live2D settings"
 #: options.php
 msgid "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."
 msgstr "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."
+
+#: options.php
+msgid "Video links"
+msgstr "Video links"
+
+#: options.php
+msgid "Optional: one complete HTTP(S) URL per line, ending in .mp4, .webm or .m3u8. Query parameters are allowed. Videos are selected randomly. This list takes priority; leave it empty to use the video address and names below. Use publicly accessible links: visitors can read these URLs."
+msgstr "Optional: one complete HTTP(S) URL per line, ending in .mp4, .webm or .m3u8. Query parameters are allowed. Videos are selected randomly. This list takes priority; leave it empty to use the video address and names below. Use publicly accessible links: visitors can read these URLs."
+
+#: inc/options-sanitize.php
+#, php-format
+msgid "Invalid video link on line %d. Use a complete HTTP(S) URL ending in .mp4, .webm or .m3u8; query parameters are allowed. The previous list was kept."
+msgstr "Invalid video link on line %d. Use a complete HTTP(S) URL ending in .mp4, .webm or .m3u8; query parameters are allowed. The previous list was kept."
+
+#: functions.php
+msgid "Loading video..."
+msgstr "Loading video..."
+
+#: functions.php
+msgid "Video paused."
+msgstr "Video paused."
+
+#: functions.php
+msgid "Unable to load this video. Click play to retry or choose another video."
+msgstr "Unable to load this video. Click play to retry or choose another video."
+
+#: functions.php
+msgid "Click play to start the video."
+msgstr "Click play to start the video."
+
+#: functions.php
+msgid "No valid video links are configured."
+msgstr "No valid video links are configured."
+
+#: functions.php
+msgid "Play video"
+msgstr "Play video"
+
+#: functions.php
+msgid "Pause video"
+msgstr "Pause video"
+
+#: functions.php
+msgid "Choose another video"
+msgstr "Choose another video"

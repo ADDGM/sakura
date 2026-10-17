@@ -629,6 +629,7 @@ var coverHls = null;
 var nativeCoverVideo = null;
 var nativeCoverMetadataHandler = null;
 var coverVideoGeneration = 0;
+var homeVideo = null;
 
 function ensureHls() {
     if (typeof window.Hls === 'function' && typeof window.Hls.isSupported === 'function') {
@@ -1480,8 +1481,210 @@ loadCSS("https://fonts.googleapis.com/css?family=Noto+SerifMerriweather|Merriwea
     }])
 });
 
+// The home video survives #page replacement, but its media resources do not.
+function createHomeVideoController(video, config, render) {
+    var sources = Array.isArray(config.sources) ? config.sources : [];
+    var selected = null, hls = null, active = false, wanted = false, hasMedia = false;
+    var generation = 0, playAttempt = 0, pendingPlay = false, savedTime = 0;
+    var phase = 'idle', timer = null, listeners = [];
+
+    function display(next, label) {
+        phase = next;
+        render(next, (config.labels || {})[label] || '', !!selected);
+    }
+    function current(token) {
+        return token === generation && active && document.documentElement.contains(video);
+    }
+    function clearTimer() {
+        clearTimeout(timer);
+        timer = null;
+    }
+    function rememberTime() {
+        if (hasMedia && Number.isFinite(video.currentTime) && video.currentTime > 0) savedTime = video.currentTime;
+    }
+    function release() {
+        generation++;
+        playAttempt++;
+        pendingPlay = false;
+        clearTimer();
+        listeners.forEach(function (entry) { video.removeEventListener(entry[0], entry[1]); });
+        listeners = [];
+        if (hls) hls.destroy();
+        hls = null;
+        if (hasMedia) {
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+        }
+        hasMedia = false;
+    }
+    function fail() {
+        wanted = false;
+        rememberTime();
+        release();
+        display('error', 'failed');
+    }
+    function restoreTime() {
+        if (!savedTime) return;
+        var target = savedTime;
+        if (Number.isFinite(video.duration) && video.duration > 0) {
+            target = Math.min(target, Math.max(0, video.duration - 0.1));
+        } else if (video.seekable && video.seekable.length) {
+            target = Math.max(video.seekable.start(0), Math.min(target, video.seekable.end(video.seekable.length - 1) - 0.1));
+        } else {
+            return;
+        }
+        try {
+            video.currentTime = target;
+            savedTime = 0;
+        } catch (error) {
+            // Retry when metadata or the seekable range becomes available.
+        }
+    }
+    function requestPlay(token) {
+        if (!current(token) || !wanted || pendingPlay) return;
+        restoreTime();
+        pendingPlay = true;
+        var attempt = ++playAttempt;
+        function rejected(error) {
+            if (!current(token) || attempt !== playAttempt || !wanted) return;
+            pendingPlay = false;
+            if (error && error.name === 'NotAllowedError') {
+                wanted = false;
+                clearTimer();
+                video.pause();
+                display('paused', 'blocked');
+            } else {
+                fail();
+            }
+        }
+        try {
+            var playback = video.play();
+            if (playback && typeof playback.catch === 'function') playback.catch(rejected);
+        } catch (error) {
+            rejected(error);
+        }
+    }
+    function watch(event, token, handler) {
+        var listener = function () { if (current(token)) handler.apply(null, arguments); };
+        video.addEventListener(event, listener);
+        listeners.push([event, listener]);
+    }
+    function startTimer(token) {
+        clearTimer();
+        timer = setTimeout(function () { if (current(token) && wanted) fail(); }, 30000);
+    }
+    function loadSelected() {
+        release();
+        hasMedia = true;
+        var token = generation;
+        display('loading', 'loading');
+        startTimer(token);
+        watch('loadedmetadata', token, restoreTime);
+        watch('canplay', token, function () { restoreTime(); requestPlay(token); });
+        watch('playing', token, function () {
+            if (!wanted) { video.pause(); return; }
+            clearTimer();
+            display('playing');
+        });
+        watch('error', token, function () { if (video.error) fail(); });
+        watch('ended', token, function () {
+            wanted = false;
+            selected = null;
+            savedTime = 0;
+            release();
+            display('idle');
+        });
+        function nativeSource() {
+            if (!current(token)) return;
+            video.src = selected.url;
+            video.load();
+            requestPlay(token);
+        }
+        function nativeHls() {
+            if (!current(token)) return;
+            if (video.canPlayType('application/vnd.apple.mpegurl')) nativeSource();
+            else fail();
+        }
+        if (selected.type !== 'm3u8') {
+            nativeSource();
+            return;
+        }
+        ensureHls().done(function (Hls) {
+            if (!current(token)) return;
+            if (!Hls.isSupported()) { nativeHls(); return; }
+            try {
+                hls = new Hls();
+                hls.on(Hls.Events.MANIFEST_PARSED, function () { requestPlay(token); });
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    if (current(token) && data.fatal) fail();
+                });
+                hls.loadSource(selected.url);
+                hls.attachMedia(video);
+            } catch (error) {
+                if (current(token)) fail();
+            }
+        }).fail(nativeHls);
+    }
+    function play() {
+        if (!active) return;
+        if (!selected) {
+            if (!sources.length) { display('error', 'empty'); return; }
+            selected = sources[Math.floor(Math.random() * sources.length)];
+        }
+        wanted = true;
+        if (!hasMedia) loadSelected();
+        else {
+            pendingPlay = false;
+            display('loading', 'loading');
+            startTimer(generation);
+            requestPlay(generation);
+        }
+    }
+    function pause() {
+        wanted = false;
+        playAttempt++;
+        pendingPlay = false;
+        clearTimer();
+        if (phase === 'loading') {
+            rememberTime();
+            release();
+        } else video.pause();
+        display('paused', 'paused');
+    }
+    function leave() {
+        if (!active) return;
+        rememberTime();
+        active = false;
+        release();
+        display(selected ? 'paused' : 'idle', selected ? 'paused' : null);
+    }
+    display('idle');
+    return {
+        toggle: function () {
+            if (!active) return;
+            if (wanted && (phase === 'playing' || phase === 'loading')) pause();
+            else play();
+        },
+        next: function () {
+            if (!active) return;
+            selected = null;
+            savedTime = 0;
+            release();
+            play();
+        },
+        leave: leave,
+        enter: function (isHome) {
+            if (!isHome) { leave(); return; }
+            if (active) return;
+            active = true;
+            if (config.live === 'open' && wanted && selected) play();
+            else wanted = false;
+        }
+    };
+}
+
 var home = location.href,
-    s = $('#bgvideo')[0],
     Siren = {
         MN: function () {
             $('.iconflat').on('click', function () {
@@ -1495,92 +1698,29 @@ var home = location.href,
                 $('#main-container,#mo-nav,.openNav').toggleClass('open');
             }
         },
-        splay: function () {
-            $('#video-btn').addClass('video-pause').removeClass('video-play').show();
-            $('.video-stu').css({
-                "bottom": "-100px"
-            });
-            $('.focusinfo').css({
-                "top": "-999px"
-            });
-            try {
-                for (var i = 0; i < ap.length; i++) {
-                    try {
-                        ap[i].destroy()
-                    } catch (e) {}
-                }
-            } catch (e) {}
-            try {
-                hermitInit()
-            } catch (e) {}
-            s.play();
-        },
-        spause: function () {
-            $('#video-btn').addClass('video-play').removeClass('video-pause');
-            $('.focusinfo').css({
-                "top": "49.3%"
-            });
-            s.pause();
-        },
-        liveplay: function () {
-            if (s.oncanplay != undefined && $('.haslive').length > 0) {
-                if ($('.videolive').length > 0) {
-                    Siren.splay();
-                }
-            }
-        },
-        livepause: function () {
-            if (s.oncanplay != undefined && $('.haslive').length > 0) {
-                Siren.spause();
-                $('.video-stu').css({
-                    "bottom": "0px"
-                }).html('已暂停 ...');
-            }
-        },
-        addsource: function () {
-            $('.video-stu').html('正在载入视频 ...').css({
-                "bottom": "0px"
-            });
-            var t = Poi.movies.name.split(","),
-                _t = t[Math.floor(Math.random() * t.length)];
-            $('#bgvideo').attr('src', Poi.movies.url + '/' + _t + '.mp4');
-            $('#bgvideo').attr('video-name', _t);
-        },
         LV: function () {
-            var _btn = $('#video-btn');
-            _btn.on('click', function () {
-                if ($(this).hasClass('loadvideo')) {
-                    $(this).addClass('video-pause').removeClass('loadvideo').hide();
-                    Siren.addsource();
-                    s.oncanplay = function () {
-                        Siren.splay();
-                        $('#video-add').show();
-                        _btn.addClass('videolive').addClass('haslive');
-                    }
-                } else {
-                    if ($(this).hasClass('video-pause')) {
-                        Siren.spause();
-                        _btn.removeClass('videolive');
-                        $('.video-stu').css({
-                            "bottom": "0px"
-                        }).html('已暂停 ...');
-                    } else {
-                        Siren.splay();
-                        _btn.addClass('videolive');
-                    }
-                }
-                s.onended = function () {
-                    $('#bgvideo').attr('src', '');
-                    $('#video-add').hide();
-                    _btn.addClass('loadvideo').removeClass('video-pause').removeClass('videolive').removeClass('haslive');
-                    $('.focusinfo').css({
-                        "top": "49.3%"
-                    });
+            var video = document.getElementById('bgvideo');
+            if (homeVideo || !video || !Poi.movies || Poi.movies === 'close' || Poi.windowheight !== 'auto') return;
+            var labels = Poi.movies.labels || {};
+            homeVideo = createHomeVideoController(video, Poi.movies, function (phase, message, selected) {
+                var running = phase === 'playing' || phase === 'loading';
+                $('#video-btn').removeClass('loadvideo video-play video-pause videolive haslive')
+                    .addClass(running ? 'video-pause' : 'video-play')
+                    .attr({role: 'button', tabindex: '0', 'aria-label': running ? labels.pause : labels.play}).show();
+                $('#video-add').attr({role: 'button', tabindex: '0', 'aria-label': labels.next}).toggle(selected);
+                $('.video-stu').text(message).css('bottom', message ? '0px' : '-100px');
+                $('.focusinfo').css('top', phase === 'playing' ? '-999px' : '49.3%');
+                if (phase === 'playing' && typeof ap !== 'undefined' && Array.isArray(ap)) {
+                    ap.forEach(function (player) { if (player && typeof player.pause === 'function') player.pause(); });
                 }
             });
-            $('#video-add').on('click', function () {
-                Siren.addsource();
+            $('#video-btn, #video-add').off('.homeVideo').on('click.homeVideo keydown.homeVideo', function (event) {
+                if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                if (this.id === 'video-add') homeVideo.next();
+                else homeVideo.toggle();
             });
+            homeVideo.enter($('h1.main-title').length > 0);
         },
         AH: function () {
             if (Poi.windowheight == 'auto' && mashiro_option.windowheight == 'auto') {
@@ -1606,7 +1746,7 @@ var home = location.href,
                     $('.headertop').css({
                         "height": "auto"
                     }).show();
-                    if (Poi.movies.live == 'open') Siren.liveplay();
+
                 } else {
                     $('.blank').css({
                         "padding-top": "75px"
@@ -1614,7 +1754,7 @@ var home = location.href,
                     $('.headertop').css({
                         "height": "0px"
                     }).hide();
-                    Siren.livepause();
+
                 }
             }
         },
@@ -2085,7 +2225,9 @@ $(function () {
         $(document).pjax('a[target!=_top]', '#page', {
             fragment: '#page',
             timeout: 8000,
-        }).on('pjax:beforeReplace', destroyCoverHls).on('pjax:beforeSend', () => { //离开页面停止播放
+        }).on('pjax:beforeReplace', destroyCoverHls).on('pjax:beforeReplace', function () {
+            if (homeVideo) homeVideo.leave();
+        }).on('pjax:beforeSend', () => { //离开页面停止播放
             $('.normal-cover-video').each(function () {
                 this.pause();
                 this.src = '';
@@ -2114,6 +2256,8 @@ $(function () {
             }
         }).on('pjax:end', function() {
             coverVideoIni();
+            Siren.PE();
+            if (homeVideo) homeVideo.enter($('h1.main-title').length > 0);
             if (window.gtag){
                 gtag('config', Poi.google_analytics_id, {
                     'page_path': window.location.pathname

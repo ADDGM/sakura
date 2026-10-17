@@ -199,7 +199,8 @@ function mo_build($entries)
         $offset += strlen($translation) + 1;
     }
 
-    return pack('V7', 0x950412de, 0, $count, $originalTableOffset, $translationTableOffset, 0, 0)
+    // 即使哈希表为空，POMO仍用该偏移定位译文索引的末尾。
+    return pack('V7', 0x950412de, 0, $count, $originalTableOffset, $translationTableOffset, 0, $stringOffset)
         . $originalTable . $translationTable . $originalStrings . $translationStrings;
 }
 

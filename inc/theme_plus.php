@@ -14,11 +14,55 @@ show_admin_bar(false);
 /*
  * 视频
  */
+/**
+ * Parse complete home video URLs without rewriting signed query strings.
+ *
+ * @return array|WP_Error
+ */
+function sakura_parse_home_video_sources($input) {
+  if (!is_string($input)) {
+    return new WP_Error('home_video_source', '', array('line' => 1));
+  }
+  $sources = array();
+  foreach (preg_split('/\r\n|\r|\n/', $input) as $index => $line) {
+    $url = trim($line, " \t");
+    if ('' === $url) continue;
+    $parts = wp_parse_url($url);
+    if (preg_match('/[\x00-\x20\x7f\\\\<>]/', $url) || !is_array($parts)
+      || !isset($parts['scheme'], $parts['host'], $parts['path']) || '' === $parts['host']
+      || !in_array(strtolower($parts['scheme']), array('http', 'https'), true)
+      || isset($parts['user']) || isset($parts['pass'])
+      || !preg_match('/\.(mp4|webm|m3u8)$/i', $parts['path'], $extension)) {
+      return new WP_Error('home_video_source', '', array('line' => $index + 1));
+    }
+    $sources[] = array('url' => $url, 'type' => strtolower($extension[1]));
+  }
+  return $sources;
+}
+
+/**
+ * Keep the legacy directory/name convention when the optional list is empty.
+ *
+ * @return array|WP_Error
+ */
+function sakura_get_home_video_sources() {
+  $sources = sakura_parse_home_video_sources(akina_option('amv_sources', ''));
+  if (is_wp_error($sources) || $sources) return $sources;
+  $directory = akina_option('amv_url', '');
+  $names = akina_option('amv_title', '');
+  if (!is_string($directory) || !is_string($names)) return array();
+  foreach (explode(',', $names) as $name) {
+    $name = trim($name);
+    if ('' !== $name) $sources[] = array('url' => $directory . '/' . $name . '.mp4', 'type' => 'mp4');
+  }
+  return $sources;
+}
+
 function bgvideo(){
   $dis = '';
   if(!akina_option('focus_amv') || akina_option('focus_height')) $dis = 'display:none;';
   $html = '<div id="video-container" style="'.$dis.'">'; 
-  $html .= '<video id="bgvideo" class="video" video-name="" src="" width="auto" preload="auto"></video>';
+  $html .= '<video id="bgvideo" class="video" width="auto" preload="none" playsinline></video>';
   $html .= '<div id="video-btn" class="loadvideo videolive"></div>';
   $html .= '<div id="video-add"></div>';
   $html .= '<div class="video-stu"></div>';

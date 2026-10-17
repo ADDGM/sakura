@@ -856,6 +856,72 @@ if (function_exists('of_sanitize_site_start_date')) {
     }
 }
 
+if (function_exists('sakura_parse_home_video_sources') && function_exists('of_sanitize_amv_sources')) {
+    require_once ABSPATH . WPINC . '/pomo/mo.php';
+    foreach (array('zh_CN', 'zh_TW', 'en_US', 'ja') as $videoLocale) {
+        $videoMo = new MO();
+        if (!$videoMo->import_from_file(get_template_directory() . '/languages/' . $videoLocale . '.mo') || !isset($videoMo->entries['Video links']) || !isset($videoMo->entries['Click play to start the video.'])) {
+            $errors[] = '首页视频翻译无法通过WordPress MO读取：' . $videoLocale;
+        }
+    }
+    $videoUrls = array(
+        'https://media.example.test/clip.MP4?part=a,b&sig=a%2Fb+Z#frame',
+        'http://media.example.test/clip.webm?x=1&y=2',
+        'https://media.example.test/master.m3u8?token=%25%2B',
+    );
+    $videoInput = " \t" . $videoUrls[0] . "\t\r\n\r\n" . $videoUrls[1] . "\r" . $videoUrls[2] . "\n";
+    $videoParsed = sakura_parse_home_video_sources($videoInput);
+    if (is_wp_error($videoParsed) || array_column($videoParsed, 'url') !== $videoUrls || array_column($videoParsed, 'type') !== array('mp4', 'webm', 'm3u8')) {
+        $errors[] = '首页视频列表未保留完整链接或正确识别三种格式。';
+    }
+    foreach (array('/relative.mp4', 'https://media.example.test/no-extension', 'https://media.example.test/file.mp4.exe', 'javascript:video.mp4', 'https://user:pass@media.example.test/a.mp4', "https://media.example.test/a\\b.mp4", "https://media.example.test/a\x00.mp4", array()) as $invalidVideo) {
+        if (!is_wp_error(sakura_parse_home_video_sources($invalidVideo))) $errors[] = '首页视频列表接受了无效的完整链接。';
+    }
+    $videoInvalidLine = sakura_parse_home_video_sources($videoUrls[0] . "\n\ninvalid");
+    if (!is_wp_error($videoInvalidLine) || $videoInvalidLine->get_error_data()['line'] !== 3) {
+        $errors[] = '首页视频配置错误未保留原输入行号。';
+    }
+
+    $videoOptions = array('amv_sources' => implode("\n", $videoUrls), 'amv_url' => '/legacy', 'amv_title' => 'first, ,second');
+    $videoFrameworkFilter = static function () { return array('id' => 'sakura'); };
+    $videoOptionFilter = static function () use (&$videoOptions) { return $videoOptions; };
+    $videoSettingsErrors = $GLOBALS['wp_settings_errors'] ?? array();
+    add_filter('pre_option_optionsframework', $videoFrameworkFilter);
+    add_filter('pre_option_sakura', $videoOptionFilter);
+    try {
+        $cleanVideo = apply_filters('of_sanitize_amv_sources', $videoInput);
+        if ($cleanVideo !== implode("\n", $videoUrls) || sakura_get_home_video_sources() !== $videoParsed) {
+            $errors[] = '首页视频专用清洗器或新列表优先级异常。';
+        }
+        if (of_sanitize_amv_sources('invalid') !== $videoOptions['amv_sources'] || of_sanitize_amv_sources(" \t\r\n") !== '') {
+            $errors[] = '首页视频非法配置没有保留原列表，或无法明确清空列表。';
+        }
+        // Exercise the real save dispatcher without persisting unrelated options.
+        $videoForm = of_get_default_values();
+        foreach (_optionsframework_options() as $field) {
+            if (isset($field['id']) && !isset($videoForm[$field['id']])) $videoForm[$field['id']] = '';
+        }
+        $videoForm['amv_sources'] = $videoInput;
+        $videoCleanForm = optionsframework_validate($videoForm);
+        if ($videoCleanForm['amv_sources'] !== $cleanVideo) $errors[] = '主题保存分派没有采用首页视频字段专用清洗器。';
+        $videoOptions['amv_sources'] = '';
+        if (array_column(sakura_get_home_video_sources(), 'url') !== array('/legacy/first.mp4', '/legacy/second.mp4')) {
+            $errors[] = '清空首页视频列表后没有回退到旧目录与名称。';
+        }
+        $videoOptions['amv_sources'] = 'invalid';
+        if (!is_wp_error(sakura_get_home_video_sources())) $errors[] = '损坏的非空首页视频列表静默回退到了旧配置。';
+        $videoOptions['amv_sources'] = '';
+        $videoOptions['amv_title'] = ' , ';
+        if (sakura_get_home_video_sources() !== array()) $errors[] = '空首页视频名称生成了虚假的媒体来源。';
+    } finally {
+        remove_filter('pre_option_optionsframework', $videoFrameworkFilter);
+        remove_filter('pre_option_sakura', $videoOptionFilter);
+        $GLOBALS['wp_settings_errors'] = $videoSettingsErrors;
+    }
+} else {
+    $errors[] = '缺少首页视频链接解析或专用清洗函数。';
+}
+
 if (function_exists('sakura_get_mail_from_address') && function_exists('sakura_get_mail_headers') && function_exists('sakura_render_test_mail')) {
     $mailOptionFilter = static function ($value) {
         return array('mail_user_name' => 'bibi');

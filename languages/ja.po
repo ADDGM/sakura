@@ -333,3 +333,48 @@ msgstr "Live2D 設定"
 #: options.php
 msgid "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."
 msgstr "ウィジェットはブラウザーの表示領域の幅が 861 ピクセル以上の場合にのみ読み込まれます。移動ハンドルでドラッグするか、リセットボタンで位置を元に戻せます。"
+
+#: options.php
+msgid "Video links"
+msgstr "動画リンク"
+
+#: options.php
+msgid "Optional: one complete HTTP(S) URL per line, ending in .mp4, .webm or .m3u8. Query parameters are allowed. Videos are selected randomly. This list takes priority; leave it empty to use the video address and names below. Use publicly accessible links: visitors can read these URLs."
+msgstr "任意：各行に .mp4、.webm、.m3u8 で終わる完全な HTTP(S) URL を入力します。クエリパラメーターも使用できます。動画はランダムに選択されます。このリストが優先され、空欄の場合は下の動画アドレスと名前を使用します。訪問者にも URL が見えるため、公開アクセス可能なリンクを使用してください。"
+
+#: inc/options-sanitize.php
+#, php-format
+msgid "Invalid video link on line %d. Use a complete HTTP(S) URL ending in .mp4, .webm or .m3u8; query parameters are allowed. The previous list was kept."
+msgstr "%d 行目の動画リンクが無効です。.mp4、.webm、.m3u8 で終わる完全な HTTP(S) URL を使用してください。クエリパラメーターも使用できます。以前のリストを保持しました。"
+
+#: functions.php
+msgid "Loading video..."
+msgstr "動画を読み込み中…"
+
+#: functions.php
+msgid "Video paused."
+msgstr "動画を一時停止しました。"
+
+#: functions.php
+msgid "Unable to load this video. Click play to retry or choose another video."
+msgstr "動画を読み込めません。再生を押して再試行するか、別の動画を選んでください。"
+
+#: functions.php
+msgid "Click play to start the video."
+msgstr "再生を押して動画を開始してください。"
+
+#: functions.php
+msgid "No valid video links are configured."
+msgstr "有効な動画リンクが設定されていません。"
+
+#: functions.php
+msgid "Play video"
+msgstr "動画を再生"
+
+#: functions.php
+msgid "Pause video"
+msgstr "動画を一時停止"
+
+#: functions.php
+msgid "Choose another video"
+msgstr "別の動画を選ぶ"

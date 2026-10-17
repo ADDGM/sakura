@@ -2585,3 +2585,48 @@ msgstr "看板娘"
 #: options.php
 msgid "The widget loads only when the browser viewport is at least 861 pixels wide. Use the move handle to drag it, or the reset button to restore its position."
 msgstr "僅在瀏覽器檢視區寬度不小於 861 像素時載入看板娘。使用移動把手拖曳，或點擊重設按鈕恢復位置。"
+
+#: options.php
+msgid "Video links"
+msgstr "影片連結"
+
+#: options.php
+msgid "Optional: one complete HTTP(S) URL per line, ending in .mp4, .webm or .m3u8. Query parameters are allowed. Videos are selected randomly. This list takes priority; leave it empty to use the video address and names below. Use publicly accessible links: visitors can read these URLs."
+msgstr "選填：每行填入一個以 .mp4、.webm 或 .m3u8 結尾的完整 HTTP(S) 連結，可含查詢參數。影片隨機選取。優先使用此清單；留空時使用下方的影片位址與名稱。請使用可公開存取的連結，訪客可以讀取這些位址。"
+
+#: inc/options-sanitize.php
+#, php-format
+msgid "Invalid video link on line %d. Use a complete HTTP(S) URL ending in .mp4, .webm or .m3u8; query parameters are allowed. The previous list was kept."
+msgstr "第 %d 行的影片連結無效。請使用以 .mp4、.webm 或 .m3u8 結尾的完整 HTTP(S) 連結，可含查詢參數。已保留原清單。"
+
+#: functions.php
+msgid "Loading video..."
+msgstr "正在載入影片…"
+
+#: functions.php
+msgid "Video paused."
+msgstr "影片已暫停。"
+
+#: functions.php
+msgid "Unable to load this video. Click play to retry or choose another video."
+msgstr "無法載入此影片。點選播放以重試，或切換其他影片。"
+
+#: functions.php
+msgid "Click play to start the video."
+msgstr "點選播放以開始影片。"
+
+#: functions.php
+msgid "No valid video links are configured."
+msgstr "尚未設定有效的影片連結。"
+
+#: functions.php
+msgid "Play video"
+msgstr "播放影片"
+
+#: functions.php
+msgid "Pause video"
+msgstr "暫停影片"
+
+#: functions.php
+msgid "Choose another video"
+msgstr "切換影片"

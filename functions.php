@@ -383,6 +383,20 @@ function sakura_scripts()
     // 20161116 @Louie
     $mv_live = akina_option('focus_mvlive') ? 'open' : 'close';
     $movies = akina_option('focus_amv') ? array('url' => akina_option('amv_url'), 'name' => akina_option('amv_title'), 'live' => $mv_live) : 'close';
+    if (is_array($movies)) {
+        $movie_sources = sakura_get_home_video_sources();
+        $movies['sources'] = is_wp_error($movie_sources) ? array() : $movie_sources;
+        $movies['labels'] = array(
+            'loading' => __('Loading video...', 'sakura'),
+            'paused' => __('Video paused.', 'sakura'),
+            'failed' => __('Unable to load this video. Click play to retry or choose another video.', 'sakura'),
+            'blocked' => __('Click play to start the video.', 'sakura'),
+            'empty' => __('No valid video links are configured.', 'sakura'),
+            'play' => __('Play video', 'sakura'),
+            'pause' => __('Pause video', 'sakura'),
+            'next' => __('Choose another video', 'sakura'),
+        );
+    }
     $auto_height = akina_option('focus_height') ? 'fixed' : 'auto';
     $code_lamp = 'close';
     // if (wp_is_mobile()) {
