@@ -16,6 +16,8 @@ Status: implemented
 
 ## Existing record audit
 
+2026-10-17在同一标签末尾追加可选 `live2d_catalog` 文本字段，理由、保存校验、上传目录示例及验证见[外置服装清单](../architecture/2026-10-17-live2d-external-costume-catalog.md)。原四项配置键及远程PNG含义不变；下方四项布局和保存结果是2026-10-07的历史验证范围。
+
 活跃笔记检索命中[部署后边界补验](../../implemented/testing/2026-10-07-live2d-deployed-boundaries.md)，其运行时边界与本方案说明部分重叠，继续作为861px边界依据；没有现有设置标签决定可吸收。
 
 后续提炼的[基础接入](../architecture/2026-10-07-live2d-integration.md)和[浮层位置](../bug-fix/2026-10-07-live2d-player-layout.md)持有运行时契约，与本篇部分重叠；本篇继续维护标签组织和保存兼容，不复制模型与布局实现说明。

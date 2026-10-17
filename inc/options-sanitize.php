@@ -2,6 +2,24 @@
 add_filter( 'of_sanitize_text', 'sanitize_text_field' );
 
 /**
+ * Keep the previous catalog address when a new value is invalid.
+ */
+function of_sanitize_live2d_catalog( $input ) {
+	$value = sakura_live2d_catalog_url( $input );
+	if ( false !== $value ) return $value;
+	add_settings_error(
+		'options-framework',
+		'live2d_catalog',
+		__( 'Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept.', 'sakura' ),
+		'error'
+	);
+	$settings = get_option( 'optionsframework' );
+	$saved = is_array( $settings ) && isset( $settings['id'] ) ? get_option( $settings['id'], array() ) : array();
+	return is_array( $saved ) && isset( $saved['live2d_catalog'] ) && is_string( $saved['live2d_catalog'] ) ? $saved['live2d_catalog'] : '';
+}
+add_filter( 'of_sanitize_live2d_catalog', 'of_sanitize_live2d_catalog' );
+
+/**
  * Validate the optional site launch date without overwriting a valid stored value.
  */
 function of_sanitize_site_start_date( $input, $option = array() ) {

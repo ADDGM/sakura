@@ -66,6 +66,7 @@ test('image failure and timeout preserve the old costume and allow retry', async
     assert.equal(await p,false); assert.equal(f.draw.textures[0],f.original); assert.equal(f.status.textContent,'failed');
     p=f.api.changeCostume(); [...f.timers.values()][0](); assert.equal(await p,false);
     assert.equal(f.images.at(-1).onload,null); assert.equal(f.deleted.length,0);
+    assert.equal(f.images.at(-1).src, '', 'Timeout must cancel the request before retrying the same URL');
     p=f.api.changeCostume(); f.images.at(-1).onload(); assert.equal(await p,true);
 });
 
@@ -94,4 +95,28 @@ test('remote swaps preserve existing query parameters and vary the cache key', a
 test('oversized decoded images do not allocate a GPU texture', async () => {
     const f=fixture(); f.configure(); const p=f.api.changeCostume(); f.images[0].naturalWidth=8192; f.images[0].onload();
     assert.equal(await p,false); assert.equal(f.uploaded.length,0); assert.equal(f.deleted.length,0);
+});
+
+test('late catalog merges preserve the current costume and an in-flight swap', async () => {
+    const f = fixture();
+    const revision = f.api.configureCostumes({textures: ['/a.png', '/b.png'], current: '/a.png'});
+    const p = f.api.changeCostume(); assert.equal(f.images[0].src, '/b.png');
+    assert.equal(f.api.mergeCostumes(['/b.png'], revision), true);
+    assert.equal(f.button.disabled, true); assert.equal(await f.api.changeCostume(), false);
+    f.images[0].onload(); assert.equal(await p, true);
+    f.api.mergeCostumes(['/b.png', '/a.png'], revision);
+    const q = f.api.changeCostume(); assert.equal(f.images[1].src, '/a.png');
+    f.images[1].onload(); assert.equal(await q, true);
+});
+
+test('catalog and image responses from an old configuration cannot overwrite the new one', async () => {
+    const f = fixture();
+    const old = f.api.configureCostumes({textures: ['/a.png', '/b.png'], current: '/a.png'});
+    const p = f.api.changeCostume();
+    f.api.configureCostumes({textures: ['/new.png'], current: '/new.png'});
+    assert.equal(f.api.mergeCostumes(['/stale.png'], old), false);
+    f.images[0].onload(); assert.equal(await p, false); assert.equal(f.uploaded.length, 0);
+    assert.equal(f.button.hidden, true);
+    const remote = f.api.configureCostumes({remote: true, current: '/random.png'});
+    assert.equal(f.api.mergeCostumes(['/catalog.png'], remote), false);
 });

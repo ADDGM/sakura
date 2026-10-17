@@ -1134,6 +1134,7 @@ if (class_exists('Sakura\\API\\Meting')) {
 }
 
 require __DIR__ . '/tests/post-cover.php';
+require __DIR__ . '/tests/live2d-catalog.php';
 
 do_action('rest_api_init');
 $routes = rest_get_server()->get_routes();

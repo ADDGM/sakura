@@ -16,6 +16,8 @@ Status: implemented
 
 ## Existing record audit
 
+[外置服装清单](../architecture/2026-10-17-live2d-external-costume-catalog.md)补充候选来源和独立配置，按钮继续复用本篇的纹理替换机制。合并候选不重置当前服装或busy；配置代次变化后旧图片响应不再提交。2026-10-17真实超时回归补充清空Image.src取消失败请求，避免同URL重试复用未结束的网络请求；120项Node和42项浏览器复验结果由该篇持有，下方87/30项保留为初始实现的历史范围。
+
 [服装目录提案](../../proposed/feature/2026-10-17-live2d-costume-catalog.md)部分重叠，负责新增素材的兼容映射与来源，本篇只负责切换行为；[基础接入](../architecture/2026-10-07-live2d-integration.md)保留启动与861px边界，[浮层布局](../bug-fix/2026-10-07-live2d-player-layout.md)保留位置和避让。现有四项设置不变，不新增后台配置或完整服装选择面板。
 
 ## Alternatives considered

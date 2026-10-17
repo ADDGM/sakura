@@ -15,6 +15,7 @@
     var remoteBase = '';
     var busy = false;
     var sequence = 0;
+    var generation = 0;
 
     function target() {
         return typeof api.getTextureTarget === 'function' ? api.getTextureTarget() : null;
@@ -36,7 +37,7 @@
         }
     }
 
-    function replaceTexture(url) {
+    function replaceTexture(url, revision) {
         var initial = target();
         return new Promise(function (resolve, reject) {
             if (!initial) { reject(new Error('Model is not ready')); return; }
@@ -48,13 +49,16 @@
                 settled = true;
                 window.clearTimeout(timer);
                 image.onload = image.onerror = null;
-                if (error) reject(error); else resolve();
+                if (error) {
+                    image.src = '';
+                    reject(error);
+                } else resolve();
             }
             image.crossOrigin = 'anonymous';
             image.onerror = function () { finish(new Error('Texture image failed to load')); };
             image.onload = function () {
                 var latest = target();
-                if (!latest || latest.model !== initial.model || latest.gl !== initial.gl) {
+                if (revision !== generation || !latest || latest.model !== initial.model || latest.gl !== initial.gl) {
                     finish(new Error('Model changed while loading texture'));
                     return;
                 }
@@ -104,10 +108,20 @@
     }
 
     api.configureCostumes = function (options) {
+        generation++;
         textures = Array.from(new Set((options.textures || []).filter(function (url) { return typeof url === 'string' && url; })));
         current = options.current;
         remoteBase = options.remote ? current : '';
         updateButton();
+        return generation;
+    };
+
+    // Catalog responses may add candidates, but must not reset an active swap.
+    api.mergeCostumes = function (urls, revision) {
+        if (revision !== generation || remoteBase) return false;
+        textures = Array.from(new Set(textures.concat(urls)));
+        updateButton();
+        return true;
     };
 
     api.changeCostume = function () {
@@ -123,14 +137,16 @@
             next = choices[Math.floor(Math.random() * choices.length)];
         }
         busy = true;
+        var revision = generation;
         updateButton();
         announce('costumeChanging');
-        return replaceTexture(next).then(function () {
+        return replaceTexture(next, revision).then(function () {
+            if (revision !== generation) return false;
             current = next;
             announce('costumeChanged');
             return true;
         }, function () {
-            announce('costumeFailed');
+            if (revision === generation) announce('costumeFailed');
             return false;
         }).finally(function () {
             busy = false;

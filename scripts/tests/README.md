@@ -82,9 +82,12 @@ node --test scripts/tests/verification.test.cjs
 ```bash
 node --test scripts/tests/live2d.test.cjs
 node --test scripts/tests/live2d-costume.test.cjs
+node --test scripts/tests/live2d-catalog.test.cjs
 ```
 
-浏览器回归是按需运行的局部夹具，需要Playwright、Chromium兼容浏览器和与内置运行时一致的APlayer 1.10.1基础样式。克隆仓库不包含这些外部依赖，应在需要复测时准备：
+清单单元测试覆盖格式/大小/路径/模型、幂等与过期响应；完整 WordPress smoke 同时执行 `live2d-catalog.php`，验证真实设置保存与读取、非法值保留、脚本依赖、四语言 MO、自定义上传目录示例及旧远程 PNG 模式。测试恢复自身选项与全局状态。
+
+浏览器回归是按需运行的局部夹具，需要Playwright、Chromium兼容浏览器和与内置运行时一致的APlayer 1.10.1基础样式。除原换装/布局外，使用两个本地 HTTP 源验证同源与跨域清单、PNG缓存、真实10秒/15秒超时和CORS失败恢复；只复用内置纹理，不分发新增素材。克隆仓库不包含这些外部依赖，应在需要复测时准备：
 
 ```bash
 node scripts/tests/live2d-browser.cjs

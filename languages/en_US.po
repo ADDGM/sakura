@@ -2630,3 +2630,20 @@ msgstr "Costume changed."
 #: functions.php
 msgid "Unable to change costume. Please try again."
 msgstr "Unable to change costume. Please try again."
+
+#: options.php
+msgid "External Live2D costume catalog"
+msgstr "External Live2D costume catalog"
+
+#: options.php
+msgid "Optional JSON catalog for the selected model. Leave empty to use bundled costumes only. Disable the remote costume API to use this catalog. Upload the catalog and PNG files separately via SFTP or your hosting file manager; theme updates do not install them."
+msgstr "Optional JSON catalog for the selected model. Leave empty to use bundled costumes only. Disable the remote costume API to use this catalog. Upload the catalog and PNG files separately via SFTP or your hosting file manager; theme updates do not install them."
+
+#: options.php
+#, php-format
+msgid "Suggested directory: %1$s<br>Example catalog URL: %2$s"
+msgstr "Suggested directory: %1$s<br>Example catalog URL: %2$s"
+
+#: inc/options-sanitize.php
+msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."
+msgstr "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."

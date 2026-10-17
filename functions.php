@@ -256,6 +256,25 @@ function sakura_live2d_is_enabled()
     return in_array(akina_option('live2d_s', false), array(true, 1, '1'), true);
 }
 
+/**
+ * Validate an optional public static catalog address. No server-side fetch is made.
+ */
+function sakura_live2d_catalog_url($input)
+{
+    if (!is_string($input)) return false;
+    $value = trim($input);
+    if ('' === $value) return '';
+    $parts = wp_parse_url($value);
+    if (strlen($value) > 2048 || preg_match('/[\x00-\x20\\\\]/', $value) || !is_array($parts) ||
+        !isset($parts['scheme'], $parts['host'], $parts['path']) ||
+        !in_array(strtolower($parts['scheme']), array('http', 'https'), true) ||
+        isset($parts['user']) || isset($parts['pass']) || isset($parts['fragment']) ||
+        !preg_match('/\.json$/i', $parts['path']) || esc_url_raw($value, array('http', 'https')) !== $value) {
+        return false;
+    }
+    return $value;
+}
+
 function sakura_scripts()
 {
     $cache_version = sakura_frontend_cache_version();
@@ -303,6 +322,19 @@ function sakura_scripts()
             $dress_url = trailingslashit(esc_url_raw($dress_base)) . $live2d_model . '?' . wp_rand(10000000, 99999999);
         }
 
+        $catalog_url = $use_remote_dress ? '' : sakura_live2d_catalog_url(akina_option('live2d_catalog', ''));
+        $loader_dependencies = array('sakura-live2d-costume');
+        if ($catalog_url) {
+            wp_enqueue_script(
+                'sakura-live2d-catalog',
+                sakura_theme_asset_url('live2d/js/catalog.js'),
+                array('sakura-live2d-costume'),
+                $cache_version,
+                true
+            );
+            $loader_dependencies[] = 'sakura-live2d-catalog';
+        }
+
         wp_enqueue_style(
             'sakura-live2d',
             sakura_theme_asset_url('live2d/css/live2d.css'),
@@ -333,13 +365,18 @@ function sakura_scripts()
         wp_enqueue_script(
             'sakura-live2d-loader',
             sakura_theme_asset_url('live2d/js/' . ($use_remote_dress ? 'run_field.js' : 'run_local.js')),
-            array('sakura-live2d-costume'),
+            $loader_dependencies,
             $cache_version,
             true
         );
         wp_localize_script('sakura-live2d-message', 'SakuraLive2D', array(
             'enabled' => true,
             'modelPath' => trailingslashit(sakura_theme_asset_url('live2d/model/' . $live2d_model)),
+            'catalogUrl' => $catalog_url ?: '',
+            'catalogModel' => $catalog_url ? array(
+                'id' => $live2d_model,
+                'sha256' => hash_file('sha256', get_template_directory() . '/live2d/model/' . $live2d_model . '/model.moc'),
+            ) : null,
             'messageUrl' => add_query_arg('ver', $cache_version, sakura_theme_asset_url('live2d/message.json')),
             'messages' => array(
                 'costumeChanging' => __('Changing costume...', 'sakura'),

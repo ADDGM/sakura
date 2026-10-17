@@ -466,3 +466,20 @@ msgstr "着替えました。"
 #: functions.php
 msgid "Unable to change costume. Please try again."
 msgstr "着替えに失敗しました。もう一度お試しください。"
+
+#: options.php
+msgid "External Live2D costume catalog"
+msgstr "外部 Live2D 衣装カタログ"
+
+#: options.php
+msgid "Optional JSON catalog for the selected model. Leave empty to use bundled costumes only. Disable the remote costume API to use this catalog. Upload the catalog and PNG files separately via SFTP or your hosting file manager; theme updates do not install them."
+msgstr "選択したモデル用の任意の JSON 衣装カタログ。空欄の場合は同梱衣装のみを使用します。カタログを使うにはリモート衣装 API を無効にしてください。SFTP またはホスティングのファイルマネージャーでカタログと PNG を別途アップロードしてください。テーマ更新ではこれらのファイルはインストールされません。"
+
+#: options.php
+#, php-format
+msgid "Suggested directory: %1$s<br>Example catalog URL: %2$s"
+msgstr "推奨ディレクトリ：%1$s<br>カタログ URL の例：%2$s"
+
+#: inc/options-sanitize.php
+msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."
+msgstr "認証情報やフラグメントを含まない完全な HTTP(S) JSON カタログ URL を入力してください。以前の値を保持しました。"

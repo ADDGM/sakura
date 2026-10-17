@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const {createHash} = require('node:crypto');
 const {chromium} = require(process.env.PLAYWRIGHT_MODULE_PATH || 'playwright');
 
 const root = path.resolve(__dirname, '../..');
@@ -14,8 +15,31 @@ const widget = read('footer.php').match(/<div id="landlord"[\s\S]+?\r?\n\t<\/div
 const themeStyle = read('style.css');
 const hoverStyle = themeStyle.match(/\.ap-hover \{[^}]*\}/)[0] + themeStyle.match(/\.ap-hover:hover \{[^}]*\}/)[0];
 const remoteTexture = Object.values(JSON.parse(read('live2d/model/pio/textures.json')).pioUrl[0])[0];
-const server = http.createServer((request, response) => {
+const modelHashes = Object.fromEntries(['pio', 'tia'].map(model => [model,
+    createHash('sha256').update(fs.readFileSync(path.join(root, 'live2d/model', model, 'model.moc'))).digest('hex')]));
+const packRequests = [];
+let failPackImages = true;
+const serve = (request, response) => {
     const url = new URL(request.url, 'http://localhost');
+    const pack = url.pathname.match(/^\/packs\/(pio|tia)\/([a-z-]+)\/(catalog\.json|[12]\.png)$/);
+    if (pack) {
+        const [, model, mode, file] = pack;
+        packRequests.push(url.pathname);
+        const json = file === 'catalog.json';
+        if (!(json && mode === 'json-cors') && !(!json && mode === 'png-cors' && failPackImages)) response.setHeader('Access-Control-Allow-Origin', '*');
+        if ((json && mode === 'json-timeout') || (!json && mode === 'png-timeout' && failPackImages)) return;
+        if ((json && mode === 'json-missing') || (!json && mode === 'png-missing' && failPackImages)) {response.writeHead(404).end(); return;}
+        response.setHeader('Content-Type', json ? 'application/json' : 'image/png');
+        response.setHeader('Cache-Control', !json && mode === 'png-cors' && failPackImages ? 'no-store' : 'public, max-age=3600');
+        if (json) {
+            response.end(JSON.stringify({version: 1, packVersion: 'v1', model: {id: mode === 'bad-model' ? 'wrong' : model, sha256: modelHashes[model]},
+                costumes: mode === 'empty' ? [] : [{id: 'one', texture: '1.png'}, {id: 'two', texture: '2.png'}]}));
+        } else {
+            const textures = JSON.parse(read('live2d/model/' + model + '/textures.json')).pioUrl;
+            fs.createReadStream(path.join(root, 'live2d/model', model, Object.values(textures[Number(file[0]) - 1])[0])).pipe(response);
+        }
+        return;
+    }
     if (url.pathname === '/') {
         response.setHeader('Content-Type', 'text/html; charset=utf-8');
         response.end('<!doctype html><html><head><link rel="icon" href="data:,"></head><body>' + widget +
@@ -40,11 +64,15 @@ const server = http.createServer((request, response) => {
     const types = {'.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.css': 'text/css'};
     response.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
     fs.createReadStream(file).pipe(response);
-});
+};
+const server = http.createServer(serve);
+const crossServer = http.createServer(serve);
 
 (async () => {
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    await new Promise(resolve => crossServer.listen(0, '127.0.0.1', resolve));
     const origin = 'http://127.0.0.1:' + server.address().port;
+    const crossOrigin = 'http://127.0.0.1:' + crossServer.address().port;
     const browser = await chromium.launch({
         headless: true,
         ...(process.env.BROWSER_EXECUTABLE ? {executablePath: process.env.BROWSER_EXECUTABLE} : {}),
@@ -70,7 +98,7 @@ const server = http.createServer((request, response) => {
         reports.push(name);
         console.log('PASS ' + name);
     };
-    async function setup({model, remote = false, blockedStorage = false, fixedHeader = false, adminBar = false} = {}) {
+    async function setup({model, remote = false, blockedStorage = false, fixedHeader = false, adminBar = false, catalogUrl = ''} = {}) {
         await page.goto(origin);
         await page.addStyleTag({url: origin + '/cdn/css/lib.css'});
         // The isolated fixture needs the base stylesheet for the bundled APlayer 1.10.1.
@@ -92,15 +120,16 @@ const server = http.createServer((request, response) => {
             }, adminBar);
         }
         await page.addScriptTag({path: path.join(root, 'cdn/js/src/01.jquery.min.js')});
-        await page.evaluate(({origin, messages, model, remoteTexture}) => {
+        await page.evaluate(({origin, messages, model, remoteTexture, catalogUrl, modelHashes}) => {
             window.SakuraLive2D = {
                 enabled: true, messageUrl: origin + '/live2d/message.json?test=1', messages,
                 modelPath: origin + '/live2d/model/' + (model || 'pio') + '/',
+                catalogUrl, catalogModel: {id: model, sha256: modelHashes[model]},
                 dressUrl: origin + '/live2d/model/pio/' + remoteTexture
             };
             window.mashiro_option = {float_player_on: true, meting_api_url: '/unused'};
             window.Poi = {nonce: 'test'};
-        }, {origin, messages, model, remoteTexture});
+        }, {origin, messages, model, remoteTexture, catalogUrl, modelHashes});
         await page.addScriptTag({path: path.join(root, 'cdn/js/src/07.APlayer.min.js')});
         await page.evaluate(() => {
             const Player = window.APlayer;
@@ -119,6 +148,15 @@ const server = http.createServer((request, response) => {
         await page.addScriptTag({path: path.join(root, 'live2d/js/message.js')});
         if (model) {
             await page.addScriptTag({path: path.join(root, 'live2d/js/costume.js')});
+            await page.addScriptTag({path: path.join(root, 'live2d/js/catalog.js')});
+            await page.evaluate(() => {
+                const api = window.sakuraLive2D;
+                const load = api.loadCostumeCatalog;
+                api.loadCostumeCatalog = (...args) => {
+                    window.catalogResult = undefined;
+                    return load(...args).then(result => {window.catalogResult = result; return result;});
+                };
+            });
             await page.addScriptTag({path: path.join(root, 'live2d/js/' + (remote ? 'run_field.js' : 'run_local.js'))});
         }
         await page.waitForTimeout(450);
@@ -385,11 +423,13 @@ const server = http.createServer((request, response) => {
                 const requests = [];
                 const listener = request => {if (request.url().includes('/live2d/model/')) requests.push(request.url());};
                 page.on('request', listener);
-                await setup({model: 'pio'});
+                const countBefore = packRequests.length;
+                await setup({model: 'pio', catalogUrl: origin + '/packs/pio/ok/catalog.json'});
                 await page.waitForTimeout(800);
                 page.off('request', listener);
                 assert.equal(await page.locator('#landlord').isVisible(), width > 860);
                 assert.equal(requests.length > 0, width > 860);
+                assert.equal(packRequests.length > countBefore, width > 860);
             });
         }
         await page.setViewportSize({width: 1280, height: 720});
@@ -477,10 +517,63 @@ const server = http.createServer((request, response) => {
             assert.ok(urls.every(url => url.pathname.endsWith(remoteTexture) && url.searchParams.has('sakura_costume')));
             assert.notEqual(urls[0].searchParams.get('sakura_costume'), urls[1].searchParams.get('sakura_costume'));
         });
+        for (const model of ['pio', 'tia']) {
+            for (const host of [origin, crossOrigin]) {
+                await check(model + (host === origin ? ' same-origin' : ' CORS') + ' catalog loads lazily and caches fixed PNGs', async () => {
+                    const start = packRequests.length;
+                    await setup({model, catalogUrl: host + '/packs/' + model + '/ok/catalog.json'});
+                    await page.waitForFunction(() => window.catalogResult !== undefined);
+                    assert.equal(await page.evaluate(() => window.catalogResult), true);
+                    assert.ok(packRequests.slice(start).every(url => url.endsWith('.json')));
+                    await page.waitForFunction(() => !document.querySelector('.change-costume').hidden);
+                    await page.evaluate(() => {window.originalRandom = Math.random; Math.random = () => 0.999;});
+                    for (let i = 0; i < 4; i++) {
+                        assert.equal(await page.evaluate(async () => {
+                            const api = window.sakuraLive2D, before = api.getTextureTarget(), old = before.model.getDrawParam().textures[0];
+                            return await api.changeCostume() && before.model === api.getTextureTarget().model &&
+                                !before.gl.isTexture(old) && before.gl.isTexture(before.model.getDrawParam().textures[0]);
+                        }), true);
+                    }
+                    const fetched = packRequests.slice(start).filter(url => url.endsWith('.png'));
+                    assert.ok(fetched.length <= 2); assert.ok(fetched.length > 0);
+                    const count = packRequests.length;
+                    await page.addScriptTag({path: path.join(root, 'live2d/js/run_local.js')});
+                    await page.evaluate(() => {window.live2d_Tips(); window.live2d_Tips(); Math.random = window.originalRandom;});
+                    await page.waitForTimeout(150);
+                    assert.equal(packRequests.length, count); assert.equal(await page.locator('#live2d').count(), 1);
+                    assert.equal(await page.locator('.aplayer').count(), 1);
+                });
+            }
+        }
+        for (const mode of ['json-missing', 'json-timeout', 'json-cors', 'bad-model', 'empty']) {
+            await check(mode + ' catalog retains working bundled costumes', async () => {
+                await setup({model: 'pio', catalogUrl: crossOrigin + '/packs/pio/' + mode + '/catalog.json'});
+                await page.waitForFunction(() => !document.querySelector('.change-costume').hidden);
+                assert.equal(await page.evaluate(() => window.sakuraLive2D.changeCostume()), true);
+                await page.waitForFunction(() => window.catalogResult !== undefined, null, {timeout: 12000});
+                assert.equal(await page.evaluate(() => window.catalogResult), mode === 'empty');
+                assert.equal(await page.evaluate(() => window.sakuraLive2D.changeCostume()), true);
+            });
+        }
+        for (const mode of ['png-missing', 'png-timeout', 'png-cors']) {
+            await check(mode + ' retains the visible texture and retries successfully', async () => {
+                failPackImages = true;
+                await setup({model: 'pio', catalogUrl: crossOrigin + '/packs/pio/' + mode + '/catalog.json'});
+                await page.waitForFunction(() => window.catalogResult === true && !document.querySelector('.change-costume').hidden);
+                assert.equal(await page.evaluate(async () => {
+                    Math.random = () => 0.999;
+                    const t = window.sakuraLive2D.getTextureTarget(), old = t.model.getDrawParam().textures[0];
+                    return !(await window.sakuraLive2D.changeCostume()) && old === t.model.getDrawParam().textures[0] && t.gl.isTexture(old);
+                }), true);
+                failPackImages = false;
+                assert.equal(await page.evaluate(() => window.sakuraLive2D.changeCostume()), true);
+            });
+        }
         assert.deepEqual(errors, [], 'Browser JavaScript errors');
         console.log('All ' + reports.length + ' browser checks passed.');
     } finally {
         await browser.close();
         server.close();
+        crossServer.close();
     }
-})().catch(error => {console.error(error); server.close(); process.exitCode = 1;});
+})().catch(error => {console.error(error); server.close(); crossServer.close(); process.exitCode = 1;});
