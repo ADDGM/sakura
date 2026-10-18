@@ -5,5 +5,5 @@
 .agents export-ignore
 board.html export-ignore
 
-# Model catalogs ship with the theme; large PNGs are served separately by CDN.
-live2d/costumes/*/textures/** export-ignore
+# Keep costume PNGs in source archives consumed by the CDN.
+# CI and release packaging exclude them only from installable theme payloads.

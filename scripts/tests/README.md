@@ -92,6 +92,8 @@ node scripts/build-live2d-costumes.cjs --check
 
 托管库检查覆盖104套生成清单、内置去重、排包规则、默认及旧配置、五来源互斥、模型隔离、固定URL、权限/nonce、256KiB Range/偏移/整文件200回退、失败完整性/续传/并发锁/清除/覆盖与整库激活。PHP独立测试复制现有PNG模拟HTTP流，自动清理临时上传目录；不访问CDN，Windows无符号链接权限时该项跳过、Linux CI执行。真实CDN和目标站点下载仍在发布后验收。
 
+`node --test scripts/tests/live2d-package.test.cjs` 使用Git与系统tar验证两种归档契约：源码归档保留107PNG，CI和Release的实际tar排除参数仅从安装载荷中移除扩展图片，保留清单及Pio/Tia内置纹理。测试采用当前工作树的Git属性，解包只取Live2D子树并自动清理临时目录；不下载依赖或创建提交。
+
 `node scripts/tests/live2d-managed-browser.cjs` 使用同样的Playwright及浏览器路径配置，但不依赖APlayer样式。它运行真实后台脚本，检查来源/模型联动、分片进度、暂停、清除、覆盖与保存隔离，并验证104候选无预取、六次WebGL换装/GPU释放以及Tia隔离。HTTP接口为本地夹具，不能代替生产下载验证。
 
 浏览器回归是按需运行的局部夹具，需要Playwright、Chromium兼容浏览器和与内置运行时一致的APlayer 1.10.1基础样式。除原换装/布局外，使用两个本地 HTTP 源验证同源与跨域清单、PNG缓存、真实10秒/15秒超时和CORS失败恢复；只复用内置纹理，不分发新增素材。克隆仓库不包含这些外部依赖，应在需要复测时准备：

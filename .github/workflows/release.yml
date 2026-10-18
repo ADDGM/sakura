@@ -157,7 +157,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          git archive --format=tar --prefix=sakura/ "$TAG" | tar -xf - -C dist
+          git archive --format=tar --prefix=sakura/ "$TAG" | tar --exclude="sakura/live2d/costumes/*/textures" -xf - -C dist
           rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
           php scripts/theme-metadata.php check-release-base --file=dist/sakura/style.css --version="$VERSION"
           php scripts/theme-metadata.php prepare --file=dist/sakura/style.css --version="$VERSION"

@@ -78,7 +78,7 @@ jobs:
           SOURCE_VERSION="$(php scripts/theme-metadata.php source-version --file=style.css)"
           VERSION="${SOURCE_VERSION}-dev.${GITHUB_RUN_NUMBER}"
           mkdir -p dist
-          git archive --format=tar --prefix=sakura/ HEAD | tar -xf - -C dist
+          git archive --format=tar --prefix=sakura/ HEAD | tar --exclude="sakura/live2d/costumes/*/textures" -xf - -C dist
           rm -rf dist/sakura/.github dist/sakura/.spec-workflow dist/sakura/.zcf
           php scripts/theme-metadata.php prepare --file=dist/sakura/style.css --version="$VERSION"
           BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"

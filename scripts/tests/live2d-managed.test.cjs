@@ -2,7 +2,6 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const {execFileSync} = require('node:child_process');
 const {test} = require('node:test');
 const {buildCatalog} = require('../build-live2d-costumes.cjs');
 const root = path.resolve(__dirname, '../..');
@@ -16,15 +15,6 @@ test('model library is reproducible, deduplicated, and uses safe relative paths'
     assert.equal(catalog.costumes.reduce((sum, item) => sum + item.bytes, 0), 50456340);
     assert.ok(catalog.costumes.every(item => /^textures\/[a-z0-9-]+\.png$/.test(item.texture)));
     assert.equal(new Set(catalog.costumes.map(item => item.sha256)).size, 104);
-});
-
-test('installable archives exclude all large PNGs and retain the small catalog', () => {
-    const pngs = fs.readdirSync(path.join(root, 'live2d/costumes/pio/textures')).map(name => 'live2d/costumes/pio/textures/' + name);
-    const files = ['live2d/costumes/pio/catalog.json', ...pngs];
-    const output = execFileSync('git', ['check-attr', '--stdin', 'export-ignore'], {cwd: root, input: files.join('\n'), encoding: 'utf8'}).trim().split('\n');
-    assert.match(output.shift(), /: unspecified$/);
-    assert.equal(output.length, 107);
-    assert.ok(output.every(line => /: set$/.test(line)));
     assert.equal(fs.existsSync(path.join(root, 'live2d/textures.json')), false);
 });
 
