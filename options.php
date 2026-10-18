@@ -1297,12 +1297,11 @@ function optionsframework_options()
         'type' => 'text');
 
     $live2d_uploads = wp_upload_dir(null, false);
-    $live2d_directory = trailingslashit($live2d_uploads['basedir']) . 'sakura-live2d/';
     $live2d_example = trailingslashit($live2d_uploads['baseurl']) . 'sakura-live2d/pio/pack-v1/catalog.json';
     $options[] = array(
         'name' => __('External Live2D costume catalog', 'sakura'),
         'desc' => __('Optional JSON catalog for the selected model. Leave empty to use bundled costumes only. Disable the remote costume API to use this catalog. Upload the catalog and PNG files separately via SFTP or your hosting file manager; theme updates do not install them.', 'sakura') . '<br>' .
-            sprintf(__('Suggested directory: %1$s<br>Example catalog URL: %2$s', 'sakura'), '<code>' . esc_html($live2d_directory) . '</code>', '<code>' . esc_html($live2d_example) . '</code>'),
+            sprintf(__('Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s', 'sakura'), '<code>wp-content/uploads/sakura-live2d/</code>', '<code>' . esc_html($live2d_example) . '</code>'),
         'id' => 'live2d_catalog',
         'std' => '',
         'type' => 'text');

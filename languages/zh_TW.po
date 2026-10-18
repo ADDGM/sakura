@@ -2729,8 +2729,8 @@ msgstr "所選模型的選用 JSON 服裝清單。留空時僅使用內建服裝
 
 #: options.php
 #, php-format
-msgid "Suggested directory: %1$s<br>Example catalog URL: %2$s"
-msgstr "建議目錄：%1$s<br>清單網址範例：%2$s"
+msgid "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s"
+msgstr "預設目錄：%1$s（相對於 WordPress 安裝目錄；自訂上傳目錄以網站設定為準）<br>清單網址範例：%2$s"
 
 #: inc/options-sanitize.php
 msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."

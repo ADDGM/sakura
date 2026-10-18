@@ -30,7 +30,7 @@ WordPress没有适用于所有自托管站点的统一主题ZIP上限。[wp_max_
 ### 存放与部署
 
 - 主题继续提供Tia/Pio各自的三套基础纹理；未配置扩展目录时行为不变。
-- 目录示意：`wp-content/uploads/sakura-live2d/pio/pack-v1/`，包含静态JSON清单和PNG。实际根路径/URL通过[wp_upload_dir](https://developer.wordpress.org/reference/functions/wp_upload_dir/)的basedir/baseurl取得，兼容自定义上传目录与多站点，不硬编码示意路径。
+- 默认目录示意：相对于WordPress安装目录的 `wp-content/uploads/sakura-live2d/pio/pack-v1/`，包含静态JSON清单和PNG。后台只显示通用目录和通过[wp_upload_dir](https://developer.wordpress.org/reference/functions/wp_upload_dir/)的baseurl生成的清单网址，不输出basedir的服务器磁盘绝对路径。自定义上传目录与多站点以站点配置为准；网址是否包含子目录由安装位置决定，主题名称不会固定增加 `/sakura/` 前缀。
 - 首期由维护者通过SFTP、服务器文件管理器或已有静态存储工具放置文件。目录独立于主题替换，但需纳入站点备份；不能承诺所有主机或清理插件永久保留它。
 - 只有WordPress后台上传能力时，可考虑按本站限制拆分小包或另案实现受控导入。通过同一PHP入口上传独立ZIP仍受相同限制；服务端下载也有网络、超时、磁盘与校验成本，首期不增加下载/解压管理器。
 - 对象存储/CDN使用版本化目录与稳定地址。跨域清单和PNG均须允许站点读取，PNG还需满足WebGL纹理CORS要求；能直接打开图片不等于可作为纹理使用。密钥不进入前端，浏览器直接请求公开静态资源，不新增PHP任意URL代理。
@@ -82,7 +82,11 @@ loader使用配置键和请求状态避免重复初始化及过期响应；`conf
 
 原生 `Theme_Upgrader::install(overwrite_package=true)` 实际替换主题，旧主题测试标记被删除，上传目录中JSON与PNG的SHA-256前后相同。安装后的真实WordPress前台首屏未请求扩展PNG，换装仅请求一张、模型身份不变、旧纹理释放、pageerror为空。外部可选资源被本地验收隔离，不代表外部音乐/图标服务验收。
 
-按当前工作区内容和Git archive排除规则构建的本地验证ZIP为412文件、15,756,996字节（约15.03MiB），根级服装和开发笔记不在包内，没有新增PNG。此包不含正式CI构建元数据，不能与构建84按字节直接比较，也不是可宣称已部署的新CI版本。未运行完整六组兼容矩阵、真实Safari或实际公网CDN；测试站仍为维护者此前安装的构建84，新功能实站验收须在后续获准发布并手动安装后完成。
+初次本地验证ZIP为412文件、15,756,996字节（约15.03MiB），根级服装和开发笔记不在包内，没有新增PNG；该包不含CI元数据，已用毕退役。
+
+2026-10-18：提交0f0aafe的[兼容性CI](https://github.com/ADDGM/sakura/actions/runs/39048002694)11项及[质量CI](https://github.com/ADDGM/sakura/actions/runs/39048002713)2项成功，包含六组WordPress7.0/7.1×PHP8.0/8.1/8.2。构建85为3.7.0-dev.85、413文件，SHA-256、CRC和412份原始Git对象核验通过（仅style.css版本头预期替换，另加build-info.txt）。维护者安装后，实站版本来源及6资源哈希匹配；实站清单尚为空，不能宣称已验收外置资源。真实Safari、多站点网络和实际公网CDN仍未验证。
+
+2026-10-18的目录说明调整去掉basedir输出，保留通用目录和实际baseurl示例。PHP语法、四语言MO一致性、四语言×根目录/子目录/自定义CDN的12组说明渲染检查通过；现有WordPress smoke改为检查磁盘路径不输出。渲染检查使用当前配置片段和目录/翻译桩，未重建完整WordPress；该文字修正尚未随新构建安装。
 
 ## Consequences
 

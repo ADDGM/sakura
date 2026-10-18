@@ -72,9 +72,12 @@ try {
     try {
         $fields = optionsframework_options();
         $field = array_values(array_filter($fields, static function ($entry) {return ($entry['id'] ?? '') === 'live2d_catalog';}))[0];
-        $catalogCheck(strpos($field['desc'], '/custom-uploads/sites/42/sakura-live2d/') !== false &&
+        $catalogCheck(strpos($field['desc'], WP_CONTENT_DIR) === false &&
+            strpos($field['desc'], '/custom-uploads/sites/42') === false,
+            '后台说明泄露服务器磁盘路径');
+        $catalogCheck(strpos($field['desc'], '<code>wp-content/uploads/sakura-live2d/</code>') !== false &&
             strpos($field['desc'], 'https://static.example.test/sites/42/sakura-live2d/pio/pack-v1/catalog.json') !== false,
-            '后台示例未使用当前上传目录的basedir/baseurl');
+            '后台通用目录或当前上传URL示例不正确');
         $catalogCheck(!is_dir(WP_CONTENT_DIR . '/custom-uploads/sites/42'), '显示设置创建了上传目录');
     } finally { remove_filter('upload_dir', $uploadFilter); }
     require_once ABSPATH . WPINC . '/pomo/mo.php';

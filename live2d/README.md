@@ -5,10 +5,10 @@
 ## 部署
 
 1. 在「主题设置 → 看板娘」选择模型，关闭「使用远程 Live2D 服装 API」。旧选项仍用于随机 PNG 接口，不能填写 JSON。
-2. 按「外置 Live2D 服装清单」下显示的实际目录，通过 SFTP 或主机文件管理器上传文件。自定义上传目录或多站点以后台显示的路径为准。
+2. 通过 SFTP 或主机文件管理器，在站点上传目录下的 `sakura-live2d/` 中放置文件。默认目录是相对于 WordPress 安装目录的 `wp-content/uploads/sakura-live2d/`，不是服务器磁盘绝对路径，也不固定以 `/sakura/` 开头。自定义上传目录或多站点以站点配置为准；后台清单网址示例使用 WordPress 当前的上传 URL，不显示服务器磁盘路径。
 
    ```text
-   uploads/sakura-live2d/pio/pack-v1/
+   wp-content/uploads/sakura-live2d/pio/pack-v1/
      catalog.json
      textures/
        outfit-a.png
