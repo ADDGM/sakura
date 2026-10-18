@@ -55,6 +55,11 @@ jobs:
       - name: Test category image initialization
         run: php scripts/tests/categories-images.php
 
+      - name: Test managed Live2D costumes
+        run: |
+          node scripts/build-live2d-costumes.cjs --check
+          php scripts/tests/live2d-managed.php
+
       - name: Check frontend JavaScript
         shell: bash
         run: |

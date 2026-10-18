@@ -11,6 +11,7 @@ define('SAKURA_VERSION', wp_get_theme()->get('Version'));
 define('BUILD_VERSION', '3');
 
 require_once dirname(__FILE__) . '/inc/release-info.php';
+require_once dirname(__FILE__) . '/inc/live2d-costumes.php';
 
 if (!function_exists('akina_setup')):
 /**
@@ -316,13 +317,14 @@ function sakura_scripts()
         }
 
         $dress_base = trim((string) akina_option('live2d_i', ''));
-        $use_remote_dress = in_array(akina_option('live2d_b', false), array(true, 1, '1'), true) && '' !== $dress_base;
+        $costume_source = sakura_live2d_costume_source();
+        $use_remote_dress = $costume_source === 'remote' && '' !== $dress_base;
         $dress_url = '';
         if ($use_remote_dress) {
             $dress_url = trailingslashit(esc_url_raw($dress_base)) . $live2d_model . '?' . wp_rand(10000000, 99999999);
         }
 
-        $catalog_url = $use_remote_dress ? '' : sakura_live2d_catalog_url(akina_option('live2d_catalog', ''));
+        $catalog_url = $costume_source === 'custom' ? sakura_live2d_catalog_url(akina_option('live2d_catalog', '')) : '';
         $loader_dependencies = array('sakura-live2d-costume');
         if ($catalog_url) {
             wp_enqueue_script(
@@ -373,6 +375,7 @@ function sakura_scripts()
             'enabled' => true,
             'modelPath' => trailingslashit(sakura_theme_asset_url('live2d/model/' . $live2d_model)),
             'catalogUrl' => $catalog_url ?: '',
+            'costumeUrls' => sakura_live2d_costume_urls($live2d_model, $costume_source),
             'catalogModel' => $catalog_url ? array(
                 'id' => $live2d_model,
                 'sha256' => hash_file('sha256', get_template_directory() . '/live2d/model/' . $live2d_model . '/model.moc'),

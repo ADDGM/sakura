@@ -2647,3 +2647,143 @@ msgstr "Default directory: %1$s (relative to the WordPress installation; custom 
 #: inc/options-sanitize.php
 msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."
 msgstr "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."
+
+#: inc/live2d-costumes.php options.php
+msgid "%1$s extension costumes, %2$s MiB. Three bundled costumes are always included."
+msgstr "%1$s extension costumes, %2$s MiB. Three bundled costumes are always included."
+
+#: inc/live2d-costumes.php options.php
+msgid "Another costume download is in progress. Please retry shortly."
+msgstr "Another costume download is in progress. Please retry shortly."
+
+#: inc/live2d-costumes.php options.php
+msgid "Bundled costumes only"
+msgstr "Bundled costumes only"
+
+#: inc/live2d-costumes.php options.php
+msgid "Checking saved costumes..."
+msgstr "Checking saved costumes..."
+
+#: inc/live2d-costumes.php options.php
+msgid "Choose one source. Compatible extensions follow the selected model; existing custom catalogs and remote APIs keep their previous selection until you change it."
+msgstr "Choose one source. Compatible extensions follow the selected model; existing custom catalogs and remote APIs keep their previous selection until you change it."
+
+#: inc/live2d-costumes.php options.php
+msgid "Custom external catalog"
+msgstr "Custom external catalog"
+
+#: inc/live2d-costumes.php options.php
+msgid "Download complete. Local costumes selected; save the settings to apply."
+msgstr "Download complete. Local costumes selected; save the settings to apply."
+
+#: inc/live2d-costumes.php options.php
+msgid "Download paused. Click download to resume."
+msgstr "Download paused. Click download to resume."
+
+#: inc/live2d-costumes.php options.php
+msgid "Download to this site / resume"
+msgstr "Download to this site / resume"
+
+#: inc/live2d-costumes.php options.php
+msgid "Downloaded and verified %1$s of %2$s costumes."
+msgstr "Downloaded and verified %1$s of %2$s costumes."
+
+#: inc/live2d-costumes.php options.php
+msgid "Downloaded to this site"
+msgstr "Downloaded to this site"
+
+#: inc/live2d-costumes.php options.php
+msgid "Enable JavaScript to manage costume downloads."
+msgstr "Enable JavaScript to manage costume downloads."
+
+#: inc/live2d-costumes.php options.php
+msgid "For the custom external catalog source only. Enter a JSON catalog compatible with the selected model. Managed CDN and local libraries need no address here."
+msgstr "For the custom external catalog source only. Enter a JSON catalog compatible with the selected model. Managed CDN and local libraries need no address here."
+
+#: inc/live2d-costumes.php options.php
+msgid "Invalid costume download request."
+msgstr "Invalid costume download request."
+
+#: inc/live2d-costumes.php options.php
+msgid "Legacy remote PNG API"
+msgstr "Legacy remote PNG API"
+
+#: inc/live2d-costumes.php options.php
+msgid "Live2D costume source"
+msgstr "Live2D costume source"
+
+#: inc/live2d-costumes.php options.php
+msgid "Model costume library"
+msgstr "Model costume library"
+
+#: inc/live2d-costumes.php options.php
+msgid "No compatible extension costumes are available for this model. Bundled costumes remain available."
+msgstr "No compatible extension costumes are available for this model. Bundled costumes remain available."
+
+#: inc/live2d-costumes.php options.php
+msgid "Pause download"
+msgstr "Pause download"
+
+#: inc/live2d-costumes.php options.php
+msgid "The compatible library follows the selected model. Downloading is optional; CDN costumes load only when selected. Downloads survive theme updates."
+msgstr "The compatible library follows the selected model. Downloading is optional; CDN costumes load only when selected. Downloads survive theme updates."
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume download failed. Check the server connection and retry to resume."
+msgstr "The costume download failed. Check the server connection and retry to resume."
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume library is incomplete. Resume the download before using local costumes."
+msgstr "The costume library is incomplete. Resume the download before using local costumes."
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume storage directory is unavailable."
+msgstr "The costume storage directory is unavailable."
+
+#: inc/live2d-costumes.php options.php
+msgid "The downloaded costume failed integrity checks. Retry the download."
+msgstr "The downloaded costume failed integrity checks. Retry the download."
+
+#: inc/live2d-costumes.php options.php
+msgid "The local costume library is ready."
+msgstr "The local costume library is ready."
+
+#: inc/live2d-costumes.php options.php
+msgid "This build has no fixed CDN reference. Install a published build to download costumes."
+msgstr "This build has no fixed CDN reference. Install a published build to download costumes."
+
+#: inc/live2d-costumes.php options.php
+msgid "You cannot manage costume downloads. Reload the settings page and try again."
+msgstr "You cannot manage costume downloads. Reload the settings page and try again."
+
+#: inc/live2d-costumes.php options.php
+msgid "jsDelivr CDN (default)"
+msgstr "jsDelivr CDN (default)"
+
+#: inc/live2d-costumes.php
+msgid "Download state is invalid. Clear the unfinished download and retry."
+msgstr "Download state is invalid. Clear the unfinished download and retry."
+
+#: inc/live2d-costumes.php
+msgid "The server returned an invalid download chunk. Retry to resume."
+msgstr "The server returned an invalid download chunk. Retry to resume."
+
+#: inc/live2d-costumes.php
+msgid "Overwrite / resume download"
+msgstr "Overwrite / resume download"
+
+#: inc/live2d-costumes.php
+msgid "Clear unfinished download"
+msgstr "Clear unfinished download"
+
+#: inc/live2d-costumes.php
+msgid "Clear removes unfinished managed downloads only. Overwrite keeps installed files until replacements pass verification. Custom catalogs are unaffected."
+msgstr "Clear removes unfinished managed downloads only. Overwrite keeps installed files until replacements pass verification. Custom catalogs are unaffected."
+
+#: inc/live2d-costumes.php
+msgid "Current file: %1$s / %2$s KiB received."
+msgstr "Current file: %1$s / %2$s KiB received."
+
+#: inc/live2d-costumes.php
+msgid "Unfinished download cleared. Installed and custom costumes were kept."
+msgstr "Unfinished download cleared. Installed and custom costumes were kept."

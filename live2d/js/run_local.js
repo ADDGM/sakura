@@ -9,7 +9,7 @@
 
     var api = window.sakuraLive2D = window.sakuraLive2D || {};
     function configKey(value) {
-        return JSON.stringify(['local', value.modelPath, value.catalogUrl || '', value.catalogModel || {}]);
+        return JSON.stringify(['local', value.modelPath, value.catalogUrl || '', value.catalogModel || {}, value.costumeUrls || []]);
     }
     var key = configKey(config);
     if (api.loaderState && api.loaderState.key === key) return;
@@ -48,6 +48,9 @@
                 revision = api.configureCostumes({textures: textureList, current: modelObj.textures[0]});
             }
             window.loadlive2d('live2d', config.modelPath, '', modelObj);
+            if (revision !== undefined && Array.isArray(config.costumeUrls) && typeof api.mergeCostumes === 'function') {
+                api.mergeCostumes(config.costumeUrls, revision);
+            }
             if (config.catalogUrl && revision !== undefined && typeof api.loadCostumeCatalog === 'function') {
                 api.loadCostumeCatalog({url: config.catalogUrl, model: config.catalogModel}, revision, isCurrent);
             }

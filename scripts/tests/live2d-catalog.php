@@ -42,7 +42,9 @@ try {
         array(true, true, $valid, false, true),
     ) as $case) {
         list($enabled, $remote, $address, $hasCatalog, $hasRemote) = $case;
-        update_option($catalogOption, array_merge($input, array('live2d_s' => $enabled, 'live2d_m' => 'pio',
+        $legacyInput = $input;
+        unset($legacyInput['live2d_costume_source']);
+        update_option($catalogOption, array_merge($legacyInput, array('live2d_s' => $enabled, 'live2d_m' => 'pio',
             'live2d_b' => $remote, 'live2d_i' => 'https://example.test/random/', 'live2d_catalog' => $address)));
         $GLOBALS['wp_scripts'] = new WP_Scripts();
         sakura_scripts();
@@ -60,6 +62,27 @@ try {
             }
         }
     }
+    $fixedReference = static function () { return str_repeat('a', 40); };
+    add_filter('sakura_remote_resource_tag', $fixedReference);
+    try {
+        foreach (array('cdn', 'local', 'bundled', 'custom', 'remote') as $costumeSource) {
+            $explicit = array_merge($input, array('live2d_s' => true, 'live2d_m' => 'pio',
+                'live2d_costume_source' => $costumeSource, 'live2d_i' => 'https://example.test/random/', 'live2d_catalog' => $valid));
+            update_option($catalogOption, optionsframework_validate($explicit));
+            $catalogCheck(akina_option('live2d_costume_source') === $costumeSource, '来源选择未沿完整设置链保存');
+            $invalidSource = $explicit;
+            $invalidSource['live2d_costume_source'] = array('invalid');
+            update_option($catalogOption, optionsframework_validate($invalidSource));
+            $catalogCheck(akina_option('live2d_costume_source') === $costumeSource, '非法来源未保留原选择');
+            $GLOBALS['wp_scripts'] = new WP_Scripts();
+            sakura_scripts();
+            preg_match('/var SakuraLive2D = (.*);/', wp_scripts()->get_data('sakura-live2d-message', 'data'), $matches);
+            $config = json_decode($matches[1] ?? '', true);
+            $catalogCheck(count($config['costumeUrls']) === ($costumeSource === 'cdn' ? 104 : 0), '托管来源与自定义来源未互斥');
+            $catalogCheck($config['catalogUrl'] === ($costumeSource === 'custom' ? $valid : ''), '自定义清单来源未互斥');
+            $catalogCheck(($config['dressUrl'] !== '') === ($costumeSource === 'remote'), '远程PNG来源未互斥');
+        }
+    } finally { remove_filter('sakura_remote_resource_tag', $fixedReference); }
     $input['live2d_catalog'] = '';
     update_option($catalogOption, optionsframework_validate($input));
     $catalogCheck(akina_option('live2d_catalog') === '', '空值未关闭清单');

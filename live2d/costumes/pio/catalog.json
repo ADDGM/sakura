@@ -1,0 +1,634 @@
+{
+  "version": 1,
+  "packVersion": "426f8998afe590bc1d1a16c101c4eb1b5bf96926c19c517f3d6295fabcdd3083",
+  "model": {
+    "id": "pio",
+    "sha256": "1545fdb296bb2d1c9c6f1c295b3a336705618aa467c45e9be8dbc9cb1ffb704d"
+  },
+  "costumes": [
+    {
+      "id": "17-school-uniform-gray",
+      "texture": "textures/17-school-uniform-gray.png",
+      "bytes": 456196,
+      "sha256": "556dd6029be2b75ea26ed34c681a6559ebe154643fc6f42b53484272ff2b0f67"
+    },
+    {
+      "id": "17-school-uniform-yellow",
+      "texture": "textures/17-school-uniform-yellow.png",
+      "bytes": 466885,
+      "sha256": "0799c35d0a0f279149c4d4e54e22bf6e4c07d85705be93fee31dc059fe56276d"
+    },
+    {
+      "id": "17-swimsuit-navy-blue",
+      "texture": "textures/17-swimsuit-navy-blue.png",
+      "bytes": 433799,
+      "sha256": "6352905fa587cacee0675a87e45fa9c886772c06fbdbcb064ef91adaeffec196"
+    },
+    {
+      "id": "17-swimsuit-red",
+      "texture": "textures/17-swimsuit-red.png",
+      "bytes": 435721,
+      "sha256": "56776fc9558872eb7d39c64fe60c58f6608869e020df4b37eb1e796a229258a4"
+    },
+    {
+      "id": "17-winter-coat-brown",
+      "texture": "textures/17-winter-coat-brown.png",
+      "bytes": 475817,
+      "sha256": "986f4652ad46254fe3514cd6a9971d6ea298f0361536ffff6eff36f5c49338f9"
+    },
+    {
+      "id": "17-winter-coat-white",
+      "texture": "textures/17-winter-coat-white.png",
+      "bytes": 452087,
+      "sha256": "aef1947b2028f150675c0b58e159180e612cc019eb5a00629c0c72b4b31fab97"
+    },
+    {
+      "id": "bunny-girl-black",
+      "texture": "textures/bunny-girl-black.png",
+      "bytes": 462930,
+      "sha256": "e4ac7ac5d39c224abcc7cf0955bed72f45e807d98a866d6536d0b148ed9b9edf"
+    },
+    {
+      "id": "bunny-girl-rad",
+      "texture": "textures/bunny-girl-rad.png",
+      "bytes": 470584,
+      "sha256": "39ff3837e68f471eb8472df206ce51456fcbe7a91323b5dc848b0c4d8483b47e"
+    },
+    {
+      "id": "bunny-pajamas",
+      "texture": "textures/bunny-pajamas.png",
+      "bytes": 455330,
+      "sha256": "7108733d1f1f9fc522f9490c54baa7590f510f33cbd5cf85cc0b099b84c7d609"
+    },
+    {
+      "id": "cake-dress-choco",
+      "texture": "textures/cake-dress-choco.png",
+      "bytes": 552660,
+      "sha256": "221abc063e78cd39224f38f5726ae274c187532dbf6121656cbb281ead765e87"
+    },
+    {
+      "id": "cake-dress-cream",
+      "texture": "textures/cake-dress-cream.png",
+      "bytes": 558822,
+      "sha256": "c46de1204f93c2ff03e0b1acf7ff0d1f951e65daf5eaf297252749c03d824a0e"
+    },
+    {
+      "id": "cat-witch-black",
+      "texture": "textures/cat-witch-black.png",
+      "bytes": 541652,
+      "sha256": "97634e0fa75976e679d769cd84b9c1cead8c661c1e9f5fa6f63d2d571ec2abad"
+    },
+    {
+      "id": "cat-witch-white",
+      "texture": "textures/cat-witch-white.png",
+      "bytes": 530669,
+      "sha256": "704251fc4d36b92fd9c6fc053027f0f5dc0e32bc1a205a805d6e3e5b06793d5d"
+    },
+    {
+      "id": "cherry-fairy-awakening",
+      "texture": "textures/cherry-fairy-awakening.png",
+      "bytes": 498734,
+      "sha256": "a12feb7f29a5fe7c326867fdc7eb80e979e09539ed777085ad23531bfeebcccb"
+    },
+    {
+      "id": "cherry-fairy",
+      "texture": "textures/cherry-fairy.png",
+      "bytes": 488949,
+      "sha256": "62b40c375354246af87fb8114c163ccde0090533b980b56314285f6764ef513a"
+    },
+    {
+      "id": "default-costume",
+      "texture": "textures/default-costume.png",
+      "bytes": 481813,
+      "sha256": "d5e526235d90326e4c780328c5590c8039f481173fbebb881d1175021b06122c"
+    },
+    {
+      "id": "fall-dress-beige",
+      "texture": "textures/fall-dress-beige.png",
+      "bytes": 508885,
+      "sha256": "28dedf44e55a27a949f233086a3744ad8de3c386f315d9d5fa04aa6ac2cf1d5b"
+    },
+    {
+      "id": "fall-dress-brown",
+      "texture": "textures/fall-dress-brown.png",
+      "bytes": 501705,
+      "sha256": "dfc34b4e65ab30ec14ae9cc48128cb6fdfde5cb4d29eee66dc95116149da23d0"
+    },
+    {
+      "id": "forest-witch-brown",
+      "texture": "textures/forest-witch-brown.png",
+      "bytes": 601383,
+      "sha256": "8f2c400fd0e97b342904ce9c4af7c18cfb2c236072be4dcbc27da722e8420454"
+    },
+    {
+      "id": "forest-witch-green",
+      "texture": "textures/forest-witch-green.png",
+      "bytes": 621567,
+      "sha256": "5ef6b750be852842abb0eb2a626e21c15a541e3917ccd0abf3bf7e0143b8be05"
+    },
+    {
+      "id": "frill-bikini-green",
+      "texture": "textures/frill-bikini-green.png",
+      "bytes": 464499,
+      "sha256": "b6ff9497333d28c717d632b172e3c054c63030dbd54ead6cbb97801ec301a06c"
+    },
+    {
+      "id": "frill-bikini-purple",
+      "texture": "textures/frill-bikini-purple.png",
+      "bytes": 465623,
+      "sha256": "482bb7c7d1e093fff056a67efa8a6e76ac64fd6c155d18048e004a0ceda2e955"
+    },
+    {
+      "id": "frill-blouse-green",
+      "texture": "textures/frill-blouse-green.png",
+      "bytes": 466696,
+      "sha256": "9c3bf4ce6f315f3051c5ccd9788d161740deb0fd99bb8f9f47d9c300d56608c3"
+    },
+    {
+      "id": "frill-blouse-red",
+      "texture": "textures/frill-blouse-red.png",
+      "bytes": 467271,
+      "sha256": "d41a5fb8e9a209fa182f1e0637bb699812f6c585276a90b444060339efed48ba"
+    },
+    {
+      "id": "furisode",
+      "texture": "textures/furisode.png",
+      "bytes": 518105,
+      "sha256": "8a9389206635e2990446ef20481fe71d7e85b2b2495ce008c1b8e220d3392704"
+    },
+    {
+      "id": "goddess-white",
+      "texture": "textures/goddess-white.png",
+      "bytes": 477039,
+      "sha256": "b98349dddb6da4fae4f74be14b018671b18ce4012531ab40c1031df9dd3669d2"
+    },
+    {
+      "id": "halloween-costume",
+      "texture": "textures/halloween-costume.png",
+      "bytes": 628974,
+      "sha256": "ecfce9fc877695887ee1ea734f07810350794cf29c61b9d053b8f4c0b1b0ac08"
+    },
+    {
+      "id": "hanbok-pink",
+      "texture": "textures/hanbok-pink.png",
+      "bytes": 502529,
+      "sha256": "9d33684c8b36f638cb9293796d009da2b51ae2cde6aeff14b8939ff40afd2fba"
+    },
+    {
+      "id": "hanbok-red-png",
+      "texture": "textures/hanbok-red-png.png",
+      "bytes": 534123,
+      "sha256": "44dd47b4412cfca8883e2f08c09c2785281165229747f6a232ea7177205ed335"
+    },
+    {
+      "id": "hanbok-sky-blue",
+      "texture": "textures/hanbok-sky-blue.png",
+      "bytes": 504651,
+      "sha256": "ae95e7a24a3bdba3482fb3595fcf5a3b1fed446297d48e208e20b111a7908ba4"
+    },
+    {
+      "id": "hanbok-yellow",
+      "texture": "textures/hanbok-yellow.png",
+      "bytes": 481465,
+      "sha256": "ef13c9bb3b60fea9e49e703c4c21b00300fcfbb45a6b35b11c7b0c19ce73294f"
+    },
+    {
+      "id": "hanbok",
+      "texture": "textures/hanbok.png",
+      "bytes": 562160,
+      "sha256": "2cf4c99d9a08d40e8d9e6af81941b483d2d4eb1b1edd0305c83597176007c301"
+    },
+    {
+      "id": "kindergarten-uniform-navy-blue",
+      "texture": "textures/kindergarten-uniform-navy-blue.png",
+      "bytes": 442211,
+      "sha256": "1b3125ee9b74dcb77e8cfcb3cddd828351b10224645e4a917bebe45f4b8381f0"
+    },
+    {
+      "id": "kindergarten-uniform-sky-blue",
+      "texture": "textures/kindergarten-uniform-sky-blue.png",
+      "bytes": 453391,
+      "sha256": "0dfdc100111d71b5bdd844a1a637e87f7de0b12fc66c83c8fcbf95275eb835c8"
+    },
+    {
+      "id": "literature-girl-costume-brown",
+      "texture": "textures/literature-girl-costume-brown.png",
+      "bytes": 432610,
+      "sha256": "d246e1cd434dc50bd28f0365b4d8a199aca55de6d95c363524108eefcdf0760e"
+    },
+    {
+      "id": "literature-girl-costume-navy-blue",
+      "texture": "textures/literature-girl-costume-navy-blue.png",
+      "bytes": 426270,
+      "sha256": "5d5d5732991de54566bc4e6be5426fc933c99e43a6d688d6d6aad959f8e10ee3"
+    },
+    {
+      "id": "lolita-suit-red",
+      "texture": "textures/lolita-suit-red.png",
+      "bytes": 514673,
+      "sha256": "9de085f604dc1658faf1a3c96c867b2f3d03bd7f20342ff77a436270316e02c7"
+    },
+    {
+      "id": "lolita-suit-sky-blue",
+      "texture": "textures/lolita-suit-sky-blue.png",
+      "bytes": 489434,
+      "sha256": "58009418055691c7575b98f71e94e5ea3189978fc5bc0ce94f8092fe271e0396"
+    },
+    {
+      "id": "luke-costume",
+      "texture": "textures/luke-costume.png",
+      "bytes": 456850,
+      "sha256": "6b1f638c9e1bb4c465648ccf4b5e9384e919b0dae0460a05373f4e5ab07ade9c"
+    },
+    {
+      "id": "magic-academy-red",
+      "texture": "textures/magic-academy-red.png",
+      "bytes": 564257,
+      "sha256": "2423cc71429634ed579bd99700821d8c1bd4547f727132ad86eedb72f130076b"
+    },
+    {
+      "id": "magical-girl-pink",
+      "texture": "textures/magical-girl-pink.png",
+      "bytes": 453668,
+      "sha256": "500781c3a807996c0ec491b8047c4696506a20fae1f6ad8875d2b7798ea47f38"
+    },
+    {
+      "id": "magical-girl-purple",
+      "texture": "textures/magical-girl-purple.png",
+      "bytes": 452602,
+      "sha256": "b7540dcdc05ccbce2499f7bacebe15d8896660ff20be8165f89f323e18303bf4"
+    },
+    {
+      "id": "maid-navy-blue",
+      "texture": "textures/maid-navy-blue.png",
+      "bytes": 495798,
+      "sha256": "a16f084f5112aa8984adaa6f8a7ee8fa0b7b5f574e2374bd7b528ed0d430f113"
+    },
+    {
+      "id": "maid-red",
+      "texture": "textures/maid-red.png",
+      "bytes": 492736,
+      "sha256": "6fd0dc68965ddc594fcde9a829cf13469dd1c7c4d36cc1a6b51f0b6e11daae73"
+    },
+    {
+      "id": "marine-navy-blue",
+      "texture": "textures/marine-navy-blue.png",
+      "bytes": 462530,
+      "sha256": "294db5d0d68ff60c564b69035322589c4de9b616be872c4b19f6dd3de99d1618"
+    },
+    {
+      "id": "marine-white",
+      "texture": "textures/marine-white.png",
+      "bytes": 463827,
+      "sha256": "ad402d6207d18d3f12412010735bad8bd46e555e22bba501fc737659c48a4bf7"
+    },
+    {
+      "id": "neet-costume",
+      "texture": "textures/neet-costume.png",
+      "bytes": 382316,
+      "sha256": "4591b6b2fc2cf421721d7e59f105c2acc43e7f8e027d6cd4ee2bd3df46de30c5"
+    },
+    {
+      "id": "night-witch-black",
+      "texture": "textures/night-witch-black.png",
+      "bytes": 555127,
+      "sha256": "14541ed5b4b6b9d3e3195d9eaace10cbc5326d2494daae5b093a9057a6cbddc4"
+    },
+    {
+      "id": "night-witch-gray",
+      "texture": "textures/night-witch-gray.png",
+      "bytes": 575124,
+      "sha256": "c85f5d280640c3d59636669fc2490ba9bbe88a50f53afe0696b55c7288e7f503"
+    },
+    {
+      "id": "nightsky-costume",
+      "texture": "textures/nightsky-costume.png",
+      "bytes": 515044,
+      "sha256": "b38b6c025c0de7847ed2285bb70c268d60577732155669bf91bd798ac1963489"
+    },
+    {
+      "id": "overalls-white",
+      "texture": "textures/overalls-white.png",
+      "bytes": 462306,
+      "sha256": "877b07c7f9f81ee2d10b0b5dcf4e82f6b57e410c9ab66a13d870b19c3ddfeabf"
+    },
+    {
+      "id": "overalls",
+      "texture": "textures/overalls.png",
+      "bytes": 446774,
+      "sha256": "d3057d5ffaaf6627bf6e2201cbf1c1b011f2d45c1f77607b3db408054e691e41"
+    },
+    {
+      "id": "pajamas-pink",
+      "texture": "textures/pajamas-pink.png",
+      "bytes": 466660,
+      "sha256": "bfc85699fe85e8895d2a8eb79dc17390f53314725368c7b8ac3b5d696765a32a"
+    },
+    {
+      "id": "party-dress-brown",
+      "texture": "textures/party-dress-brown.png",
+      "bytes": 465003,
+      "sha256": "c7d6fc86ca5ffdb9e1eae9b34c1f3e267ec8eb259012a7c15f12d4828fa53f53"
+    },
+    {
+      "id": "party-dress-purple",
+      "texture": "textures/party-dress-purple.png",
+      "bytes": 490109,
+      "sha256": "0834b7f6d6f8c96582d62b36daa4dd12596021cd885e4f627768cbe9c59b82fd"
+    },
+    {
+      "id": "qipao-pink",
+      "texture": "textures/qipao-pink.png",
+      "bytes": 420548,
+      "sha256": "86f68d4b050b3428f5851d3e7cc84920665af3199fc0e5082e77b07e2ffc0080"
+    },
+    {
+      "id": "qipao-red",
+      "texture": "textures/qipao-red.png",
+      "bytes": 436168,
+      "sha256": "f8e09ced3a98e51a27c626f303b0d2efed05fad3d7c6ee0ae9850cb8148d1043"
+    },
+    {
+      "id": "raccoon-pajamas",
+      "texture": "textures/raccoon-pajamas.png",
+      "bytes": 465897,
+      "sha256": "2d12cd54dfd5fa0223898a6366b002e0c1bd8aa41bf1a718468efea1151aed8d"
+    },
+    {
+      "id": "ribbon-dress-brown",
+      "texture": "textures/ribbon-dress-brown.png",
+      "bytes": 531356,
+      "sha256": "83b5d62addb941517592bc4ab95412d1d2732e0992634db2fa0891a9f45e9811"
+    },
+    {
+      "id": "ribbon-dress-purple",
+      "texture": "textures/ribbon-dress-purple.png",
+      "bytes": 531955,
+      "sha256": "d34907ed1893ecad53332873994737dee890bb7c08751d24eef7984989b92375"
+    },
+    {
+      "id": "ribbon-dress-red",
+      "texture": "textures/ribbon-dress-red.png",
+      "bytes": 492670,
+      "sha256": "f1165aac547ef5f0be587be23ccc2b1b5f393e5302ace03bd4962bc2af590d53"
+    },
+    {
+      "id": "ribbon-dress-yellow",
+      "texture": "textures/ribbon-dress-yellow.png",
+      "bytes": 493383,
+      "sha256": "7aade627ca4e5e3180fed47937e33d319b2cf15ad4724923987082edc39ba4c3"
+    },
+    {
+      "id": "sailor-suit-black",
+      "texture": "textures/sailor-suit-black.png",
+      "bytes": 431200,
+      "sha256": "7ab7845753d64e73904ab491ed017d1083fff995febe6b5c17e1403c44bed313"
+    },
+    {
+      "id": "sailor-suit-white",
+      "texture": "textures/sailor-suit-white.png",
+      "bytes": 441093,
+      "sha256": "1780d4faec0940f620d59e1083006759eb7157e8c1d70b24041cf34cc0968009"
+    },
+    {
+      "id": "sakura-sailor-suit-navy-blue",
+      "texture": "textures/sakura-sailor-suit-navy-blue.png",
+      "bytes": 536356,
+      "sha256": "eab5bf2c5d7020547f75eccd72cd210abe96a82ea3047ff1598439aae7cbe020"
+    },
+    {
+      "id": "sakura-sailor-suit-pink",
+      "texture": "textures/sakura-sailor-suit-pink.png",
+      "bytes": 528194,
+      "sha256": "bd17ca28fa32ff95290f9d2558a368ac37382f3de3e715cc35365fdbe86183e0"
+    },
+    {
+      "id": "santa-suit-green",
+      "texture": "textures/santa-suit-green.png",
+      "bytes": 552344,
+      "sha256": "9338d8a4976f545cc8bba06cba09e36dc94ff7a3edf75ce1b0082d936a788f41"
+    },
+    {
+      "id": "santa-suit-red",
+      "texture": "textures/santa-suit-red.png",
+      "bytes": 546281,
+      "sha256": "6957a832d1a3d169b2468df2ddb2b5cb0a6c83a79daa1f8ed7d27151fafe5bf8"
+    },
+    {
+      "id": "sarori-costume",
+      "texture": "textures/sarori-costume.png",
+      "bytes": 455347,
+      "sha256": "6e048ab4faab5950f20453d2ff4fac82bcdd445a44637458dce6e6b12a08c7b2"
+    },
+    {
+      "id": "school-uniform-navy-blue",
+      "texture": "textures/school-uniform-navy-blue.png",
+      "bytes": 464999,
+      "sha256": "b7b9d9ed11dcc4ea4da883d58468569f50b63adf3b0301be537f36fce8875679"
+    },
+    {
+      "id": "school-uniform",
+      "texture": "textures/school-uniform.png",
+      "bytes": 454188,
+      "sha256": "a9c39f680323899cd5af70bc6de0104a7a3b83f1902de97b0430705855fe7b6c"
+    },
+    {
+      "id": "sfc-uniform-red",
+      "texture": "textures/sfc-uniform-red.png",
+      "bytes": 374200,
+      "sha256": "78afce61f3ce370435771e9a65b1bc7579ed740215a71dc973d67b33e72185d6"
+    },
+    {
+      "id": "sfc-uniform-yellow",
+      "texture": "textures/sfc-uniform-yellow.png",
+      "bytes": 379134,
+      "sha256": "1774294624ad3bc86b56d42c7dca9d958f33330fb2aa10cc249722e263d2cea2"
+    },
+    {
+      "id": "sheep-costume",
+      "texture": "textures/sheep-costume.png",
+      "bytes": 469751,
+      "sha256": "528146f7e4901bfef960cf3ede9fcd189994095cfc74b3fafec2eb977dfa9ad4"
+    },
+    {
+      "id": "sheep-pajamas",
+      "texture": "textures/sheep-pajamas.png",
+      "bytes": 484985,
+      "sha256": "959581cba58bd308e08e31e736ea702b27e87b96916c01d0ae8901ba7cca7588"
+    },
+    {
+      "id": "sinairoad-shop-uniform-lr",
+      "texture": "textures/sinairoad-shop-uniform-lr.png",
+      "bytes": 439485,
+      "sha256": "d5a32ae4b611b802f15546ae8369b22f11fdfe8d36f6ed6d589fa965654327f3"
+    },
+    {
+      "id": "sinairoad-shop-uniform-sr",
+      "texture": "textures/sinairoad-shop-uniform-sr.png",
+      "bytes": 449684,
+      "sha256": "50f10187252469beb1ebe8131cc85015562bac99909a99cdaee4b7b0412f57dd"
+    },
+    {
+      "id": "sporty-hoodie-black",
+      "texture": "textures/sporty-hoodie-black.png",
+      "bytes": 453967,
+      "sha256": "ebe5d0001eb39992026b5305ff629b2cb8c517aabe8582df989b7c764d0d0884"
+    },
+    {
+      "id": "sporty-hoodie-blue",
+      "texture": "textures/sporty-hoodie-blue.png",
+      "bytes": 457506,
+      "sha256": "d7cc39dca5f04c0e719f935951b95b776a9d16a71760d048ff73ca49e8784a6d"
+    },
+    {
+      "id": "star-witch-brown",
+      "texture": "textures/star-witch-brown.png",
+      "bytes": 548065,
+      "sha256": "39d062b051f81d9743c52b09ac7779736c6caebba7f951733ea95011659fb6c0"
+    },
+    {
+      "id": "star-witch-green",
+      "texture": "textures/star-witch-green.png",
+      "bytes": 551451,
+      "sha256": "26246e686f8772cd9c48bb6ab9c3fae9fbe1c993efc3e3b433ad6039edf017f0"
+    },
+    {
+      "id": "succubus-suit-black",
+      "texture": "textures/succubus-suit-black.png",
+      "bytes": 449864,
+      "sha256": "20907728f89f92dde820f156a1e8fe238a75624fcbac2b9ab32dfa8ce1e75829"
+    },
+    {
+      "id": "succubus-suit-red",
+      "texture": "textures/succubus-suit-red.png",
+      "bytes": 470074,
+      "sha256": "3bf47a0bc72687281da79b1397b8eb6995b7365c0036917f1d1f7431d87bc5c5"
+    },
+    {
+      "id": "sukumizu-navy-blue",
+      "texture": "textures/sukumizu-navy-blue.png",
+      "bytes": 426162,
+      "sha256": "cf3455179be9c5e8e0ce38f6ff9e30341350a370c555ce2312f479702fadd317"
+    },
+    {
+      "id": "sukumizu-white",
+      "texture": "textures/sukumizu-white.png",
+      "bytes": 428092,
+      "sha256": "9a9f7418562540da8bc7beb925643399c5e8885d93c747e70f0607caba571394"
+    },
+    {
+      "id": "summer-dress-sky-blue",
+      "texture": "textures/summer-dress-sky-blue.png",
+      "bytes": 452708,
+      "sha256": "99b6cab210a4b2a5155470df7ab51388cd43ee31b550dc206ccaae57ee04a1e1"
+    },
+    {
+      "id": "summer-dress-white",
+      "texture": "textures/summer-dress-white.png",
+      "bytes": 417638,
+      "sha256": "fa707b797c00ad351186229c9a0eda030270afdbfdbe24fdde257aff7295721e"
+    },
+    {
+      "id": "tirami-costume",
+      "texture": "textures/tirami-costume.png",
+      "bytes": 462881,
+      "sha256": "967e43c856ad18ddf97bc2796f755be453527299d897df0afaafba63ed921ea0"
+    },
+    {
+      "id": "turtle-neck-red",
+      "texture": "textures/turtle-neck-red.png",
+      "bytes": 476138,
+      "sha256": "822ba10e6e49013c011f31f3c69176c27834667a558126558f287d742d4f7628"
+    },
+    {
+      "id": "turtle-neck",
+      "texture": "textures/turtle-neck.png",
+      "bytes": 484903,
+      "sha256": "af9d3e8cef3089ce70ebdff09a503b9aacfad5bee7780f930c71f68700a2ae5b"
+    },
+    {
+      "id": "valentine-costume-brown",
+      "texture": "textures/valentine-costume-brown.png",
+      "bytes": 505873,
+      "sha256": "7b17d0a7f421f98d282fd3adb77b542bb4446cc5fb040610a5bba2fedf5c5e39"
+    },
+    {
+      "id": "valentine-costume-pink",
+      "texture": "textures/valentine-costume-pink.png",
+      "bytes": 508596,
+      "sha256": "a42fc79b01534b083babe0d910a5786f1ddaa3ffb6e26f7a1b2b6f2f11e34aa3"
+    },
+    {
+      "id": "vampire-costume-awakening",
+      "texture": "textures/vampire-costume-awakening.png",
+      "bytes": 439507,
+      "sha256": "837c492dc46cff830f77d9786bca99e1121cec747078de21cc7f6d3bf2c10c50"
+    },
+    {
+      "id": "vampire-costume",
+      "texture": "textures/vampire-costume.png",
+      "bytes": 458898,
+      "sha256": "f12bc50922a0acdebb6cbe56e3150185174f8f0e5bea262903a61de54d0c5566"
+    },
+    {
+      "id": "whiteday-dress-purple",
+      "texture": "textures/whiteday-dress-purple.png",
+      "bytes": 483521,
+      "sha256": "f535ec1e44f3c9902b0f7c24f3ba586617a1759fafcf036f69a779a89d17c33a"
+    },
+    {
+      "id": "whiteday-dress-red",
+      "texture": "textures/whiteday-dress-red.png",
+      "bytes": 488081,
+      "sha256": "915a20cc65760ba824f61b8aa421e828c5d40f6600c90f8ba1540fb365f592e6"
+    },
+    {
+      "id": "winter-clothes-navy-blue",
+      "texture": "textures/winter-clothes-navy-blue.png",
+      "bytes": 525956,
+      "sha256": "afab2882026fca44961cae2107c43d4fa1c29b20b8a67ab656640d888d3e6ff9"
+    },
+    {
+      "id": "winter-clothes-white",
+      "texture": "textures/winter-clothes-white.png",
+      "bytes": 517299,
+      "sha256": "ea8d13b13a5c2efb4845f3172404b08085d55c5cc539d35aad1523d9b7b6d8de"
+    },
+    {
+      "id": "winter-coat-pink",
+      "texture": "textures/winter-coat-pink.png",
+      "bytes": 467235,
+      "sha256": "ee0d34507b1f8524b2158d5f2f7b58ac9cecb211e33bf779bfcfea5239f999c5"
+    },
+    {
+      "id": "winter-coat-white",
+      "texture": "textures/winter-coat-white.png",
+      "bytes": 475002,
+      "sha256": "7c54ec2464869c83a802ba26eb990928b6abb334163ccc29e30b79af6b515d52"
+    },
+    {
+      "id": "winter-fairy-black",
+      "texture": "textures/winter-fairy-black.png",
+      "bytes": 480330,
+      "sha256": "08e7372242579583239c4c707b49d1c3712108e6716e9cd261404855eea540b3"
+    },
+    {
+      "id": "winter-fairy-pink",
+      "texture": "textures/winter-fairy-pink.png",
+      "bytes": 467720,
+      "sha256": "4172f1c6c23f82ef3f3e3d4694fe2b1203d1503756dca6d61b184cd33fb3ac50"
+    },
+    {
+      "id": "xhaman-costume-blue",
+      "texture": "textures/xhaman-costume-blue.png",
+      "bytes": 575551,
+      "sha256": "485850ce6256fea8635683ea06c14e00b10001a587572fe87275801bbb2da64f"
+    },
+    {
+      "id": "xhaman-costume",
+      "texture": "textures/xhaman-costume.png",
+      "bytes": 575461,
+      "sha256": "805cf404bb6b535474a6db9a9ed8c350939f588c9439f2ada43bfd56e9462671"
+    }
+  ]
+}

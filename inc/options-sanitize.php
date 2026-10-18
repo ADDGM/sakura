@@ -19,6 +19,12 @@ function of_sanitize_live2d_catalog( $input ) {
 }
 add_filter( 'of_sanitize_live2d_catalog', 'of_sanitize_live2d_catalog' );
 
+function of_sanitize_live2d_costume_source( $input, $option ) {
+    if ( is_string( $input ) && isset( $option['options'][$input] ) ) return $input;
+    return sakura_live2d_costume_source();
+}
+add_filter( 'of_sanitize_live2d_costume_source', 'of_sanitize_live2d_costume_source', 10, 2 );
+
 /**
  * Validate the optional site launch date without overwriting a valid stored value.
  */

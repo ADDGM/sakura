@@ -483,3 +483,143 @@ msgstr "既定のディレクトリ：%1$s（WordPress のインストール先�
 #: inc/options-sanitize.php
 msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."
 msgstr "認証情報やフラグメントを含まない完全な HTTP(S) JSON カタログ URL を入力してください。以前の値を保持しました。"
+
+#: inc/live2d-costumes.php options.php
+msgid "%1$s extension costumes, %2$s MiB. Three bundled costumes are always included."
+msgstr "拡張衣装 %1$s 着、%2$s MiB。内蔵の3着は常に利用できます。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Another costume download is in progress. Please retry shortly."
+msgstr "別の衣装ダウンロードが進行中です。しばらくしてから再試行してください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Bundled costumes only"
+msgstr "内蔵衣装のみ"
+
+#: inc/live2d-costumes.php options.php
+msgid "Checking saved costumes..."
+msgstr "保存済みの衣装を確認中…"
+
+#: inc/live2d-costumes.php options.php
+msgid "Choose one source. Compatible extensions follow the selected model; existing custom catalogs and remote APIs keep their previous selection until you change it."
+msgstr "読み込み元を一つ選択します。対応する拡張衣装はモデルに連動します。既存のカスタムカタログやリモートAPIは、選択を変更するまで維持されます。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Custom external catalog"
+msgstr "カスタム外部カタログ"
+
+#: inc/live2d-costumes.php options.php
+msgid "Download complete. Local costumes selected; save the settings to apply."
+msgstr "ダウンロード完了。サイト内の衣装を選択しました。設定を保存して適用してください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Download paused. Click download to resume."
+msgstr "ダウンロードを一時停止しました。ダウンロードボタンで再開できます。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Download to this site / resume"
+msgstr "サイトにダウンロード／再開"
+
+#: inc/live2d-costumes.php options.php
+msgid "Downloaded and verified %1$s of %2$s costumes."
+msgstr "%2$s 着中 %1$s 着をダウンロードし検証しました。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Downloaded to this site"
+msgstr "サイトに保存した衣装"
+
+#: inc/live2d-costumes.php options.php
+msgid "Enable JavaScript to manage costume downloads."
+msgstr "衣装のダウンロードを管理するにはJavaScriptを有効にしてください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "For the custom external catalog source only. Enter a JSON catalog compatible with the selected model. Managed CDN and local libraries need no address here."
+msgstr "カスタム外部カタログ専用です。選択したモデルに対応するJSONカタログを指定してください。管理されたCDNやサイト内の衣装庫では入力不要です。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Invalid costume download request."
+msgstr "衣装のダウンロード要求が無効です。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Legacy remote PNG API"
+msgstr "従来のリモートPNG API"
+
+#: inc/live2d-costumes.php options.php
+msgid "Live2D costume source"
+msgstr "Live2D衣装の読み込み元"
+
+#: inc/live2d-costumes.php options.php
+msgid "Model costume library"
+msgstr "モデルの衣装ライブラリ"
+
+#: inc/live2d-costumes.php options.php
+msgid "No compatible extension costumes are available for this model. Bundled costumes remain available."
+msgstr "このモデルに対応する拡張衣装はありません。内蔵衣装を利用できます。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Pause download"
+msgstr "ダウンロードを一時停止"
+
+#: inc/live2d-costumes.php options.php
+msgid "The compatible library follows the selected model. Downloading is optional; CDN costumes load only when selected. Downloads survive theme updates."
+msgstr "衣装庫は選択したモデルに連動します。サイトへの保存は任意です。CDN画像は衣装を選んだ時だけ読み込みます。テーマ更新後も保存済みの衣装は残ります。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume download failed. Check the server connection and retry to resume."
+msgstr "衣装をダウンロードできませんでした。サーバーの接続を確認し、再試行して再開してください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume library is incomplete. Resume the download before using local costumes."
+msgstr "衣装庫が未完成です。サイト内の衣装を使う前にダウンロードを再開してください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume storage directory is unavailable."
+msgstr "衣装の保存先を利用できません。アップロード先と書き込み権限を確認してください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The downloaded costume failed integrity checks. Retry the download."
+msgstr "ダウンロードした衣装の整合性検証に失敗しました。再試行してください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The local costume library is ready."
+msgstr "サイト内の衣装庫は利用可能です。"
+
+#: inc/live2d-costumes.php options.php
+msgid "This build has no fixed CDN reference. Install a published build to download costumes."
+msgstr "このビルドには固定CDN参照がありません。公開済みビルドをインストールして衣装をダウンロードしてください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "You cannot manage costume downloads. Reload the settings page and try again."
+msgstr "衣装のダウンロードを管理できません。設定ページを再読み込みして再試行してください。"
+
+#: inc/live2d-costumes.php options.php
+msgid "jsDelivr CDN (default)"
+msgstr "jsDelivr CDN（既定）"
+
+#: inc/live2d-costumes.php
+msgid "Download state is invalid. Clear the unfinished download and retry."
+msgstr "ダウンロード状態が無効です。未完了のダウンロードを消去して再試行してください。"
+
+#: inc/live2d-costumes.php
+msgid "The server returned an invalid download chunk. Retry to resume."
+msgstr "サーバーからの分割データが無効です。再試行して再開してください。"
+
+#: inc/live2d-costumes.php
+msgid "Overwrite / resume download"
+msgstr "上書きダウンロード／再開"
+
+#: inc/live2d-costumes.php
+msgid "Clear unfinished download"
+msgstr "未完了のダウンロードを消去"
+
+#: inc/live2d-costumes.php
+msgid "Clear removes unfinished managed downloads only. Overwrite keeps installed files until replacements pass verification. Custom catalogs are unaffected."
+msgstr "消去は未完了の管理対象ダウンロードのみです。上書き時も新しいファイルの検証まで既存ファイルを保持します。カスタムカタログは変更しません。"
+
+#: inc/live2d-costumes.php
+msgid "Current file: %1$s / %2$s KiB received."
+msgstr "現在のファイル：%1$s / %2$s KiBを受信。"
+
+#: inc/live2d-costumes.php
+msgid "Unfinished download cleared. Installed and custom costumes were kept."
+msgstr "未完了のダウンロードを消去しました。導入済みの衣装とカスタム衣装は保持しました。"

@@ -2735,3 +2735,143 @@ msgstr "預設目錄：%1$s（相對於 WordPress 安裝目錄；自訂上傳目
 #: inc/options-sanitize.php
 msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."
 msgstr "請輸入完整的 HTTP(S) JSON 清單網址，不含帳號密碼或片段識別。已保留原值。"
+
+#: inc/live2d-costumes.php options.php
+msgid "%1$s extension costumes, %2$s MiB. Three bundled costumes are always included."
+msgstr "擴充服裝 %1$s 套，%2$s MiB；一律保留三套內建服裝。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Another costume download is in progress. Please retry shortly."
+msgstr "另一個服裝下載正在進行，請稍後重試。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Bundled costumes only"
+msgstr "僅內建服裝"
+
+#: inc/live2d-costumes.php options.php
+msgid "Checking saved costumes..."
+msgstr "正在檢查已儲存的服裝……"
+
+#: inc/live2d-costumes.php options.php
+msgid "Choose one source. Compatible extensions follow the selected model; existing custom catalogs and remote APIs keep their previous selection until you change it."
+msgstr "選擇一種來源，相容的擴充服裝會隨所選模型自動關聯；既有自訂清單與遠端介面在變更選擇前繼續沿用。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Custom external catalog"
+msgstr "自訂外置清單"
+
+#: inc/live2d-costumes.php options.php
+msgid "Download complete. Local costumes selected; save the settings to apply."
+msgstr "下載完成，已選取本站服裝；請儲存設定以套用。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Download paused. Click download to resume."
+msgstr "下載已暫停，點選下載可繼續。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Download to this site / resume"
+msgstr "下載到本站／繼續下載"
+
+#: inc/live2d-costumes.php options.php
+msgid "Downloaded and verified %1$s of %2$s costumes."
+msgstr "已下載並驗證 %1$s／%2$s 套服裝。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Downloaded to this site"
+msgstr "已下載到本站"
+
+#: inc/live2d-costumes.php options.php
+msgid "Enable JavaScript to manage costume downloads."
+msgstr "請啟用 JavaScript 以管理服裝下載。"
+
+#: inc/live2d-costumes.php options.php
+msgid "For the custom external catalog source only. Enter a JSON catalog compatible with the selected model. Managed CDN and local libraries need no address here."
+msgstr "僅用於「自訂外置清單」來源，請填入相容於目前模型的 JSON 清單網址。託管 CDN 與本站服裝庫無需在此填寫網址。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Invalid costume download request."
+msgstr "服裝下載請求無效。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Legacy remote PNG API"
+msgstr "舊版遠端 PNG 介面"
+
+#: inc/live2d-costumes.php options.php
+msgid "Live2D costume source"
+msgstr "Live2D 服裝來源"
+
+#: inc/live2d-costumes.php options.php
+msgid "Model costume library"
+msgstr "模型服裝庫"
+
+#: inc/live2d-costumes.php options.php
+msgid "No compatible extension costumes are available for this model. Bundled costumes remain available."
+msgstr "此模型尚無相容的擴充服裝，仍可使用內建服裝。"
+
+#: inc/live2d-costumes.php options.php
+msgid "Pause download"
+msgstr "暫停下載"
+
+#: inc/live2d-costumes.php options.php
+msgid "The compatible library follows the selected model. Downloading is optional; CDN costumes load only when selected. Downloads survive theme updates."
+msgstr "服裝庫隨所選模型自動關聯。下載到本站為選用操作；CDN 僅在換裝選中時載入圖片。已下載資源不會因主題更新而刪除。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume download failed. Check the server connection and retry to resume."
+msgstr "服裝下載失敗，請檢查伺服器網路連線後重試，已完成的部分可以續傳。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume library is incomplete. Resume the download before using local costumes."
+msgstr "本站服裝庫尚未完整，請繼續下載後再使用本站服裝。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The costume storage directory is unavailable."
+msgstr "服裝儲存目錄無法使用，請檢查上傳目錄及寫入權限。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The downloaded costume failed integrity checks. Retry the download."
+msgstr "下載的服裝未通過完整性驗證，請重試下載。"
+
+#: inc/live2d-costumes.php options.php
+msgid "The local costume library is ready."
+msgstr "本站服裝庫已就緒。"
+
+#: inc/live2d-costumes.php options.php
+msgid "This build has no fixed CDN reference. Install a published build to download costumes."
+msgstr "目前建置沒有固定的 CDN 來源，請安裝已發佈建置後下載服裝。"
+
+#: inc/live2d-costumes.php options.php
+msgid "You cannot manage costume downloads. Reload the settings page and try again."
+msgstr "目前無法管理服裝下載，請重新載入設定頁面後再試。"
+
+#: inc/live2d-costumes.php options.php
+msgid "jsDelivr CDN (default)"
+msgstr "jsDelivr CDN（預設）"
+
+#: inc/live2d-costumes.php
+msgid "Download state is invalid. Clear the unfinished download and retry."
+msgstr "下載狀態無效，請清除未完成下載後重試。"
+
+#: inc/live2d-costumes.php
+msgid "The server returned an invalid download chunk. Retry to resume."
+msgstr "伺服器傳回的分片無效，請重試以繼續下載。"
+
+#: inc/live2d-costumes.php
+msgid "Overwrite / resume download"
+msgstr "覆寫重新下載／繼續"
+
+#: inc/live2d-costumes.php
+msgid "Clear unfinished download"
+msgstr "清除未完成下載"
+
+#: inc/live2d-costumes.php
+msgid "Clear removes unfinished managed downloads only. Overwrite keeps installed files until replacements pass verification. Custom catalogs are unaffected."
+msgstr "清除僅處理未完成的託管下載；覆寫時先驗證新檔案再替換原檔案。已啟用的完整庫與自訂清單不受清除影響。"
+
+#: inc/live2d-costumes.php
+msgid "Current file: %1$s / %2$s KiB received."
+msgstr "目前檔案已接收 %1$s／%2$s KiB。"
+
+#: inc/live2d-costumes.php
+msgid "Unfinished download cleared. Installed and custom costumes were kept."
+msgstr "未完成下載已清除，已啟用的完整服裝庫及自訂服裝已保留。"

@@ -1283,11 +1283,23 @@ function optionsframework_options()
         ));
 
     $options[] = array(
-        'name' => __('Use remote Live2D costume API', 'sakura'),
-        'desc' => __('When enabled, load a costume PNG from the configured endpoint instead of selecting a bundled costume at random.', 'sakura'),
-        'id' => 'live2d_b',
-        'std' => '0',
-        'type' => 'checkbox');
+        'name' => __('Live2D costume source', 'sakura'),
+        'desc' => __('Choose one source. Compatible extensions follow the selected model; existing custom catalogs and remote APIs keep their previous selection until you change it.', 'sakura'),
+        'id' => 'live2d_costume_source',
+        'std' => 'cdn',
+        'type' => 'select',
+        'options' => array(
+            'cdn' => __('jsDelivr CDN (default)', 'sakura'),
+            'local' => __('Downloaded to this site', 'sakura'),
+            'bundled' => __('Bundled costumes only', 'sakura'),
+            'custom' => __('Custom external catalog', 'sakura'),
+            'remote' => __('Legacy remote PNG API', 'sakura'),
+        ));
+
+    $options[] = array(
+        'name' => __('Model costume library', 'sakura'),
+        'id' => 'live2d_resources',
+        'type' => 'live2d_resources');
 
     $options[] = array(
         'name' => __('Remote Live2D costume endpoint', 'sakura'),
@@ -1298,7 +1310,7 @@ function optionsframework_options()
 
     $options[] = array(
         'name' => __('External Live2D costume catalog', 'sakura'),
-        'desc' => __('Optional JSON catalog for the selected model. Leave empty to use bundled costumes only. Disable the remote costume API to use this catalog. Upload the catalog and PNG files separately via SFTP or your hosting file manager; theme updates do not install them.', 'sakura') . '<br>' .
+        'desc' => __('For the custom external catalog source only. Enter a JSON catalog compatible with the selected model. Managed CDN and local libraries need no address here.', 'sakura') . '<br>' .
             sprintf(__('Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s (replace the domain and upload path with your own)', 'sakura'), '<code>wp-content/uploads/sakura-live2d/</code>', '<code>https://example.com/wp-content/uploads/sakura-live2d/pio/pack-v1/catalog.json</code>'),
         'id' => 'live2d_catalog',
         'std' => '',

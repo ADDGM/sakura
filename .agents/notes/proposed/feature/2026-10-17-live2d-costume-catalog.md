@@ -4,15 +4,17 @@ Status: proposed
 
 ## Problem
 
-看板娘默认从 Tia/Pio 各自的三套内置纹理中随机选择，另支持可选外置清单。仓库根级服装集合尚未接入；相同图片尺寸、相似名称或 `pioUrl` 字段不能证明纹理适配某个模型。直接启用整个集合可能造成脸部、衣服或动作错位，也会扩大主题安装包。
+看板娘默认从 Tia/Pio 各自的三套内置纹理中随机选择，另支持可选外置清单。根级完整服装集合未随主题接入，首批五套仅在维护者测试站独立部署验证；相同图片尺寸、相似名称或 `pioUrl` 字段不能证明纹理适配某个模型。直接启用整个集合可能造成脸部、衣服或动作错位，也会扩大主题安装包。
 
-2026-10-17 的后续规划在既有基础功能之上展开。本篇是这次具体方案的成文日期；大型服装作为后续方向已在[基础接入决定](../../implemented/architecture/2026-10-07-live2d-integration.md)中保留。当前已完成资源调查及214个配对的离线映射，尚未实施新增素材的扩展加载。
+2026-10-17 的后续规划在既有基础功能之上展开。本篇是这次具体方案的成文日期；大型服装作为后续方向已在[基础接入决定](../../implemented/architecture/2026-10-07-live2d-integration.md)中保留。当前已完成资源调查、214个配对的离线映射及首批五套同站点外置清单验收，新增公开分发依据仍未补齐。
 
 ## Proposal
 
+2026-10-18维护者进一步授权完整服装库、默认CDN、可选分片下载及仓库路径规范化，[模型关联服装库](../../implemented/feature/2026-10-18-live2d-managed-costumes.md)接管整库交付并已在本地实现。107PNG迁入 `live2d/costumes/pio/textures/` 且字节不变，清单去除三份内置重复后为104套；以下保留原映射、首批候选取舍和来源边界，历史路径代表调查当时状态。
+
 先为根级 107 套候选建立独立的 Tia/Pio 视觉兼容目录，再从通过验证的候选中选择首批少量服装。以 Pio 的三个字节相同样本建立对照，但不预先认定整个集合都属于 Pio；Tia 单独判断。没有通过视觉验证的条目保持待定，不能进入随机选择池。
 
-最初的分发建议是沿用模型目录的 `textures.json` 和现有随机选择行为，只补充确认适配的少量纹理及清单条目。维护者随后提出主题上传体积限制，已实施的[外置服装清单](../../implemented/architecture/2026-10-17-live2d-external-costume-catalog.md)将扩展素材独立存放，接管本篇的小批随主题分发方式；本篇继续负责模型映射、具体候选与来源依据。加载能力已用内置纹理验证，新增素材尚未分发，根级完整素材集合继续排除于主题安装包。
+最初的分发建议是沿用模型目录的 `textures.json` 和现有随机选择行为，只补充确认适配的少量纹理及清单条目。维护者随后提出主题上传体积限制，已实施的[外置服装清单](../../implemented/architecture/2026-10-17-live2d-external-costume-catalog.md)将扩展素材独立存放，接管本篇的小批随主题分发方式；本篇继续负责模型映射、具体候选与来源依据。加载能力已用内置纹理和首批五套新增外观验证；根级完整素材集合继续排除于主题安装包，新增公开分发仍待来源审核。
 
 2026-10-17维护者确认先执行离线映射，并提出在看板娘上增加便捷换装按钮。[换装按钮已本地实现](../../implemented/feature/2026-10-17-live2d-costume-button.md)，支持现有模型专属清单、键盘及失败恢复。根级素材没有因为按钮出现而进入选择池，新增素材仍按本篇独立确定范围。
 
@@ -50,7 +52,7 @@ Status: proposed
 
 每条原始记录均出现一条未附URL的`net::ERR_FAILED`资源诊断，但就绪、动作截图完成；相同运行时的两份内置对照诊断补采样未复现，原因未确认。因此这些视觉结论不能表述为全部请求或控制台零错误。
 
-首批可评审建议为Pio的以下5套：覆盖不同外观、没有内置哈希重复，总原始图片2,633,148字节（约2.51MiB，非ZIP增量），均尚未接入。它们的来源与分发依据仍未补齐；这是后续接入的具体输入，不表示已批准分发。
+首批Pio候选为以下5套：覆盖不同外观、没有内置哈希重复，总原始图片2,633,148字节（约2.51MiB，非ZIP增量）。2026-10-18独立候选包已由维护者上传，并完成测试站验收；新增公开分发依据尚未确认，来源核对的进展见下节。
 
 | 根级PNG条目 | 字节 |
 | --- | ---: |
@@ -59,6 +61,34 @@ Status: proposed
 | `forest-witch(green)` | 621,567 |
 | `hanbok(pink)` | 502,529 |
 | `cat-witch(white)` | 530,669 |
+
+### Candidate package preparation
+
+2026-10-18同站点外置加载已用既有服装完成验收，维护者继续推进不同外观。候选包使用上述5份现有仓库PNG，保持图像字节不变，放在`wp-content/uploads/sakura-live2d/pio/pack-v1/`；它与先前重复内置外观的`verify-v1`分开。维护者已手动上传并配置该清单，测试站验收不扩大公开分发范围。
+
+清单使用既有version 1格式和当前Pio模型指纹。输出文件名把括号颜色改成短横线，例如`lolita-suit(sky-blue).png`变为`lolita-suit-sky-blue.png`，以满足现行路径规则；原文件不重命名，PNG不重新编码。三套内置纹理不进入候选包，主题仍提供基础服装；大集合与新增图片不进入主题ZIP。
+
+来源比对仅涉及选中的5份文件。[Asagiriran/Pio_Live2D固定版本](https://github.com/Asagiriran/Pio_Live2D/tree/c0927a6f18fcf8d9ff5635d98ed68f6b5082ccae)中找到全部五份相同副本；2026-10-18通过GitHub Contents的JSON/base64在内存取得PNG，五份SHA-256与字节数均和本地候选一致，没有落盘下载图片。
+
+| 本地根级PNG | 已核验分发仓库路径 |
+| --- | --- |
+| `cherry-fairy.png` | `textures/texture_67.png` |
+| `lolita-suit(sky-blue).png` | `textures/texture_39.png` |
+| `forest-witch(green).png` | `textures/texture_17.png` |
+| `hanbok(pink).png` | `textures/texture_27.png` |
+| `cat-witch(white).png` | `textures_1/texture_122.png` |
+
+该固定版本的两份JSON记录模型配置，`motions/readme`与`textures_1/read`均只有一个换行；仓库许可元数据为空，所查文档与提交说明未给出原作者署名或分发授权。同源副本便于追溯，但不能把仓库所有者直接认定为素材作者或授权人。
+
+[fghrsh/live2d_api固定目录](https://github.com/fghrsh/live2d_api/tree/02dc5b3aaf5cee35455c816596820055c5363205/model/Potion-Maker/Pio/textures)还包含两份匹配：`hanbok-costume-pink.png`的Git blob为`986cfa5ab21ce0ed905d074f46c18443e7a75672`，与本地`hanbok(pink).png`相同；`witch-costume-white.png`的blob为`f5577bf43d88b943500cb550c35b13a0e3621c9d`，与本地`cat-witch(white).png`相同。
+
+该仓库[版权说明](https://github.com/fghrsh/live2d_api/blob/02dc5b3aaf5cee35455c816596820055c5363205/README.md)将模型权利留给原作者，不能由API代码的MIT许可推定图片授权。另查到的[ViewerEX分发仓库](https://github.com/longhao-li/Live2DViewerEX-PotionMaker-Pio/tree/3ef798f2cc0479727f7d2b9a8d974e39a79f79cb)虽有CC BY-NC-SA文本，73项完整树未匹配这5个Git blob，也未取得对这批PNG的原作者授权依据，不套用为候选包许可。既有[来源边界](../../implemented/architecture/2026-10-07-live2d-integration.md#resource-provenance)继续适用。此次已完成有明确入口的副本比对，原作者授权待新线索补查，不重复把公开副本数量当作授权进展。
+
+本地候选ZIP为7文件、2,568,754字节，包含5PNG、JSON和来源/部署说明；CRC、安全路径、PNG解码及逐文件源哈希通过。当前Pio运行时在Edge155.0.4283.62中经本地HTTP逐套换装成功，模型保持、旧GPU纹理释放、无预取，860/861px边界通过，pageerror为空。确定性逐套检查之后，自然随机候选池也完成一次按钮切换。
+
+构建3.7.0-dev.87测试站的JSON和5PNG均返回200，字节哈希与候选包一致。前台Pio清单指向pack-v1，旧远程模式未启用；12次普通按钮操作覆盖五套新增外观，另完成文章页换装及返回首页后的Enter换装，共14次成功，模型、Canvas保持且旧GPU纹理释放。页面往返通过PJAX，未预取新增PNG，pageerror与Live2D错误为空；五套实站画面已核对。首轮脚本等待完整load超时，补采样确认页面仍为interactive但PJAX已完成，改按DOM与PJAX完成事件验证通过，未修改主题导航。860/861px仍属此前本地证据，不冒充实站检查。
+
+安装与验收结束后，本地候选ZIP/checksum和冗余实站截图已退役，保留来源、哈希、合成预览与测试结果，服务器资源不受清理影响。本篇保持proposed，范围是尚未核清来源依据的新增公开分发；上述五套同站点技术验收已完成。
 
 ### Mapping procedure
 
