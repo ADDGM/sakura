@@ -2454,7 +2454,7 @@ msgstr ""
 
 #: options.php
 #, php-format
-msgid "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s"
+msgid "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s (replace the domain and upload path with your own)"
 msgstr ""
 
 #: inc/options-sanitize.php

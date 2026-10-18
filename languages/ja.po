@@ -477,8 +477,8 @@ msgstr "選択したモデル用の任意の JSON 衣装カタログ。空欄の
 
 #: options.php
 #, php-format
-msgid "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s"
-msgstr "既定のディレクトリ：%1$s（WordPress のインストール先からの相対パス。アップロード先を変更している場合は異なります）<br>カタログ URL の例：%2$s"
+msgid "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s (replace the domain and upload path with your own)"
+msgstr "既定のディレクトリ：%1$s（WordPress のインストール先からの相対パス。アップロード先を変更している場合は異なります）<br>カタログ URL の例：%2$s（ドメインとアップロードパスをご自身のものに置き換えてください）"
 
 #: inc/options-sanitize.php
 msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."

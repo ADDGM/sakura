@@ -73,11 +73,12 @@ try {
         $fields = optionsframework_options();
         $field = array_values(array_filter($fields, static function ($entry) {return ($entry['id'] ?? '') === 'live2d_catalog';}))[0];
         $catalogCheck(strpos($field['desc'], WP_CONTENT_DIR) === false &&
-            strpos($field['desc'], '/custom-uploads/sites/42') === false,
-            '后台说明泄露服务器磁盘路径');
+            strpos($field['desc'], '/custom-uploads/sites/42') === false &&
+            strpos($field['desc'], 'static.example.test') === false,
+            '后台说明泄露服务器磁盘路径或本站上传地址');
         $catalogCheck(strpos($field['desc'], '<code>wp-content/uploads/sakura-live2d/</code>') !== false &&
-            strpos($field['desc'], 'https://static.example.test/sites/42/sakura-live2d/pio/pack-v1/catalog.json') !== false,
-            '后台通用目录或当前上传URL示例不正确');
+            strpos($field['desc'], '<code>https://example.com/wp-content/uploads/sakura-live2d/pio/pack-v1/catalog.json</code>') !== false,
+            '后台通用目录或占位网址示例不正确');
         $catalogCheck(!is_dir(WP_CONTENT_DIR . '/custom-uploads/sites/42'), '显示设置创建了上传目录');
     } finally { remove_filter('upload_dir', $uploadFilter); }
     require_once ABSPATH . WPINC . '/pomo/mo.php';

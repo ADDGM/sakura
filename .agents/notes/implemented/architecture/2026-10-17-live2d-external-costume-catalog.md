@@ -30,7 +30,7 @@ WordPress没有适用于所有自托管站点的统一主题ZIP上限。[wp_max_
 ### 存放与部署
 
 - 主题继续提供Tia/Pio各自的三套基础纹理；未配置扩展目录时行为不变。
-- 默认目录示意：相对于WordPress安装目录的 `wp-content/uploads/sakura-live2d/pio/pack-v1/`，包含静态JSON清单和PNG。后台只显示通用目录和通过[wp_upload_dir](https://developer.wordpress.org/reference/functions/wp_upload_dir/)的baseurl生成的清单网址，不输出basedir的服务器磁盘绝对路径。自定义上传目录与多站点以站点配置为准；网址是否包含子目录由安装位置决定，主题名称不会固定增加 `/sakura/` 前缀。
+- 默认目录示意：相对于WordPress安装目录的 `wp-content/uploads/sakura-live2d/pio/pack-v1/`，包含静态JSON清单和PNG。后台说明只显示通用目录与固定的 `example.com` 清单网址，并提示替换域名和上传路径；不读取或显示本站的basedir/baseurl。自定义上传目录与多站点以站点配置为准，WordPress目录规则见[wp_upload_dir](https://developer.wordpress.org/reference/functions/wp_upload_dir/)；网址是否包含子目录由安装位置决定，主题名称不会固定增加 `/sakura/` 前缀。实际清单配置仍由维护者填写，不把占位示例用作默认值。
 - 首期由维护者通过SFTP、服务器文件管理器或已有静态存储工具放置文件。目录独立于主题替换，但需纳入站点备份；不能承诺所有主机或清理插件永久保留它。
 - 只有WordPress后台上传能力时，可考虑按本站限制拆分小包或另案实现受控导入。通过同一PHP入口上传独立ZIP仍受相同限制；服务端下载也有网络、超时、磁盘与校验成本，首期不增加下载/解压管理器。
 - 对象存储/CDN使用版本化目录与稳定地址。跨域清单和PNG均须允许站点读取，PNG还需满足WebGL纹理CORS要求；能直接打开图片不等于可作为纹理使用。密钥不进入前端，浏览器直接请求公开静态资源，不新增PHP任意URL代理。
@@ -86,7 +86,9 @@ loader使用配置键和请求状态避免重复初始化及过期响应；`conf
 
 2026-10-18：提交0f0aafe的[兼容性CI](https://github.com/ADDGM/sakura/actions/runs/39048002694)11项及[质量CI](https://github.com/ADDGM/sakura/actions/runs/39048002713)2项成功，包含六组WordPress7.0/7.1×PHP8.0/8.1/8.2。构建85为3.7.0-dev.85、413文件，SHA-256、CRC和412份原始Git对象核验通过（仅style.css版本头预期替换，另加build-info.txt）。维护者安装后，实站版本来源及6资源哈希匹配；实站清单尚为空，不能宣称已验收外置资源。真实Safari、多站点网络和实际公网CDN仍未验证。
 
-2026-10-18的目录说明调整去掉basedir输出，保留通用目录和实际baseurl示例。PHP语法、四语言MO一致性、四语言×根目录/子目录/自定义CDN的12组说明渲染检查通过；现有WordPress smoke改为检查磁盘路径不输出。渲染检查使用当前配置片段和目录/翻译桩，未重建完整WordPress；该文字修正尚未随新构建安装。
+2026-10-18的第一次目录说明调整去掉basedir输出，保留通用目录和实际baseurl示例。12组说明渲染、PHP语法与四语言MO检查通过；提交8c440e0的[兼容性86](https://github.com/ADDGM/sakura/actions/runs/39096974122)11项和[质量38](https://github.com/ADDGM/sakura/actions/runs/39096974095)2项通过，构建86经完整包核验后由维护者安装，实站版本来源与资源哈希匹配。
+
+维护者随后明确要求清单网址示例也不展示本站地址，说明统一改为example.com占位网址并提示替换。四语言实际字段渲染与MO一致性、PHP语法通过；字段渲染中禁止读取上传目录，默认配置仍为空。现有WordPress smoke同步检查本站域名不进入说明。本轮局部验证不替代后续完整WordPress CI及手动安装后的后台验收。
 
 ## Consequences
 

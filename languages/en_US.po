@@ -2641,8 +2641,8 @@ msgstr "Optional JSON catalog for the selected model. Leave empty to use bundled
 
 #: options.php
 #, php-format
-msgid "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s"
-msgstr "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s"
+msgid "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s (replace the domain and upload path with your own)"
+msgstr "Default directory: %1$s (relative to the WordPress installation; custom upload locations may differ)<br>Example catalog URL: %2$s (replace the domain and upload path with your own)"
 
 #: inc/options-sanitize.php
 msgid "Enter a full HTTP(S) URL to a JSON catalog, without credentials or a fragment. The previous value has been kept."
