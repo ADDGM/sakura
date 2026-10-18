@@ -1,5 +1,6 @@
 <?php
 /** Model-bound costume catalogs and opt-in local downloads. */
+require_once __DIR__ . '/live2d-costume-history.php';
 
 /** Preserve existing installations until an explicit source is saved. */
 function sakura_live2d_costume_source()
@@ -207,15 +208,17 @@ function sakura_live2d_costume_status($catalog, $directory)
     $refresh = sakura_live2d_costume_refresh_state($directory, $catalog);
     if (is_wp_error($refresh)) return $refresh;
     $missing = array();
+    $parts = array();
     $received = 0;
     foreach ($catalog['costumes'] as $index => $item) {
         if (!$directory || ($refresh !== null && !in_array($index, $refresh['done'], true)) ||
             !sakura_live2d_costume_file_valid($directory['path'] . '/' . $item['texture'], $item)) {
             $missing[] = $index;
-            if ($directory) $received += max(0, sakura_live2d_costume_part_size($directory['path'] . '/textures/.part-' . $item['sha256'], $item));
+            $parts[$index] = $directory ? max(0, sakura_live2d_costume_part_size($directory['path'] . '/textures/.part-' . $item['sha256'], $item)) : 0;
+            $received += $parts[$index];
         } else $received += $item['bytes'];
     }
-    return array('total' => count($catalog['costumes']), 'missing' => $missing,
+    return array('total' => count($catalog['costumes']), 'missing' => $missing, 'parts' => $parts,
         'bytes' => $received, 'size' => array_sum(array_column($catalog['costumes'], 'bytes')), 'refresh' => $refresh !== null,
         'ready' => count($missing) === 0 && sakura_live2d_costume_ready($directory, $catalog));
 }
@@ -295,7 +298,11 @@ function sakura_live2d_costume_ajax()
     $model = isset($_POST['model']) && is_string($_POST['model']) ? wp_unslash($_POST['model']) : '';
     $mode = isset($_POST['mode']) && is_string($_POST['mode']) ? wp_unslash($_POST['mode']) : '';
     $index = isset($_POST['index']) && is_string($_POST['index']) && preg_match('/\A[0-9]{1,3}\z/', $_POST['index']) ? (int) $_POST['index'] : null;
-    $result = sakura_live2d_costume_request($model, $mode, $index);
+    if (in_array($mode, array('history', 'history-preview', 'history-delete'), true)) {
+        $version = isset($_POST['version']) && is_string($_POST['version']) ? wp_unslash($_POST['version']) : '';
+        $ticket = isset($_POST['ticket']) && is_string($_POST['ticket']) ? wp_unslash($_POST['ticket']) : '';
+        $result = sakura_live2d_costume_history_request($model, $mode, $version, $ticket);
+    } else $result = sakura_live2d_costume_request($model, $mode, $index);
     if (is_wp_error($result)) wp_send_json_error(array('message' => $result->get_error_message()), 400);
     else wp_send_json_success($result);
 }
@@ -303,13 +310,33 @@ add_action('wp_ajax_sakura_live2d_resources', 'sakura_live2d_costume_ajax');
 
 function sakura_live2d_costume_field()
 {
-    return '<p>' . esc_html(__('The compatible library follows the selected model. Downloading is optional; CDN costumes load only when selected. Downloads survive theme updates.', 'sakura')) . '</p>' .
-        '<p id="sakura-costume-summary"></p><button type="button" class="button" id="sakura-costume-download" disabled>' . esc_html(__('Download to this site / resume', 'sakura')) . '</button> ' .
-        '<button type="button" class="button" id="sakura-costume-stop" hidden>' . esc_html(__('Pause download', 'sakura')) . '</button>' .
-        ' <button type="button" class="button" id="sakura-costume-restart" disabled>' . esc_html(__('Overwrite / resume download', 'sakura')) . '</button>' .
-        ' <button type="button" class="button" id="sakura-costume-clear">' . esc_html(__('Clear unfinished download', 'sakura')) . '</button>' .
-        '<p>' . esc_html(__('Clear removes unfinished managed downloads only. Overwrite keeps installed files until replacements pass verification. Custom catalogs are unaffected.', 'sakura')) . '</p>' .
-        '<p id="sakura-costume-progress" role="status" aria-live="polite"></p><noscript>' . esc_html(__('Enable JavaScript to manage costume downloads.', 'sakura')) . '</noscript>';
+    return '<div id="sakura-costume-panel" class="sakura-costume-panel" data-state="idle">' .
+        '<div class="sakura-costume-header"><div><span class="sakura-costume-eyebrow">' . esc_html(__('Model library', 'sakura')) . '</span>' .
+        '<strong id="sakura-costume-model"></strong></div><span id="sakura-costume-badge" class="sakura-costume-badge"></span></div>' .
+        '<p id="sakura-costume-summary"></p>' .
+        '<p class="sakura-costume-description">' . esc_html(__('The compatible library follows the selected model. Downloading is optional; CDN costumes load only when selected. Downloads survive theme updates.', 'sakura')) . '</p>' .
+        '<div id="sakura-costume-meter" class="sakura-costume-meter" hidden>' .
+        '<div class="sakura-costume-meter-heading"><label for="sakura-costume-bar">' . esc_html(__('Download progress', 'sakura')) . '</label><strong id="sakura-costume-percent"></strong></div>' .
+        '<progress id="sakura-costume-bar" max="100" value="0" aria-describedby="sakura-costume-transfer"></progress>' .
+        '<div class="sakura-costume-meter-details"><span id="sakura-costume-count"></span><span id="sakura-costume-transfer"></span></div>' .
+        '<p id="sakura-costume-chunk" class="sakura-costume-description"></p></div>' .
+        '<p id="sakura-costume-progress" class="sakura-costume-status" role="status" aria-live="polite" aria-atomic="true"></p>' .
+        '<div class="sakura-costume-actions"><button type="button" class="button button-primary" id="sakura-costume-download" disabled>' . esc_html(__('Download to this site', 'sakura')) . '</button>' .
+        '<button type="button" class="button" id="sakura-costume-stop" hidden>' . esc_html(__('Pause download', 'sakura')) . '</button></div>' .
+        '<details class="sakura-costume-maintenance"><summary>' . esc_html(__('Download management', 'sakura')) . '</summary>' .
+        '<p class="sakura-costume-description">' . esc_html(__('Clear removes unfinished managed downloads only. Overwrite keeps installed files until replacements pass verification. Custom catalogs are unaffected.', 'sakura')) . '</p>' .
+        '<div class="sakura-costume-actions"><button type="button" class="button" id="sakura-costume-restart" disabled>' . esc_html(__('Overwrite / resume download', 'sakura')) . '</button>' .
+        '<button type="button" class="button sakura-costume-clear" id="sakura-costume-clear" disabled>' . esc_html(__('Clear unfinished download', 'sakura')) . '</button></div>' .
+        '<div class="sakura-costume-history"><h5>' . esc_html(__('Version history', 'sakura')) . '</h5>' .
+        '<p class="sakura-costume-description">' . esc_html(__('Theme updates keep older libraries. Preview one version before cleaning it; the current version is always protected.', 'sakura')) . '</p>' .
+        '<div class="sakura-costume-actions"><button type="button" class="button" id="sakura-costume-history-load">' . esc_html(__('View history', 'sakura')) . '</button></div>' .
+        '<p id="sakura-costume-history-status" role="status" aria-live="polite"></p><ul id="sakura-costume-history-list"></ul>' .
+        '<div id="sakura-costume-history-confirm" class="sakura-costume-confirm" role="group" aria-labelledby="sakura-costume-history-heading" hidden>' .
+        '<strong id="sakura-costume-history-heading">' . esc_html(__('Confirm version cleanup', 'sakura')) . '</strong><p id="sakura-costume-history-preview"></p>' .
+        '<p class="sakura-costume-description">' . esc_html(__('This removes the selected local copy. Any custom links to this version will stop working. It does not remove CDN resources.', 'sakura')) . '</p>' .
+        '<div class="sakura-costume-actions"><button type="button" class="button sakura-costume-clear" id="sakura-costume-history-delete">' . esc_html(__('Confirm cleanup', 'sakura')) . '</button>' .
+        '<button type="button" class="button" id="sakura-costume-history-cancel">' . esc_html(__('Cancel', 'sakura')) . '</button></div></div></div></details>' .
+        '<noscript>' . esc_html(__('Enable JavaScript to manage costume downloads.', 'sakura')) . '</noscript></div>';
 }
 
 function sakura_live2d_costume_admin_scripts($hook)
@@ -324,6 +351,7 @@ function sakura_live2d_costume_admin_scripts($hook)
             'downloadable' => $catalog && sakura_live2d_costume_cdn_base($catalog) !== '',
             'ready' => $catalog && sakura_live2d_costume_ready($directory, $catalog));
     }
+    wp_enqueue_style('sakura-live2d-resources', sakura_theme_asset_url('inc/css/live2d-costumes.css'), array('optionsframework'), sakura_frontend_cache_version());
     wp_enqueue_script('sakura-live2d-resources', sakura_theme_asset_url('inc/js/live2d-costumes.js'), array('jquery'), sakura_frontend_cache_version(), true);
     wp_localize_script('sakura-live2d-resources', 'SakuraCostumeAdmin', array(
         'ajaxUrl' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('sakura-live2d-costumes'), 'models' => $models,
@@ -340,6 +368,34 @@ function sakura_live2d_costume_admin_scripts($hook)
             'ready' => __('The local costume library is ready.', 'sakura'),
             'chunk' => __('Current file: %1$s / %2$s KiB received.', 'sakura'),
             'cleared' => __('Unfinished download cleared. Installed and custom costumes were kept.', 'sakura'),
+            'download' => __('Download to this site', 'sakura'),
+            'resume' => __('Resume download', 'sakura'),
+            'useLocal' => __('Use local costumes', 'sakura'),
+            'cdn' => __('CDN on demand', 'sakura'),
+            'available' => __('Local library ready', 'sakura'),
+            'idle' => __('Not downloaded', 'sakura'),
+            'noLibrary' => __('Bundled costumes only', 'sakura'),
+            'downloading' => __('Downloading', 'sakura'),
+            'overwriting' => __('Overwriting', 'sakura'),
+            'pausing' => __('Pausing after the current request...', 'sakura'),
+            'pausedLabel' => __('Paused', 'sakura'),
+            'failedLabel' => __('Download interrupted', 'sakura'),
+            'checkingLabel' => __('Checking', 'sakura'),
+            'verifying' => __('Verifying the complete library...', 'sakura'),
+            'clearing' => __('Clearing unfinished downloads...', 'sakura'),
+            'verified' => __('%1$s / %2$s verified', 'sakura'),
+            'transferred' => __('%1$s / %2$s MiB', 'sakura'),
+            'historyLoading' => __('Reading version history...', 'sakura'),
+            'historyEmpty' => __('No managed versions were found for this model.', 'sakura'),
+            'historySkipped' => __('Some entries were left untouched because they could not be recognized or the list limit was reached.', 'sakura'),
+            'historyCurrent' => __('Current version · protected', 'sakura'),
+            'historyAvailable' => __('Older version', 'sakura'),
+            'historyBlocked' => __('Unrecognized or incomplete · kept', 'sakura'),
+            'historyBusy' => __('In use · kept', 'sakura'),
+            'historySize' => __('%1$s files · %2$s MiB', 'sakura'),
+            'historyPreview' => __('Preview cleanup', 'sakura'),
+            'historyDeleting' => __('Cleaning the selected version...', 'sakura'),
+            'historyDeleted' => __('Selected version cleaned. Current and other versions were kept.', 'sakura'),
         ),
     ));
 }

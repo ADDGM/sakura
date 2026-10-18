@@ -2787,3 +2787,174 @@ msgstr "Current file: %1$s / %2$s KiB received."
 #: inc/live2d-costumes.php
 msgid "Unfinished download cleared. Installed and custom costumes were kept."
 msgstr "Unfinished download cleared. Installed and custom costumes were kept."
+
+#: inc/live2d-costumes.php
+msgid "Model library"
+msgstr "Model library"
+
+#: inc/live2d-costumes.php
+msgid "Download progress"
+msgstr "Download progress"
+
+#: inc/live2d-costumes.php
+msgid "Download to this site"
+msgstr "Download to this site"
+
+#: inc/live2d-costumes.php
+msgid "Download management"
+msgstr "Download management"
+
+#: inc/live2d-costumes.php
+msgid "Resume download"
+msgstr "Resume download"
+
+#: inc/live2d-costumes.php
+msgid "Use local costumes"
+msgstr "Use local costumes"
+
+#: inc/live2d-costumes.php
+msgid "CDN on demand"
+msgstr "CDN on demand"
+
+#: inc/live2d-costumes.php
+msgid "Local library ready"
+msgstr "Local library ready"
+
+#: inc/live2d-costumes.php
+msgid "Not downloaded"
+msgstr "Not downloaded"
+
+#: inc/live2d-costumes.php
+msgid "Downloading"
+msgstr "Downloading"
+
+#: inc/live2d-costumes.php
+msgid "Overwriting"
+msgstr "Overwriting"
+
+#: inc/live2d-costumes.php
+msgid "Pausing after the current request..."
+msgstr "Pausing after the current request..."
+
+#: inc/live2d-costumes.php
+msgid "Paused"
+msgstr "Paused"
+
+#: inc/live2d-costumes.php
+msgid "Download interrupted"
+msgstr "Download interrupted"
+
+#: inc/live2d-costumes.php
+msgid "Checking"
+msgstr "Checking"
+
+#: inc/live2d-costumes.php
+msgid "Verifying the complete library..."
+msgstr "Verifying the complete library..."
+
+#: inc/live2d-costumes.php
+msgid "Clearing unfinished downloads..."
+msgstr "Clearing unfinished downloads..."
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s / %2$s verified"
+msgstr "%1$s / %2$s verified"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s / %2$s MiB"
+msgstr "%1$s / %2$s MiB"
+
+#: inc/live2d-costume-history.php
+msgid "This version cannot be cleaned automatically. Unrecognized or incomplete files were kept."
+msgstr "This version cannot be cleaned automatically. Unrecognized or incomplete files were kept."
+
+#: inc/live2d-costume-history.php
+msgid "The current costume version is protected."
+msgstr "The current costume version is protected."
+
+#: inc/live2d-costume-history.php
+msgid "This version is in use. Retry after the download finishes."
+msgstr "This version is in use. Retry after the download finishes."
+
+#: inc/live2d-costume-history.php
+msgid "The version changed or the confirmation expired. Preview it again before cleaning."
+msgstr "The version changed or the confirmation expired. Preview it again before cleaning."
+
+#: inc/live2d-costume-history.php
+msgid "Cleanup could not finish. Refresh the history list to inspect the remaining files."
+msgstr "Cleanup could not finish. Refresh the history list to inspect the remaining files."
+
+#: inc/live2d-costumes.php
+msgid "Version history"
+msgstr "Version history"
+
+#: inc/live2d-costumes.php
+msgid "Theme updates keep older libraries. Preview one version before cleaning it; the current version is always protected."
+msgstr "Theme updates keep older libraries. Preview one version before cleaning it; the current version is always protected."
+
+#: inc/live2d-costumes.php
+msgid "View history"
+msgstr "View history"
+
+#: inc/live2d-costumes.php
+msgid "Confirm version cleanup"
+msgstr "Confirm version cleanup"
+
+#: inc/live2d-costumes.php
+msgid "This removes the selected local copy. Any custom links to this version will stop working. It does not remove CDN resources."
+msgstr "This removes the selected local copy. Any custom links to this version will stop working. It does not remove CDN resources."
+
+#: inc/live2d-costumes.php
+msgid "Confirm cleanup"
+msgstr "Confirm cleanup"
+
+#: inc/live2d-costumes.php
+msgid "Cancel"
+msgstr "Cancel"
+
+#: inc/live2d-costumes.php
+msgid "Reading version history..."
+msgstr "Reading version history..."
+
+#: inc/live2d-costumes.php
+msgid "No managed versions were found for this model."
+msgstr "No managed versions were found for this model."
+
+#: inc/live2d-costumes.php
+msgid "Some entries were left untouched because they could not be recognized or the list limit was reached."
+msgstr "Some entries were left untouched because they could not be recognized or the list limit was reached."
+
+#: inc/live2d-costumes.php
+msgid "Current version · protected"
+msgstr "Current version · protected"
+
+#: inc/live2d-costumes.php
+msgid "Older version"
+msgstr "Older version"
+
+#: inc/live2d-costumes.php
+msgid "Unrecognized or incomplete · kept"
+msgstr "Unrecognized or incomplete · kept"
+
+#: inc/live2d-costumes.php
+msgid "In use · kept"
+msgstr "In use · kept"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s files · %2$s MiB"
+msgstr "%1$s files · %2$s MiB"
+
+#: inc/live2d-costumes.php
+msgid "Preview cleanup"
+msgstr "Preview cleanup"
+
+#: inc/live2d-costumes.php
+msgid "Cleaning the selected version..."
+msgstr "Cleaning the selected version..."
+
+#: inc/live2d-costumes.php
+msgid "Selected version cleaned. Current and other versions were kept."
+msgstr "Selected version cleaned. Current and other versions were kept."

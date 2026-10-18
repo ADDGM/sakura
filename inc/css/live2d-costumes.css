@@ -1,0 +1,282 @@
+/* Model library controls inherit the active WordPress admin palette. */
+#optionsframework #section-live2d_resources .controls {
+  float: none;
+  width: 100%;
+  padding-right: 0;
+}
+
+#optionsframework .sakura-costume-panel {
+  --costume-accent: var(--options-control-hover, #2271b1);
+  padding: 22px 24px;
+  border: 1px solid var(--options-border);
+  border-radius: 8px;
+  background: var(--options-surface-alt);
+}
+
+#optionsframework .sakura-costume-panel [hidden] {
+  display: none !important;
+}
+
+#optionsframework .sakura-costume-header,
+#optionsframework .sakura-costume-meter-heading,
+#optionsframework .sakura-costume-meter-details,
+#optionsframework .sakura-costume-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+#optionsframework .sakura-costume-header,
+#optionsframework .sakura-costume-meter-heading,
+#optionsframework .sakura-costume-meter-details {
+  justify-content: space-between;
+}
+
+#optionsframework .sakura-costume-header {
+  margin-bottom: 12px;
+}
+
+#optionsframework .sakura-costume-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--options-muted-text);
+  font-size: 12px;
+}
+
+#optionsframework #sakura-costume-model {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+#optionsframework .sakura-costume-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid var(--options-border);
+  border-radius: 20px;
+  background: var(--options-surface);
+  color: var(--options-text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#optionsframework .sakura-costume-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--costume-accent);
+}
+
+#optionsframework #sakura-costume-summary {
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+#optionsframework .sakura-costume-description,
+#optionsframework .sakura-costume-meter-details {
+  color: var(--options-muted-text);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+#optionsframework .sakura-costume-meter {
+  margin: 20px 0 12px;
+  padding: 16px;
+  border: 1px solid var(--options-border);
+  border-radius: 6px;
+  background: var(--options-surface);
+  font-variant-numeric: tabular-nums;
+}
+
+#optionsframework .sakura-costume-meter label {
+  margin: 0;
+  font-weight: 500;
+}
+
+#optionsframework #sakura-costume-percent {
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+#optionsframework #sakura-costume-bar {
+  display: block;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  margin: 12px 0 10px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: var(--options-surface-emphasis);
+  color: var(--costume-accent);
+  accent-color: var(--costume-accent);
+}
+
+#optionsframework #sakura-costume-bar::-webkit-progress-bar {
+  background: var(--options-surface-emphasis);
+  border-radius: 4px;
+}
+
+#optionsframework #sakura-costume-bar::-webkit-progress-value {
+  background: var(--costume-accent);
+  border-radius: 4px;
+}
+
+#optionsframework #sakura-costume-bar::-moz-progress-bar {
+  background: var(--costume-accent);
+  border-radius: 4px;
+}
+
+#optionsframework #sakura-costume-chunk {
+  margin: 6px 0 0;
+}
+
+#optionsframework #sakura-costume-progress {
+  margin: 14px 0;
+  overflow-wrap: anywhere;
+}
+
+#optionsframework #sakura-costume-progress:empty,
+#optionsframework #sakura-costume-chunk:empty {
+  display: none;
+}
+
+#optionsframework .sakura-costume-actions {
+  margin-top: 16px;
+  gap: 8px;
+}
+
+#optionsframework .sakura-costume-actions .button,
+#optionsframework .sakura-costume-version .button {
+  min-height: 36px;
+  height: auto;
+  margin: 0;
+  padding: 6px 14px;
+  border-radius: 4px;
+  line-height: 1.6;
+  white-space: normal;
+}
+
+#optionsframework .sakura-costume-actions .button:disabled,
+#optionsframework .sakura-costume-version .button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+#optionsframework .sakura-costume-maintenance {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--options-border);
+}
+
+#optionsframework .sakura-costume-maintenance summary {
+  width: fit-content;
+  color: var(--options-muted-text);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+#optionsframework .sakura-costume-maintenance[open] summary {
+  margin-bottom: 10px;
+}
+
+#optionsframework .sakura-costume-maintenance summary:focus-visible {
+  outline: 2px solid var(--options-focus);
+  outline-offset: 4px;
+}
+
+#optionsframework .sakura-costume-clear {
+  color: var(--options-danger);
+}
+
+#optionsframework .sakura-costume-panel[data-state="failed"] {
+  --costume-accent: var(--options-danger);
+}
+
+#optionsframework .sakura-costume-panel[data-state="failed"] .sakura-costume-status {
+  color: var(--options-danger);
+}
+
+@media (max-width: 480px) {
+  #optionsframework .sakura-costume-panel { padding: 16px; }
+  #optionsframework .sakura-costume-meter { padding: 12px; }
+  #optionsframework .sakura-costume-actions .button { flex: 1 1 auto; }
+}
+
+#optionsframework .sakura-costume-history {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--options-border);
+}
+
+#optionsframework .sakura-costume-history h5 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+#optionsframework #sakura-costume-history-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#optionsframework .sakura-costume-version {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--options-border);
+}
+
+#optionsframework .sakura-costume-version > div {
+  min-width: 0;
+  flex: 1 1 200px;
+}
+
+#optionsframework .sakura-costume-version strong {
+  font-size: 12px;
+}
+
+#optionsframework .sakura-costume-version-id {
+  margin: 4px 0;
+}
+
+#optionsframework .sakura-costume-version-id code,
+#optionsframework #sakura-costume-history-preview code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+
+#optionsframework .sakura-costume-version-id summary {
+  margin-bottom: 0;
+  font-family: monospace;
+}
+
+#optionsframework .sakura-costume-confirm {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--options-danger);
+  border-radius: 6px;
+  background: var(--options-surface);
+}
+
+#optionsframework #sakura-costume-history-preview span {
+  display: block;
+  margin-top: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+#optionsframework #sakura-costume-history-status:empty {
+  display: none;
+}

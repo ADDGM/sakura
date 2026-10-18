@@ -623,3 +623,174 @@ msgstr "現在のファイル：%1$s / %2$s KiBを受信。"
 #: inc/live2d-costumes.php
 msgid "Unfinished download cleared. Installed and custom costumes were kept."
 msgstr "未完了のダウンロードを消去しました。導入済みの衣装とカスタム衣装は保持しました。"
+
+#: inc/live2d-costumes.php
+msgid "Model library"
+msgstr "モデル衣装ライブラリ"
+
+#: inc/live2d-costumes.php
+msgid "Download progress"
+msgstr "ダウンロードの進捗"
+
+#: inc/live2d-costumes.php
+msgid "Download to this site"
+msgstr "このサイトにダウンロード"
+
+#: inc/live2d-costumes.php
+msgid "Download management"
+msgstr "ダウンロード管理"
+
+#: inc/live2d-costumes.php
+msgid "Resume download"
+msgstr "ダウンロードを再開"
+
+#: inc/live2d-costumes.php
+msgid "Use local costumes"
+msgstr "ローカルの衣装を使用"
+
+#: inc/live2d-costumes.php
+msgid "CDN on demand"
+msgstr "CDN から必要時に読み込み"
+
+#: inc/live2d-costumes.php
+msgid "Local library ready"
+msgstr "ローカルの衣装を利用可能"
+
+#: inc/live2d-costumes.php
+msgid "Not downloaded"
+msgstr "未ダウンロード"
+
+#: inc/live2d-costumes.php
+msgid "Downloading"
+msgstr "ダウンロード中"
+
+#: inc/live2d-costumes.php
+msgid "Overwriting"
+msgstr "上書きダウンロード中"
+
+#: inc/live2d-costumes.php
+msgid "Pausing after the current request..."
+msgstr "現在のリクエストが完了したら一時停止します…"
+
+#: inc/live2d-costumes.php
+msgid "Paused"
+msgstr "一時停止中"
+
+#: inc/live2d-costumes.php
+msgid "Download interrupted"
+msgstr "ダウンロード中断"
+
+#: inc/live2d-costumes.php
+msgid "Checking"
+msgstr "確認中"
+
+#: inc/live2d-costumes.php
+msgid "Verifying the complete library..."
+msgstr "衣装ライブラリ全体を検証中…"
+
+#: inc/live2d-costumes.php
+msgid "Clearing unfinished downloads..."
+msgstr "未完了のダウンロードを削除中…"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s / %2$s verified"
+msgstr "%1$s / %2$s 着を検証済み"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s / %2$s MiB"
+msgstr "%1$s / %2$s MiB"
+
+#: inc/live2d-costume-history.php
+msgid "This version cannot be cleaned automatically. Unrecognized or incomplete files were kept."
+msgstr "このバージョンは自動で削除できません。不明または未完了のファイルは保持されました。"
+
+#: inc/live2d-costume-history.php
+msgid "The current costume version is protected."
+msgstr "現在の衣装バージョンは保護されています。"
+
+#: inc/live2d-costume-history.php
+msgid "This version is in use. Retry after the download finishes."
+msgstr "このバージョンは使用中です。ダウンロード完了後に再試行してください。"
+
+#: inc/live2d-costume-history.php
+msgid "The version changed or the confirmation expired. Preview it again before cleaning."
+msgstr "内容が変更されたか、確認の有効期限が切れました。再度プレビューしてから削除してください。"
+
+#: inc/live2d-costume-history.php
+msgid "Cleanup could not finish. Refresh the history list to inspect the remaining files."
+msgstr "削除を完了できませんでした。履歴を更新して残りのファイルを確認してください。"
+
+#: inc/live2d-costumes.php
+msgid "Version history"
+msgstr "バージョン履歴"
+
+#: inc/live2d-costumes.php
+msgid "Theme updates keep older libraries. Preview one version before cleaning it; the current version is always protected."
+msgstr "テーマ更新時も古い衣装ライブラリは保持されます。削除前に対象をプレビューしてください。現在のバージョンは常に保護されます。"
+
+#: inc/live2d-costumes.php
+msgid "View history"
+msgstr "履歴を表示"
+
+#: inc/live2d-costumes.php
+msgid "Confirm version cleanup"
+msgstr "バージョンの削除を確認"
+
+#: inc/live2d-costumes.php
+msgid "This removes the selected local copy. Any custom links to this version will stop working. It does not remove CDN resources."
+msgstr "選択したローカルコピーを削除します。このバージョンへのカスタムリンクは利用できなくなります。CDN のリソースには影響しません。"
+
+#: inc/live2d-costumes.php
+msgid "Confirm cleanup"
+msgstr "削除を確定"
+
+#: inc/live2d-costumes.php
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: inc/live2d-costumes.php
+msgid "Reading version history..."
+msgstr "バージョン履歴を読み込み中…"
+
+#: inc/live2d-costumes.php
+msgid "No managed versions were found for this model."
+msgstr "このモデルのローカルバージョンはありません。"
+
+#: inc/live2d-costumes.php
+msgid "Some entries were left untouched because they could not be recognized or the list limit was reached."
+msgstr "識別できない項目、または表示件数の上限を超えた項目は保持されました。"
+
+#: inc/live2d-costumes.php
+msgid "Current version · protected"
+msgstr "現在のバージョン · 保護中"
+
+#: inc/live2d-costumes.php
+msgid "Older version"
+msgstr "旧バージョン · 削除可能"
+
+#: inc/live2d-costumes.php
+msgid "Unrecognized or incomplete · kept"
+msgstr "不明または未完了 · 保持"
+
+#: inc/live2d-costumes.php
+msgid "In use · kept"
+msgstr "使用中 · 保持"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s files · %2$s MiB"
+msgstr "%1$s ファイル · %2$s MiB"
+
+#: inc/live2d-costumes.php
+msgid "Preview cleanup"
+msgstr "削除内容を確認"
+
+#: inc/live2d-costumes.php
+msgid "Cleaning the selected version..."
+msgstr "選択したバージョンを削除中…"
+
+#: inc/live2d-costumes.php
+msgid "Selected version cleaned. Current and other versions were kept."
+msgstr "選択したバージョンを削除しました。現在および他のバージョンは保持されました。"

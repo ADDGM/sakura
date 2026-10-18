@@ -2875,3 +2875,174 @@ msgstr "目前檔案已接收 %1$s／%2$s KiB。"
 #: inc/live2d-costumes.php
 msgid "Unfinished download cleared. Installed and custom costumes were kept."
 msgstr "未完成下載已清除，已啟用的完整服裝庫及自訂服裝已保留。"
+
+#: inc/live2d-costumes.php
+msgid "Model library"
+msgstr "模型服裝庫"
+
+#: inc/live2d-costumes.php
+msgid "Download progress"
+msgstr "下載進度"
+
+#: inc/live2d-costumes.php
+msgid "Download to this site"
+msgstr "下載到本站"
+
+#: inc/live2d-costumes.php
+msgid "Download management"
+msgstr "下載管理"
+
+#: inc/live2d-costumes.php
+msgid "Resume download"
+msgstr "繼續下載"
+
+#: inc/live2d-costumes.php
+msgid "Use local costumes"
+msgstr "使用本站服裝"
+
+#: inc/live2d-costumes.php
+msgid "CDN on demand"
+msgstr "CDN 按需載入"
+
+#: inc/live2d-costumes.php
+msgid "Local library ready"
+msgstr "本站資源已就緒"
+
+#: inc/live2d-costumes.php
+msgid "Not downloaded"
+msgstr "尚未下載到本站"
+
+#: inc/live2d-costumes.php
+msgid "Downloading"
+msgstr "正在下載"
+
+#: inc/live2d-costumes.php
+msgid "Overwriting"
+msgstr "正在覆寫下載"
+
+#: inc/live2d-costumes.php
+msgid "Pausing after the current request..."
+msgstr "正在暫停，等待目前請求完成…"
+
+#: inc/live2d-costumes.php
+msgid "Paused"
+msgstr "已暫停"
+
+#: inc/live2d-costumes.php
+msgid "Download interrupted"
+msgstr "下載已中斷"
+
+#: inc/live2d-costumes.php
+msgid "Checking"
+msgstr "正在檢查"
+
+#: inc/live2d-costumes.php
+msgid "Verifying the complete library..."
+msgstr "正在驗證完整服裝庫…"
+
+#: inc/live2d-costumes.php
+msgid "Clearing unfinished downloads..."
+msgstr "正在清除未完成下載…"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s / %2$s verified"
+msgstr "已驗證 %1$s / %2$s 套"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s / %2$s MiB"
+msgstr "%1$s / %2$s MiB"
+
+#: inc/live2d-costume-history.php
+msgid "This version cannot be cleaned automatically. Unrecognized or incomplete files were kept."
+msgstr "此版本無法自動清理，已保留無法識別或未完成的檔案。"
+
+#: inc/live2d-costume-history.php
+msgid "The current costume version is protected."
+msgstr "目前服裝版本受保護。"
+
+#: inc/live2d-costume-history.php
+msgid "This version is in use. Retry after the download finishes."
+msgstr "此版本正在使用，請在下載結束後重試。"
+
+#: inc/live2d-costume-history.php
+msgid "The version changed or the confirmation expired. Preview it again before cleaning."
+msgstr "版本內容已變更或確認已過期，請重新預覽後再清理。"
+
+#: inc/live2d-costume-history.php
+msgid "Cleanup could not finish. Refresh the history list to inspect the remaining files."
+msgstr "清理未能完成，請重新整理歷史清單查看剩餘檔案。"
+
+#: inc/live2d-costumes.php
+msgid "Version history"
+msgstr "歷史版本"
+
+#: inc/live2d-costumes.php
+msgid "Theme updates keep older libraries. Preview one version before cleaning it; the current version is always protected."
+msgstr "佈景主題更新會保留舊服裝庫。清理前請先預覽所選版本，目前版本始終受保護。"
+
+#: inc/live2d-costumes.php
+msgid "View history"
+msgstr "查看歷史版本"
+
+#: inc/live2d-costumes.php
+msgid "Confirm version cleanup"
+msgstr "確認清理此版本"
+
+#: inc/live2d-costumes.php
+msgid "This removes the selected local copy. Any custom links to this version will stop working. It does not remove CDN resources."
+msgstr "將刪除所選版本的本站副本，指向此版本的自訂連結將失效。CDN 資源不受影響。"
+
+#: inc/live2d-costumes.php
+msgid "Confirm cleanup"
+msgstr "確認清理"
+
+#: inc/live2d-costumes.php
+msgid "Cancel"
+msgstr "取消"
+
+#: inc/live2d-costumes.php
+msgid "Reading version history..."
+msgstr "正在讀取歷史版本…"
+
+#: inc/live2d-costumes.php
+msgid "No managed versions were found for this model."
+msgstr "此模型暫無本站託管版本。"
+
+#: inc/live2d-costumes.php
+msgid "Some entries were left untouched because they could not be recognized or the list limit was reached."
+msgstr "部分項目無法識別或超過清單顯示上限，已保留。"
+
+#: inc/live2d-costumes.php
+msgid "Current version · protected"
+msgstr "目前版本 · 受保護"
+
+#: inc/live2d-costumes.php
+msgid "Older version"
+msgstr "歷史版本 · 可清理"
+
+#: inc/live2d-costumes.php
+msgid "Unrecognized or incomplete · kept"
+msgstr "無法識別或未完成 · 已保留"
+
+#: inc/live2d-costumes.php
+msgid "In use · kept"
+msgstr "正在使用 · 已保留"
+
+#: inc/live2d-costumes.php
+#, php-format
+msgid "%1$s files · %2$s MiB"
+msgstr "%1$s 個檔案 · %2$s MiB"
+
+#: inc/live2d-costumes.php
+msgid "Preview cleanup"
+msgstr "預覽清理"
+
+#: inc/live2d-costumes.php
+msgid "Cleaning the selected version..."
+msgstr "正在清理所選版本…"
+
+#: inc/live2d-costumes.php
+msgid "Selected version cleaned. Current and other versions were kept."
+msgstr "所選版本已清理，目前版本和其他版本已保留。"

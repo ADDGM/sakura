@@ -29,6 +29,8 @@ function akina_option($key, $default = false) { return $GLOBALS['options'][$key]
 function get_template_directory() { return $GLOBALS['root']; }
 function sakura_remote_resource_ref() { return $GLOBALS['reference']; }
 function wp_json_encode($value, $flags = 0) { return json_encode($value, $flags); }
+function wp_create_nonce($action) { return hash_hmac('sha256', $action, 'fixture-user-' . ($GLOBALS['nonce_user'] ?? 1)); }
+function wp_verify_nonce($ticket, $action) { return hash_equals(wp_create_nonce($action), $ticket); }
 function wp_upload_dir($time, $create) {
     verify($create === false, '读取上传根不会创建日期目录');
     return array('basedir' => $GLOBALS['uploads'], 'baseurl' => 'https://static.example.test/sites/42', 'error' => false);
@@ -136,12 +138,16 @@ try {
     }
     $failure = '';
     try { sakura_live2d_costume_ajax(); } catch (CostumeResponse $result) { verify($result->status === 200, '合法AJAX下载'); }
-    verify(sakura_live2d_costume_request('pio', 'status')['bytes'] === 262144, '单文件进度跨请求保留');
+    $progress = sakura_live2d_costume_request('pio', 'status');
+    verify($progress['bytes'] === 262144, '单文件进度跨请求保留');
+    verify($progress['parts'][0] === 262144 && $progress['parts'][1] === 0, '响应按文件返回真实分片偏移');
     verify(!is_file($directory['path'] . '/' . $catalog['costumes'][0]['texture']), '分片未完整时不安装PNG');
     verify(download_all(0)['complete'] === true && $ranges[count($ranges) - 1][0] > 0, '按字节偏移续传到完整文件');
     $before = count($requests);
     verify(sakura_live2d_costume_request('pio', 'download', 0)['complete'] === true && count($requests) === $before, '续传跳过已验证PNG');
     verify(count(sakura_live2d_costume_request('pio', 'status')['missing']) === 103, '恢复实际文件进度');
+    $progress = sakura_live2d_costume_request('pio', 'status');
+    verify(!isset($progress['parts'][0]) && $progress['bytes'] === $catalog['costumes'][0]['bytes'], '已校验文件不重复计入分片');
     verify(is_wp_error(sakura_live2d_costume_request('pio', 'finish')), '部分下载不能激活');
     verify(is_wp_error(sakura_live2d_costume_request('pio', 'download', null)) && is_wp_error(sakura_live2d_costume_request('pio', 'download', 999)), '拒绝非法索引');
     $lock = fopen($directory['path'] . '/.lock', 'c');
@@ -208,6 +214,7 @@ try {
     verify(sakura_live2d_costume_urls('pio', 'local') === $local, '已安装本地库不依赖CDN引用');
     file_put_contents($directory['path'] . '/' . $catalog['costumes'][0]['texture'], 'broken');
     verify(sakura_live2d_costume_request('pio', 'status')['missing'] === array(0), '断点恢复重验损坏文件');
+    require __DIR__ . '/live2d-history.php';
     echo 'PASS ' . $checks . " managed costume checks\n";
 } finally {
     remove_fixture($temporary, $temporary);
