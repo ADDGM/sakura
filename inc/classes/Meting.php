@@ -124,7 +124,7 @@ class Meting
                 break;
             }
         }
-        curl_close($curl);
+        unset($curl);
 
         return $this;
     }

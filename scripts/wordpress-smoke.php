@@ -1107,7 +1107,9 @@ if (!class_exists('Sakura\\API\\Meting')) {
 if (class_exists('Sakura\\API\\Meting')) {
     $meting = new \Sakura\API\Meting('netease');
     $neteaseUrl = new ReflectionMethod($meting, 'netease_url');
-    $neteaseUrl->setAccessible(true);
+    if (PHP_VERSION_ID < 80100) {
+        $neteaseUrl->setAccessible(true);
+    }
     $fallbackResult = json_decode($neteaseUrl->invoke($meting, wp_json_encode(array(
         'data' => array(array(
             'url' => 'https://example.com/original.mp3',

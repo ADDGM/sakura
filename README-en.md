@@ -5,7 +5,7 @@ Sakura🌸: A Wonderful WordPress Theme
 
 ![Sakura](screenshot.jpg)
 
-![PHP version](https://img.shields.io/badge/PHP-8.0--8.2-4F5B93.svg?style=flat-square&logo=php)
+![PHP version](https://img.shields.io/badge/PHP-8.0--8.5-4F5B93.svg?style=flat-square&logo=php)
 ![WP version](https://img.shields.io/badge/WordPress-7.0--7.1-0073aa.svg?style=flat-square&logo=wordpress)
 [![GitHub release](https://img.shields.io/github/release/ADDGM/sakura.svg?style=flat-square)](https://github.com/ADDGM/sakura/releases/latest)
 [![Github commits (since latest release)](https://img.shields.io/github/commits-since/ADDGM/sakura/latest/develop.svg?style=flat-square)](https://github.com/ADDGM/sakura/commits/develop)
@@ -13,7 +13,9 @@ Sakura🌸: A Wonderful WordPress Theme
 
 Modified based on theme [Akina (by Fuzzz)](http://www.akina.pw/themeakina) and [Siren (by Louie)](https://github.com/louie-senpai/Siren).
 
-The rebuild version is on the way :)
+This maintenance branch targets WordPress 7.0/7.1 and PHP 8.0/8.1/8.2/8.3/8.4/8.5. CI runs six PHP builds and twelve WordPress/PHP smoke-test combinations. Check the workflow results for the exact commit; older releases do not inherit new validation from this branch.
+
+For production, use a [supported PHP branch](https://www.php.net/supported-versions.php) with current security updates. PHP 8.0/8.1 remain compatibility regression targets only. The [October 21, 2026 PHP advisory](https://www.php.net/index.php) requires 8.2.35, 8.3.36, 8.4.27, 8.5.12 or later fixes; Windows users must also check the October 26 `-1` dependency rebuilds. Theme compatibility changes do not update or secure the server's PHP runtime.
 
 ### Install
 

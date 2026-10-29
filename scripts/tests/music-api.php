@@ -25,9 +25,11 @@
         }
         $player = new \Sakura\API\Aplayer();
         $cacheKey = new ReflectionMethod($player, 'cache_key');
-        $cacheKey->setAccessible(true);
         $resourceUrl = new ReflectionMethod($player, 'resource_url');
-        $resourceUrl->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $cacheKey->setAccessible(true);
+            $resourceUrl->setAccessible(true);
+        }
         $fixtures = array('playlist' => array(), 'lyric' => '[00:00.00]fixture', 'pic' => 'https://example.test/cover.jpg', 'url' => 'https://example.test/music.mp3');
         foreach (array_keys($fixtures) as $type) {
             foreach (array('fixture-resource', 'different-id') as $id) {

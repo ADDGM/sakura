@@ -17,6 +17,16 @@ python scripts/tests/commit-policy.py php
 
 完整 WordPress 检查使用 `wp eval-file scripts/wordpress-smoke.php`。源码契约比较会规范化 CRLF/LF 换行，以兼容 Windows 安装包；实际主题源码和运行时行为不受影响。
 
+CI配置覆盖PHP8.0/8.1/8.2/8.3/8.4/8.5，以及WordPress7.0/7.1与这六版PHP的十二组smoke。按当前提交的CI结果确认实际通过范围，旧验证记录保留原版本和日期。
+
+PHP版本升级的独立回归：
+
+```bash
+php scripts/tests/php-runtime.php
+```
+
+需要cURL扩展；以`E_ALL`诊断运行真实Parsedown标题、表格、普通文本与链接解析，并通过临时本地文件执行Meting真实cURL读取及释放。无需WordPress、数据库或远程音乐服务；PHP警告与弃用直接失败，临时文件自动清理。PHP8.0仍显式开启反射方法访问，8.1起省略无效调用，避免8.5弃用。此检查不证明远程音乐平台可用性。
+
 核心资源检查使用独立临时目录中的构建信息，覆盖完整源码提交、缺失或无效来源、显式固定版本覆盖、旧本地/远程开关与缓存参数。检查读取真实构建解析函数，完成后恢复过滤器并清理自身夹具，不请求CDN；发布后的远程文件仍需单独核对，见[构建资源引用](../../.agents/notes/implemented/architecture/2026-10-09-core-resource-build-reference.md)。
 
 ## 分类图片后台初始化
@@ -25,7 +35,7 @@ python scripts/tests/commit-policy.py php
 php scripts/tests/categories-images.php
 ```
 
-独立PHP进程加载真实`inc/categories-images.php`，以内存选项和钩子替身覆盖未保存配置、非数组配置、有效/无效排除列表及内置/自定义分类注册。弃用提示等PHP诊断直接使测试失败，并检查初始化不写回选项。无需WordPress、数据库或下载依赖，CI在PHP8.0/8.1/8.2构建矩阵中执行；不替代实站后台心跳与日志验收。
+独立PHP进程加载真实`inc/categories-images.php`，以内存选项和钩子替身覆盖未保存配置、非数组配置、有效/无效排除列表及内置/自定义分类注册。弃用提示等PHP诊断直接使测试失败，并检查初始化不写回选项。无需WordPress、数据库或下载依赖，CI在上述六版PHP构建矩阵中执行；不替代实站后台心跳与日志验收。
 
 ## 前台依赖一致性
 

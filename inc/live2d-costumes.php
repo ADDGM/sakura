@@ -141,7 +141,7 @@ function sakura_live2d_costume_part_size($file, $item)
 /** One 256 KiB range per request; a verified whole-file response is also accepted. */
 function sakura_live2d_costume_download($catalog, $directory, $index, $force = false)
 {
-    if (!isset($catalog['costumes'][$index])) return new WP_Error('index', __('Invalid costume download request.', 'sakura'));
+    if (!is_int($index) || !isset($catalog['costumes'][$index])) return new WP_Error('index', __('Invalid costume download request.', 'sakura'));
     $item = $catalog['costumes'][$index];
     $file = $directory['path'] . '/' . $item['texture'];
     $complete = array('complete' => true, 'bytes' => $item['bytes'], 'size' => $item['bytes']);

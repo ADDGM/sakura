@@ -149,7 +149,11 @@ try {
     $progress = sakura_live2d_costume_request('pio', 'status');
     verify(!isset($progress['parts'][0]) && $progress['bytes'] === $catalog['costumes'][0]['bytes'], '已校验文件不重复计入分片');
     verify(is_wp_error(sakura_live2d_costume_request('pio', 'finish')), '部分下载不能激活');
-    verify(is_wp_error(sakura_live2d_costume_request('pio', 'download', null)) && is_wp_error(sakura_live2d_costume_request('pio', 'download', 999)), '拒绝非法索引');
+    foreach (array(null, -1, 999, '0', false, 0.5, array(), new stdClass()) as $invalidIndex) {
+        $before = count($requests);
+        verify(sakura_live2d_costume_request('pio', 'download', $invalidIndex)->code === 'index', '拒绝非法索引');
+        verify(count($requests) === $before, '非法索引不触发网络请求');
+    }
     $lock = fopen($directory['path'] . '/.lock', 'c');
     flock($lock, LOCK_EX);
     verify(sakura_live2d_costume_request('pio', 'download', 1)->code === 'busy', '两个下载操作不同时写入');

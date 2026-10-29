@@ -18,7 +18,7 @@ Status: implemented
 
 ## Existing record audit
 
-- [兼容性证据](../../implemented/testing/2026-10-07-compatibility-evidence.md)：部分重叠；本篇接管旧版本分支保留策略，六组支持版本与证据层级继续有效。
+- [兼容性证据](../../implemented/testing/2026-10-07-compatibility-evidence.md)：部分重叠；本篇接管旧版本分支保留策略，支持基线与证据层级继续有效；当前矩阵由兼容性笔记维护。
 - [jQuery 迁移](../../implemented/architecture/2026-10-08-jquery4-and-plugin-migration.md)：部分重叠；该篇负责前台合并包，本篇处理独立登录依赖及共用注册脚本。
 - [后台设置边界](../../implemented/architecture/2026-10-07-admin-settings-boundary.md)：部分重叠；只退役未使用样式，存储与当前配色规则继续有效。
 - [音乐缓存](../../implemented/architecture/2026-10-07-music-cache-contract.md)：相邻契约；本篇不改变音乐鉴权与缓存。

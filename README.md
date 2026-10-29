@@ -4,7 +4,7 @@
 
 ![Sakura](screenshot.jpg)
 
-![PHP version](https://img.shields.io/badge/PHP-8.0--8.2-4F5B93.svg?style=flat-square&logo=php)
+![PHP version](https://img.shields.io/badge/PHP-8.0--8.5-4F5B93.svg?style=flat-square&logo=php)
 ![WP version](https://img.shields.io/badge/WordPress-7.0--7.1-0073aa.svg?style=flat-square&logo=wordpress)
 [![GitHub release](https://img.shields.io/github/v/release/ADDGM/sakura.svg?style=flat-square&logo=github)](https://github.com/ADDGM/sakura/releases/latest)
 [![Github commits (since latest release)](https://img.shields.io/github/commits-since/ADDGM/sakura/latest/develop.svg?style=flat-square&logo=git&color=important)](https://github.com/ADDGM/sakura/commits/develop)
@@ -26,13 +26,15 @@
 
 ### 当前维护版本
 
-`develop` 分支用于兼容性升级，目标环境为 WordPress 7.0/7.1 与 PHP 8.0/8.1/8.2。推送到 `develop` 后，GitHub Actions 会生成可下载的测试主题包；发布版本时会根据中文 Git 提交自动生成中文更新记录。
+`develop` 分支用于兼容性升级，目标环境为 WordPress 7.0/7.1 与 PHP 8.0/8.1/8.2/8.3/8.4/8.5。推送到 `develop` 后，GitHub Actions 会生成可下载的测试主题包；发布版本时会根据中文 Git 提交自动生成中文更新记录。
+
+生产环境请使用仍受[PHP官方支持](https://www.php.net/supported-versions.php)的分支并安装最新安全更新。PHP 8.0/8.1 仅保留主题兼容回归，不代表它们仍获官方安全维护。2026-10-21 的[PHP安全公告](https://www.php.net/index.php)要求更新到 8.2.35、8.3.36、8.4.27、8.5.12 或后续修复版本；Windows 还需核对 2026-10-26 的 `-1` 依赖重建包。主题兼容补丁不能替代服务器 PHP 更新。
 
 主题头中的兼容性字段含义如下：
 
 - `Requires at least: 7.0` 是允许安装的最低 WordPress 版本，不是唯一支持的版本。
 - `Tested up to: 7.1` 表示本维护版本已完成测试的最高 WordPress 版本。
-- `Requires PHP: 8.0` 是允许安装的最低 PHP 版本；当前 CI 会验证 PHP 8.0、8.1 和 8.2。
+- `Requires PHP: 8.0` 是允许安装的最低 PHP 版本；当前 CI 配置验证 PHP 8.0、8.1、8.2、8.3、8.4、8.5，并与 WordPress 7.0/7.1 组成十二组烟雾测试。实际通过状态以对应提交的工作流结果为准。
 - Release 中的主题 ZIP 是通用安装包，不按 WordPress 或 PHP 版本分别构建；只要运行环境满足最低版本并处于已验证矩阵内，即可使用同一个包。
 
 CI 会从 `style.css` 自动读取源码基准版本，并使用 `<源码版本>-dev.<运行编号>` 作为测试包版本。Release 包使用去掉 `v` 前缀后的标签版本，例如标签 `v3.5.0-beta.2` 或 `v3.5.0-rc.1` 分别对应主题版本 `3.5.0-beta.2` 或 `3.5.0-rc.1`；发布前会校验标签核心版本与源码基准版本一致。
@@ -41,17 +43,20 @@ WordPress 上传主题后会读取并显示完整版本字符串，因此测试�
 
 ### 构建包、测试包与发布包
 
-CI 会在每次推送 `develop` 后使用 PHP 8.0、8.1、8.2 分别执行同一套检查，因此同一运行编号会出现三个 Actions Artifact：
+CI 会在每次推送 `develop` 后使用 PHP 8.0–8.5 分别执行同一套检查，因此全部构建成功时，同一运行编号会出现六个 Actions Artifact：
 
 ```text
 sakura-ci-php8.0-19
 sakura-ci-php8.1-19
 sakura-ci-php8.2-19
+sakura-ci-php8.3-19
+sakura-ci-php8.4-19
+sakura-ci-php8.5-19
 ```
 
-这三个名称表示“该包由哪个 PHP 矩阵任务验证”，不是三个功能不同或只能运行在对应 PHP 版本上的主题。主题是 PHP 源代码，不包含按 PHP 版本编译的二进制文件；三个任务生成的主题内容原则上相同，区别主要是 `build-info.txt` 中记录的验证环境和 Artifact 名称。
+这些名称表示“该包由哪个 PHP 矩阵任务验证”。主题是 PHP 源代码，不包含按 PHP 版本编译的二进制文件；六个任务生成的主题内容原则上相同，区别主要是 `build-info.txt` 中记录的验证环境和 Artifact 名称。
 
-如果测试服务器使用 PHP 8.1，可以优先下载 `sakura-ci-php8.1-19`，这样下载记录和服务器环境一致；使用另外两个 CI 包通常也可以安装，但不能把它们理解成“PHP 8.0 专用包”或“PHP 8.2 专用包”。
+如果测试服务器使用 PHP 8.4，可以优先下载 `sakura-ci-php8.4-19`，这样下载记录和服务器环境一致。同次提交的其他矩阵包也使用相同主题源码；安装前仍需确认该提交在目标 PHP 版本上的检查通过。
 
 下载 GitHub Actions Artifact 后，还会再得到一个外层下载压缩包。部署时应解压外层 Artifact，再把里面的主题 ZIP 上传到 WordPress：
 
@@ -82,7 +87,7 @@ sakura-3.5.0-beta.4.zip.sha256
 release-notes.zh-CN.md
 ```
 
-标签包只有一个，是因为 Release 发布的是同一份通用主题源代码；PHP/WordPress 矩阵的职责是验证兼容性，不是为每个环境制作不同安装包。Release 包由 PHP 8.2 的打包任务生成，但仍适用于已验证的 WordPress 7.0/7.1 与 PHP 8.0/8.1/8.2 环境。正式标签 `v3.5.0`、Beta 标签和 RC 标签的 ZIP 结构相同，区别在于版本号和 Release 是否标记为预发布。RC 只用于发布前最终回归，不能视为正式版。
+标签包只有一个，是因为 Release 发布的是同一份通用主题源代码；PHP/WordPress 矩阵负责验证兼容性。Release 包由 PHP 8.2 的打包任务生成，目标矩阵扩展为 WordPress 7.0/7.1 与 PHP 8.0–8.5；具体版本的支持证据以该标签提交实际通过的 CI 为准，旧 Release 不因分支矩阵扩展而自动获得新验证。正式标签 `v3.5.0`、Beta 标签和 RC 标签的 ZIP 结构相同，区别在于版本号和 Release 是否标记为预发布。RC 只用于发布前最终回归，不能视为正式版。
 
 各类文件的使用建议如下：
 
